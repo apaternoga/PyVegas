@@ -13,7 +13,7 @@ Dlatego w tym pliku po krotce wytlumacze Ci co masz robic i co robia poszczegoln
 
 /assets
     TU WRZUCAMY GRAFIKI I DZWIEKI
-    Uzywajcie nazw zrozumialych dla reszty temu, bez spacji, z malej litery.
+    Uzywajcie nazw zrozumialych dla reszty teamu, bez spacji, z malej litery.
     ZLE: "pic 3.png"
     DOBRZE: "ace_spades.png"
     Gramy zespolo to nie komplikumy sobie roboty, wpisanie poprawnej nazwy zajmnie wam kilka sekund wiecej, a oszczedzi nieprzyjemnosci.
