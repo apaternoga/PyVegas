@@ -19,7 +19,10 @@ class CrashGame :
         # Stan portfela (Tymczasowy, docelowo pobierany z globalnego gracza)
         self.balance = 1000
         self.current_bet = 0
-        
+      
+        # Historia wynikow
+        self.game_history = []
+  
         #Przyciski bet i cashout
         self.btn_bet_rect = pygame.Rect(430, 500, 150, 50)
         self.btn_cash_rect = pygame.Rect(670, 500, 150, 50)
@@ -53,8 +56,7 @@ class CrashGame :
         self.error_msg = msg
         self.error_timer = 120
 
-    def choose_bet(self):
-        pass
+ 
     def _generate_crash_point(self) :
         """
         Generuje punkt Crash zgodnie z algorytmem Bustabit (Open Source).
@@ -96,7 +98,12 @@ class CrashGame :
             
     def cash_out(self) :
         """Gracz wypłaca środki w trakcie lotu"""
-        if self.state == "RUNNING" :
+        if self.state == "RUNNING":
+
+            # Dodanie do historii obecnego wyniku przy sukcesie
+
+            self.game_history.append((self.current_multiplier, True))
+            if len(self.game_history) > 10: self.game_history.pop(0)
             self.state = "SUCCESS"
             self.cashout_point = self.current_multiplier
             win_amount = int(self.current_bet * self.cashout_point)
@@ -124,6 +131,8 @@ class CrashGame :
             # Sprawdzenie czy nastąpił wybuch
             if self.current_multiplier >= self.target_crash :
                 self.current_multiplier = self.target_crash  # Ustawiamy na wynik końcowy
+                self.game_history.append((self.target_crash, False))  # Dodanie do historii wyniku przy crashu
+                if len(self.game_history) > 10: self.game_history.pop(0) # Tylko 10 ostatnich wynikow naraz
                 self.state = "CRASHED"
                 self.growth_speed = 0.01  # Reset prędkości na przyszłość
 
@@ -169,6 +178,16 @@ class CrashGame :
         """Rysowanie wszystkiego na ekranie"""
         self.screen.fill(BLACK)
 
+
+        # Rysowanie historii
+        history_x = 340
+        for val, is_success in self.game_history:
+            # Kolor zalezny od tego, czy gracz zdazyl wyplacic
+            color = GREEN if is_success else RED
+
+            txt = self.font_small.render(f"{val:.2f}x", True, color)
+            self.screen.blit(txt, (history_x, 110))
+            history_x += txt.get_width() + 20
 
         # Rysowanie wykresu
         line_color = WHITE
@@ -298,5 +317,4 @@ if __name__ == "__main__" :
     run_crash_game(screen)
 
     pygame.quit()
-
 
