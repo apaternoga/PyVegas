@@ -254,12 +254,17 @@ class Hand:
         self.value = 0
         self.aces = 0
 
-    # dodajemy karte do reki gracza badz dealera, jesli to as dopasowywujemy najkorzystniejsza wartosc
     def add_card(self, card):
         self.cards.append(card)
-        self.value += values[card.rank]
-        if card.rank == "Ace":
-            self.aces += 1
+        self.calculate_value()
+
+    def calculate_value(self):
+        self.value = 0
+        self.aces = 0
+        for card in self.cards:
+            self.value += values[card.rank]
+            if card.rank == "Ace":
+                self.aces += 1
         self.adjust_for_ace()
 
     # As moze przyjmowac rozne wartosci, ta funkcja odpowiada za to zeby dopasowac najkorzystniejsza wartosc
@@ -376,27 +381,33 @@ class BlackjackGame:
         if self.check_initial_blackjack():
             return
 
-    def check_initial_blackjack(self):
-        player_bj = self.player_hands[0].value == 21
+    def check_initial_blackjack(self, hand_index=0):
+
+        player_bj = self.player_hands[hand_index].value == 21
         dealer_bj = self.dealer_hand.value == 21
 
-        if player_bj and dealer_bj:
-            # Remis: Oddajemy zabraną stawkę
-            self.chips += self.current_bet
-            self.message = "Remis (Push)! Obaj macie Blackjacka."
-            self.state = "game_over"
-            return True
-        elif player_bj:
-            # Wygrana: Oddajemy stawkę + 1.5 stawki wygranej
-            win_amount = self.current_bet + int(self.current_bet * 1.5)
-            self.chips += win_amount
-            self.message = "Blackjack! Wygrywasz 3:2!"
-            self.state = "game_over"
-            return True
-        elif dealer_bj:
-            # Przegrana: Nic nie robimy, pieniądze już zabrane w start_round
-            pass
-        return False
+        if len(self.player_hands) == 1:
+            if player_bj and dealer_bj:
+                # Remis: Oddajemy zabraną stawkę
+                self.chips += self.current_bet
+                self.message = "Remis (Push)! Obaj macie Blackjacka."
+                self.state = "game_over"
+                return True
+            elif player_bj:
+                # Wygrana: Oddajemy stawkę + 1.5 stawki wygranej
+                win_amount = self.current_bet + int(self.current_bet * 1.5)
+                self.chips += win_amount
+                self.message = "Blackjack! Wygrywasz 3:2!"
+                self.state = "game_over"
+                return True
+            elif dealer_bj:
+                # Przegrana: Nic nie robimy, pieniądze już zabrane w start_round
+                pass
+            return False
+        else:
+            if player_bj:
+                return True
+            return False
 
     # funkcja odpowiadajaca za wcisniecia klawiszy ORAZ myszki
     def handle_input(self, event):
@@ -504,6 +515,7 @@ class BlackjackGame:
         self.chips -= self.current_bet
         # Zabieramy jedna karte z obecnej reki, by stworzyc nowa
         card_to_move = current_hand.cards.pop()
+        current_hand.calculate_value() # Aktualizujemy wartosc obecnej reki
         new_hand = Hand()
         new_hand.add_card(card_to_move)
         new_hand.bet = self.current_bet
@@ -520,6 +532,12 @@ class BlackjackGame:
         if self.current_hand_index < len(self.player_hands) - 1:
             self.current_hand_index += 1
             self.message = f"Reka {self.current_hand_index + 1} - Twoj ruch"
+            next_hand = self.player_hands[self.current_hand_index]
+            if self.check_initial_blackjack(self.current_hand_index):
+                self.draw()
+                pygame.display.update()
+                pygame.time.wait(500)
+                self.next_hand_or_dealer()
         else:
             self.state = "dealer_turn"
             self.dealer_logic()
@@ -541,9 +559,20 @@ class BlackjackGame:
             pygame.time.wait(1000)
         # sprawdzanie warunkow wygranej/przegranej
         final_message = ""
+        dealer_is_bj = self.dealer_hand.value == 21 and len(self.dealer_hand.cards) == 2
+        
         for i, hand in enumerate(self.player_hands):
+            player_is_bj = hand.value == 21 and len(hand.cards) == 2
             if hand.value > 21:
-                final_message += f"Reka {i+1}: Fura! "
+                final_message += f"Ręka {i+1}: Fura! "
+            elif player_is_bj:
+                if dealer_is_bj:
+                    self.chips += hand.bet
+                    final_message += f"Ręka {i+1}: Remis (BJ). "
+                else:
+                    win_amount = hand.bet + int(hand.bet * 1.5)
+                    self.chips += win_amount
+                    final_message += f"Ręka {i+1}: Blackjack (3:2)! "
             elif self.dealer_hand.value > 21:
                 self.chips += hand.bet * 2
                 final_message += f"Reka {i+1}: Wygrana! "
