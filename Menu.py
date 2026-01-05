@@ -1,3 +1,4 @@
+import os
 import pygame
 import sys
 from games import blackjack
@@ -14,19 +15,44 @@ BLACK = (0, 0, 0)
 GRAY = (200, 200, 200)
 DARK_GRAY = (150, 150, 150) # Dodatkowy kolor dla efektu najechania
 
+try:
+    sound_hover = pygame.mixer.Sound(os.path.join("assets", "hover.wav"))
+    sound_click = pygame.mixer.Sound(os.path.join("assets", "click.wav"))
+    sound_hover.set_volume(0.5)
+    sound_click.set_volume(0.5)
+except FileNotFoundError:
+    print("Ostrzeżenie: Nie znaleziono plików dźwiękowych w folderze assets!")
+    class DummySound:
+        def play(self): pass
+    sound_hover = DummySound()
+    sound_click = DummySound()
+
 # --- KLASA PRZYCISKU (Tu pracuje osoba od grafiki i logiki) ---
 class Button:
     def __init__(self, x, y, width, height, text):
         self.rect = pygame.Rect(x, y, width, height)
         self.text = text
         self.color = GRAY
+
+        self.is_hovered = False
         
     def draw(self, surface):
         # Pobierz pozycję myszki
         mouse_pos = pygame.mouse.get_pos()
         
         # LOGIKA GRAFIKA: Zmiana koloru jeśli myszka najeżdża na przycisk
-        current_color = DARK_GRAY if self.rect.collidepoint(mouse_pos) else self.color
+        # zmiana: dodanie logiki dźwiękowej
+        if self.rect.collidepoint(mouse_pos): 
+            current_color = DARK_GRAY
+            if not self.is_hovered:
+                sound_hover.play()
+                self.is_hovered = True
+        else:   
+            current_color = self.color
+            self.is_hovered = False
+
+
+
         
         # Rysowanie prostokąta
         pygame.draw.rect(surface, current_color, self.rect)
@@ -40,6 +66,7 @@ class Button:
         # LOGIKA PROGRAMISTY: Sprawdź, czy kliknięto w ten przycisk
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if self.rect.collidepoint(event.pos):
+                sound_click.play()
                 return True
         return False
 
