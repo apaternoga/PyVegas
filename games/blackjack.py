@@ -27,10 +27,10 @@ class Card:
         pass
     
     #funkcja odpowiedzialna za wyswietlanie karty na ekranie
-    def draw(self,screen,x,y,hidden= False):
+    def draw(self,screen,x,y,w=100,h=150,hidden= False):
         
         #tutaj rysuje tlo karty z czarnym obrysem
-        rect= pygame.Rect(x,y,100,150)
+        rect= pygame.Rect(x,y,w,h)
         pygame.draw.rect(screen,WHITE,rect,border_radius=5)
         pygame.draw.rect(screen,BLACK,rect,2,border_radius=5)
         
