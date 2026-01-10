@@ -45,11 +45,43 @@ class Card:
     def __init__(self, suit, rank):
         self.suit = suit
         self.rank = rank
+        # karta sie teraz pojawia poza ekranem
+        self.x = -150
+        self.y = 300
+        # animacja bedzie od self.x itd do target
+        self.target_x = -150
+        self.target_y = 300
+        # predkosc 0.1 to 10% dystansu na klatke
+        self.speed = 0.1
 
     def __str__(self):
         return f"{self.rank} of {self.suit}"
 
-    def draw(self, screen, x, y, hidden=False):
+    # nowa funkcja do obliczania ruchu
+    def update(self):
+        #olbiczam roznice miedzy celem a obecna pozycja
+        dx = self.target_x - self.x
+        dy = self.target_y - self.y
+        
+        # jesli jestesmy blisko celu to ustawiamy pozycje idealnie, zeby nie bylo efektu drgania karty
+        if abs(dx) < 1 and abs(dy) < 1:
+            self.x = self.target_x
+            self.y = self.target_y
+        else:
+            self.x += dx * self.speed
+            self.y += dy * self.speed
+
+    # ZMIANA: draw teraz pobiera target zamiast zwyklego x i y
+    def draw(self, screen, target_x, target_y, hidden=False):
+        # ustawiamy cel i aktualizujemy pozycje
+        self.target_x = target_x
+        self.target_y = target_y
+        self.update()
+
+        # do rysowania uzywamy aktualnej (tej aktualizowanej)
+        x = int(self.x)
+        y = int(self.y)
+
         # Rysujemy cień: daje on efekt głębi
         shadow_rect = pygame.Rect(x + 2, y + 2, 100, 150)
         pygame.draw.rect(screen, (0, 0, 0, 100), shadow_rect, border_radius=8)
@@ -242,7 +274,12 @@ class Deck:
     def deal(self):
         if len(self.deck) == 0:
             self.create_shoe()
-        return self.deck.pop()
+        
+        card = self.deck.pop()
+        # reset pozycji karty, aby wylatywala z lewej strony
+        card.x = -150
+        card.y = 300
+        return card
 
     def needs_shuffle(self):
         return len(self.deck) < (52 * self.num_decks * 0.25)
@@ -274,11 +311,17 @@ class Hand:
             self.aces -= 1
 
     # iterujac po decku, rysujemy obok siebie karty w przesunieciu o 10 pixeli od poprzedniej karty, (bo karta ma 100)
+    # ZMIANA: Przekazujemy cel (target), a nie sztywna pozycje. Karta sie zanimuje.
     def draw(self, screen, start_x, start_y, hide_first=False):
         for i, card in enumerate(self.cards):
             is_hidden = hide_first and i == 0
-            card.draw(screen, start_x + (i * 110), start_y, hidden=is_hidden)
-
+            
+            # obliczamy gdzie karta POWINNA sie znalezc
+            target_x = start_x + (i * 110)
+            target_y = start_y
+            
+            # przekazujemy to do karty, ona sama obsluguje ruch w strone celu
+            card.draw(screen, target_x, target_y, hidden=is_hidden)
 
 class BlackjackGame:
     def __init__(self, screen):
