@@ -44,6 +44,8 @@ except FileNotFoundError:
 
 class Button:
     def __init__(self, x, y, width, height, text):
+        if x == -1:
+            x = (800 - width) // 2 # Jeśli podasz x = -1, przycisk sam się wyśrodkuje
         self.rect = pygame.Rect(x, y, width, height)
         self.text = text
         self.color = GRAY
@@ -74,7 +76,7 @@ class Button:
         surface.blit(text_surf, text_rect)
 
     def is_clicked(self, event):
-        # LOGIKA PROGRAMISTY: Sprawdź, czy kliknięto w ten przycisk
+        # Sprawdź, czy kliknięto w ten przycisk
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if self.rect.collidepoint(event.pos):
                 sound_click.play()
@@ -157,46 +159,49 @@ class Button2:
         return False
 
 # TWORZENIE PRZYCISKÓW
-btn_start = Button(300, 250, 200, 50, "START")
-btn_exit = Button(300, 350, 200, 50, "WYJŚCIE")
-btn_settings = Button(300, 450, 200, 50, "USTAWIENIA")
+btn_start = Button(-1, 250, 200, 50, "START")
+btn_exit = Button(-1, 350, 200, 50, "WYJŚCIE")
+btn_settings = Button(-1, 450, 200, 50, "USTAWIENIA")
 
 btn_bj = Button2(50, 200, 200, 200, "Blackjack", icon_renderer=BlackjackIcon())
 btn_g2 = Button2(300, 200, 200, 200, "Gra 2")
 btn_g3 = Button2(550, 200, 200, 200, "Gra 3")
-btn_back = Button(250, 500, 300, 60, "COFNIJ")
-btn_licenses = Button(250, 150, 300, 50, "LICENCJE")
-btn_instructions = Button(250, 220, 300, 50, "INSTRUKCJE")
-btn_fullscreen = Button(250, 290, 300, 50, "PEŁNY EKRAN")
+btn_back = Button(-1, 500, 300, 60, "COFNIJ")
+btn_licenses = Button(-1, 150, 400, 50, "LICENCJE")
+btn_instructions = Button(-1, 220, 400, 50, "INSTRUKCJE")
+btn_fullscreen = Button(-1, 290, 400, 50, "PEŁNY EKRAN/OKNO")
 btn_yes = Button(250, 300, 140, 50, "TAK")
 btn_no = Button(410, 300, 140, 50, "NIE")
+btn_music_menu = Button(-1, 360, 400, 50, "MUZYKA")
+btn_track1 = Button(150, 200, 240, 50, "UTWÓR 1")
+btn_track2 = Button(410, 200, 240, 50, "UTWÓR 2")
+btn_stop_music = Button(-1, 420, 340, 50, "WYCISZ MUZYKĘ")
+
+# Zmienne dla muzyki
+volume = 0.5  # Startowa głośność (50%)
+current_track = "Brak" 
 
 state = "MENU"
 
 active_game = None
 
-def draw_settings(): # Funkcja do rysowania 'USTAWIENIA'
+def draw_settings():
     if bg_image:
         screen.blit(bg_image, (0, 0))
     else:
         screen.fill(GRAY)
         
-    # Tytuł okna 
-    settings_title = font.render("USTAWIENIA", True, WHITE)
-    screen.blit(settings_title, (310, 50))
+    # WYŚRODKOWANIE TYTUŁU
+    settings_title_surf = font.render("USTAWIENIA", True, WHITE)
+    settings_title_rect = settings_title_surf.get_rect(center=(400, 70))
+    screen.blit(settings_title_surf, settings_title_rect)
     
-    # Rysowanie przycisków opcji
     btn_instructions.draw(screen)
     btn_fullscreen.draw(screen)
     btn_licenses.draw(screen)
-
-    # Przycisk powrotu 
+    btn_music_menu.draw(screen)
     btn_back.draw(screen)
     
-    # Miejsce na mikser głośności 
-   # vol_text = font.render(f"Głośność: {int(volume * 100)}%", True, WHITE)
-   # screen.blit(vol_txt, (300, 380))
-
 def draw_menu(): # Rysowanie MENU 
     if bg_image:
         screen.blit(bg_image, (0, 0))
@@ -228,6 +233,36 @@ def draw_exit(): # Funkcja, która potwierdza wyjście z gry
     btn_yes.draw(screen)
     btn_no.draw(screen)
 
+def draw_settings_music():
+    if bg_image:
+        screen.blit(bg_image, (0, 0))
+    else:
+        screen.fill(GRAY)
+    
+    # WYŚRODKOWANIE TYTUŁU
+    title_surf = font.render("MUZYKA", True, WHITE)
+    # Tworzymy prostokąt napisu i ustawiamy jego środek na 400
+    title_rect = title_surf.get_rect(center=(400, 70)) 
+    screen.blit(title_surf, title_rect)
+    
+    # 1. Mikser
+    vol_surf = font.render(f"Głośność: {int(volume * 100)}%", True, WHITE)
+    vol_rect = vol_surf.get_rect(center=(400, 140))
+    screen.blit(vol_surf, vol_rect)
+    
+    # Pasek głośności 
+    pygame.draw.rect(screen, BLACK, (200, 170, 400, 20))
+    pygame.draw.rect(screen, (52, 152, 219), (200, 170, 400 * volume, 20))
+    
+    # 2. Informacja o utworze 
+    info_surf = font.render(f"Aktualnie gra: {current_track}", True, WHITE)
+    info_rect = info_surf.get_rect(center=(400, 270))
+    screen.blit(info_surf, info_rect)
+    
+    btn_track1.draw(screen)
+    btn_track2.draw(screen)
+    btn_stop_music.draw(screen)
+    btn_back.draw(screen)
 
 def draw_game_placeholder(): # Funkcja do blackjacka 
     if bg_image:
@@ -287,9 +322,6 @@ while running:
             
             if btn_settings.is_clicked(event):
                 state = "SETTINGS"
-            
-            if btn_settings.is_clicked(event):
-                state = "SETTINGS"
 
             if btn_exit.is_clicked(event):
                 state = "EXIT" 
@@ -302,8 +334,7 @@ while running:
             if btn_no.is_clicked(event):
                 state = "MENU" # Wtedy wracamy do menu głównego
 
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     state = "MENU" # ESC też anuluje wyjście
 
             if btn_start.is_clicked(event):
@@ -327,6 +358,49 @@ while running:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     state = "MENU"
+            # OGÓLNE USTAWIENIA
+        elif state == "SETTINGS":
+            if btn_music_menu.is_clicked(event):
+                state = "SETTINGS_MUSIC"
+            if btn_back.is_clicked(event):
+                state = "MENU"
+            if btn_fullscreen.is_clicked(event):
+                print("Przełączam na tryb Pełnoekranowy")
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                state = "MENU"
+
+        # SEKCJA MUZYKI
+        elif state == "SETTINGS_MUSIC":
+            if btn_back.is_clicked(event):
+                state = "SETTINGS" # Wraca do ustawień, a nie do menu!
+            
+            # Sterowanie głośnością 
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RIGHT:
+                    volume = min(1.0, volume + 0.1)
+                    pygame.mixer.music.set_volume(volume)
+                if event.key == pygame.K_LEFT:
+                    volume = max(0.0, volume - 0.1)
+                    pygame.mixer.music.set_volume(volume)
+
+            # Wybór utworów
+            if btn_track1.is_clicked(event):
+                try:
+                    pygame.mixer.music.load(os.path.join("assets", "music1.mp3"))
+                    pygame.mixer.music.play(-1)
+                    current_track = "Utwór 1"
+                except: current_track = "Błąd pliku 1"
+
+            if btn_track2.is_clicked(event):
+                try:
+                    pygame.mixer.music.load(os.path.join("assets", "music2.mp3"))
+                    pygame.mixer.music.play(-1)
+                    current_track = "Utwór 2"
+                except: current_track = "Błąd pliku 2"
+                
+            if btn_stop_music.is_clicked(event):
+                pygame.mixer.music.stop()
+                current_track = "Wyciszono"
 
         elif state == "GRA":
             if event.type == pygame.KEYDOWN:
@@ -362,6 +436,8 @@ while running:
         draw_settings()
     elif state == "GRY":
         draw_game_placeholder()
+    elif state == "SETTINGS_MUSIC":
+        draw_settings_music()
     elif state == "GRA":
         if active_game:
             active_game.draw()
