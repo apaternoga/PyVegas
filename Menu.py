@@ -9,6 +9,7 @@ pygame.init()
 screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Nasza Gra - Menu")
 font = pygame.font.SysFont("Arial", 40)
+font_small = pygame.font.SysFont("Arial", 35)
 
 # Kolory
 WHITE = (255, 255, 255)
@@ -16,7 +17,7 @@ BLACK = (0, 0, 0)
 GRAY = (200, 200, 200)
 DARK_GRAY = (150, 150, 150)  # Dodatkowy kolor dla efektu najechania
 
-#wczytanie dzwiekow
+# wczytanie dzwiekow
 try:
     sound_hover = pygame.mixer.Sound(os.path.join("assets", "hover.wav"))
     sound_click = pygame.mixer.Sound(os.path.join("assets", "click.wav"))
@@ -40,8 +41,6 @@ try:
 except FileNotFoundError:
     print("Ostrzeżenie: Nie znaleziono pliku tlo_menu.jpg w assets")
 
-
-# --- KLASA PRZYCISKU (Tu pracuje osoba od grafiki i logiki) ---
 class Button:
     def __init__(self, x, y, width, height, text):
         self.rect = pygame.Rect(x, y, width, height)
@@ -158,7 +157,7 @@ class Button2:
 
 # TWORZENIE PRZYCISKÓW
 btn_start = Button(300, 250, 200, 50, "START")
-btn_exit = Button(300, 350, 200, 50, "EXIT")
+btn_exit = Button(300, 350, 200, 50, "WYJŚCIE")
 btn_autorzy = Button(300, 450, 200, 50, "CREDITS")
 
 btn_bj = Button2(50, 200, 200, 200, "Blackjack", icon_renderer=BlackjackIcon())
@@ -176,12 +175,36 @@ def draw_menu():
         screen.blit(bg_image, (0, 0))
     else:
         screen.fill(WHITE)
-    title_text = font.render("MENU GŁÓWNE", True, WHITE)
-    screen.blit(title_text, (275, 100))
-
+    
     btn_start.draw(screen)
     btn_exit.draw(screen)
     btn_autorzy.draw(screen)
+
+
+# Przyciski do komunikatu wyjścia
+btn_yes = Button(250, 300, 140, 50, "TAK")
+btn_no = Button(410, 300, 140, 50, "NIE")
+
+def draw_exit(): # Funkcja, która potwierdza wyjście z gry 
+   
+    draw_menu()
+
+    # Tworzenie półprzezroczystej nakładki
+    overlay = pygame.Surface((800, 600))
+    overlay.set_alpha(180) 
+    overlay.fill((0, 0, 0))
+    screen.blit(overlay, (0, 0))
+    
+    # Rysowanie ramki komunikatu jako nowego ekranu
+    pygame.draw.rect(screen, WHITE, (100, 200, 600, 200), border_radius=15)
+    pygame.draw.rect(screen, BLACK, (100, 200, 600, 200), 3, border_radius=15)
+    
+    text = font_small.render("CZY NA PEWNO CHCESZ WYJŚĆ Z GRY?", True, BLACK)
+    text_rect = text.get_rect(center=(400, 250))
+    screen.blit(text, text_rect)
+    
+    btn_yes.draw(screen)
+    btn_no.draw(screen)
 
 
 def draw_game_placeholder():
@@ -237,6 +260,26 @@ while running:
             running = False
 
         if state == "MENU":
+            if btn_start.is_clicked(event):
+                state = "GRY"
+
+            if btn_autorzy.is_clicked(event):
+                state = "CREDITS"
+
+            if btn_exit.is_clicked(event):
+                state = "EXIT" 
+
+        # KOMUNIKAT WYJŚCIA
+        elif state == "EXIT":
+            if btn_yes.is_clicked(event):
+                running = False # Tutaj ostatecznie zamykamy grę
+            
+            if btn_no.is_clicked(event):
+                state = "MENU" # Wtedy wracamy do menu głównego
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    state = "MENU" # ESC też anuluje wyjście
 
             if btn_start.is_clicked(event):
                 state = "GRY"
@@ -281,6 +324,8 @@ while running:
 
     if state == "MENU":
         draw_menu()
+    elif state == "EXIT":
+        draw_exit()
     elif state == "GRY":
         draw_game_placeholder()
     elif state == "GRA":
