@@ -6,10 +6,11 @@ from games.blackjack import Card
 
 # 1. Inicjalizacja ekranu
 pygame.init()
-screen = pygame.display.set_mode((800, 600))
+screen = pygame.display.set_mode((800, 600), pygame.SCALED)
 pygame.display.set_caption("Nasza Gra - Menu")
 font = pygame.font.SysFont("Arial", 38)
 font_small = pygame.font.SysFont("Arial", 35)
+font_smaller = pygame.font.SysFont("Arial", 30)
 
 # Kolory
 WHITE = (255, 255, 255)
@@ -180,10 +181,33 @@ btn_stop_music = Button(-1, 420, 340, 50, "WYCISZ MUZYKĘ")
 # Zmienne dla muzyki
 volume = 0.5  # Startowa głośność (50%)
 current_track = "Brak" 
+is_fullscreen = False  # Zmienna śledząca tryb ekranu
 
 state = "MENU"
 
 active_game = None
+
+def draw_fullscreen():
+    draw_settings() # Rysowanie ustawień w tle
+
+    # Nakładka przyciemniająca
+    overlay = pygame.Surface((800, 600))
+    overlay.set_alpha(180)
+    overlay.fill((0, 0, 0))
+    screen.blit(overlay, (0, 0))
+    
+    # Ramka komunikatu
+    pygame.draw.rect(screen, WHITE, (100, 200, 600, 200), border_radius=15)
+    pygame.draw.rect(screen, BLACK, (100, 200, 600, 200), 3, border_radius=15)
+    
+    # Tekst pytania 
+    mode_text = "PEŁNY EKRAN" if not is_fullscreen else "TRYB OKNA"
+    text = font_smaller.render(f"CZY CHCESZ PRZEŁĄCZYĆ NA {mode_text}?", True, BLACK)
+    text_rect = text.get_rect(center=(400, 250))
+    screen.blit(text, text_rect)
+    
+    btn_yes.draw(screen)
+    btn_no.draw(screen)
 
 def draw_settings():
     if bg_image:
@@ -316,65 +340,54 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
+        # --- MENU GŁÓWNE ---
         if state == "MENU":
             if btn_start.is_clicked(event):
                 state = "GRY"
-            
             if btn_settings.is_clicked(event):
                 state = "SETTINGS"
-
             if btn_exit.is_clicked(event):
                 state = "EXIT" 
 
-        # KOMUNIKAT WYJŚCIA
+        # --- KOMUNIKAT WYJŚCIA ---
         elif state == "EXIT":
             if btn_yes.is_clicked(event):
-                running = False # Tutaj ostatecznie zamykamy grę
-            
-            if btn_no.is_clicked(event):
-                state = "MENU" # Wtedy wracamy do menu głównego
-
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                    state = "MENU" # ESC też anuluje wyjście
-
-            if btn_start.is_clicked(event):
-                state = "GRY"
-
-            if btn_exit.is_clicked(event):
                 running = False
-
-        elif state == "GRY":
-            if btn_bj.is_clicked(event):
-                active_game = blackjack.BlackjackGame(screen)
-                state = "GRA"
-            if btn_g2.is_clicked(event):
-                print("Wybrano Grę 2")
-                state = "GRA"
-            if btn_g3.is_clicked(event):
-                print("Wybrano Grę 3")
-                state = "GRA"
-            if btn_back.is_clicked(event):
+            if btn_no.is_clicked(event):
                 state = "MENU"
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    state = "MENU"
-            # OGÓLNE USTAWIENIA
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                state = "MENU"
+
+        # --- OGÓLNE USTAWIENIA ---
         elif state == "SETTINGS":
+            if btn_fullscreen.is_clicked(event):
+                state = "FULLSCREEN"
             if btn_music_menu.is_clicked(event):
                 state = "SETTINGS_MUSIC"
             if btn_back.is_clicked(event):
                 state = "MENU"
-            if btn_fullscreen.is_clicked(event):
-                print("Przełączam na tryb Pełnoekranowy")
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 state = "MENU"
 
-        # SEKCJA MUZYKI
+        # --- POTWIERDZENIE FULLSCREEN ---
+        elif state == "FULLSCREEN":
+            if btn_no.is_clicked(event):
+                state = "SETTINGS"
+            if btn_yes.is_clicked(event):
+                is_fullscreen = not is_fullscreen
+                if is_fullscreen:
+                    # SCALED + FULLSCREEN 
+                    screen = pygame.display.set_mode((800, 600), pygame.FULLSCREEN | pygame.SCALED)
+                else:
+                    screen = pygame.display.set_mode((800, 600), pygame.SCALED)
+                state = "SETTINGS"
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                state = "SETTINGS"
+
+        # --- SEKCJA MUZYKI ---
         elif state == "SETTINGS_MUSIC":
             if btn_back.is_clicked(event):
-                state = "SETTINGS" # Wraca do ustawień, a nie do menu!
-            
-            # Sterowanie głośnością 
+                state = "SETTINGS"
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RIGHT:
                     volume = min(1.0, volume + 0.1)
@@ -382,34 +395,36 @@ while running:
                 if event.key == pygame.K_LEFT:
                     volume = max(0.0, volume - 0.1)
                     pygame.mixer.music.set_volume(volume)
-
-            # Wybór utworów
+            # logika utworów 
             if btn_track1.is_clicked(event):
                 try:
                     pygame.mixer.music.load(os.path.join("assets", "music1.mp3"))
                     pygame.mixer.music.play(-1)
                     current_track = "Utwór 1"
                 except: current_track = "Błąd pliku 1"
-
             if btn_track2.is_clicked(event):
                 try:
                     pygame.mixer.music.load(os.path.join("assets", "music2.mp3"))
                     pygame.mixer.music.play(-1)
                     current_track = "Utwór 2"
                 except: current_track = "Błąd pliku 2"
-                
             if btn_stop_music.is_clicked(event):
                 pygame.mixer.music.stop()
                 current_track = "Wyciszono"
 
-        elif state == "GRA":
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    state = "GRY"
-                    active_game = None
+        # --- MINIGIERKI I GRA ---
+        elif state == "GRY":
+            if btn_bj.is_clicked(event):
+                active_game = blackjack.BlackjackGame(screen)
+                state = "GRA"
+            if btn_back.is_clicked(event): state = "MENU"
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: state = "MENU"
 
-                if active_game:
-                    active_game.handle_input(event)
+        elif state == "GRA":
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                state = "GRY"
+                active_game = None
+            if active_game: active_game.handle_input(event)
 
         elif state == "CREDITS":
             if btn_credits_back.is_clicked(event):
@@ -432,6 +447,8 @@ while running:
         draw_menu()
     elif state == "EXIT":
         draw_exit()
+    elif state == "FULLSCREEN":
+        draw_fullscreen()
     elif state == "SETTINGS":
         draw_settings()
     elif state == "GRY":
