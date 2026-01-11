@@ -36,6 +36,7 @@ def main():
             #przekazujemy kazde zdarzenie (wcisniecie klawisza) do logiki naszej gry
             game.handle_input(event)
 
+        game.update()
         #rysujemy cala gre na ekranie
         game.draw()
 
