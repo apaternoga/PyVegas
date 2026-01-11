@@ -8,7 +8,7 @@ from games.blackjack import Card
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Nasza Gra - Menu")
-font = pygame.font.SysFont("Arial", 40)
+font = pygame.font.SysFont("Arial", 38)
 font_small = pygame.font.SysFont("Arial", 35)
 
 # Kolory
@@ -17,7 +17,7 @@ BLACK = (0, 0, 0)
 GRAY = (200, 200, 200)
 DARK_GRAY = (150, 150, 150)  # Dodatkowy kolor dla efektu najechania
 
-# wczytanie dzwiekow
+# Wczytanie dzwiekow
 try:
     sound_hover = pygame.mixer.Sound(os.path.join("assets", "hover.wav"))
     sound_click = pygame.mixer.Sound(os.path.join("assets", "click.wav"))
@@ -34,6 +34,7 @@ except FileNotFoundError:
     sound_click = DummySound()
 
 bg_image = None # Wczytanie tła menu
+
 
 try:
     loaded_bg = pygame.image.load(os.path.join("assets", "tlo_menu.jpg"))
@@ -54,7 +55,7 @@ class Button:
         mouse_pos = pygame.mouse.get_pos()
 
         # LOGIKA GRAFIKA: Zmiana koloru jeśli myszka najeżdża na przycisk
-        # zmiana: dodanie logiki dźwiękowej
+        # Zmiana: dodanie logiki dźwiękowej
         if self.rect.collidepoint(mouse_pos):
             current_color = DARK_GRAY
             if not self.is_hovered:
@@ -89,9 +90,9 @@ class BlackjackIcon:
         scale = 0.65
         h = 150*scale
         w = 100*scale
-        draw_y = center_y - (h / 2) - 30 #ile do gory (15)
-        self.card1.draw(surface, center_x - offset -30, draw_y, w, h) #ukryta
-        self.card2.draw(surface, center_x + offset -30, draw_y, w, h) #widoczna
+        draw_y = center_y - (h / 2) - 30 # ile do gory (15)
+        self.card1.draw(surface, center_x - offset -30, draw_y, w, h) # ukryta
+        self.card2.draw(surface, center_x + offset -30, draw_y, w, h) # widoczna
 
 class Button2:
     def __init__(self, x, y, width, height, text, icon_renderer=None):
@@ -117,10 +118,10 @@ class Button2:
         # LOGIKA NAJECHANIA I ANIMACJI
         if self.original_rect.collidepoint(mouse_pos):
             current_color = self.hover_color
-            #animacia powiekszenia
+            # animacia powiekszenia
             self.rect = self.original_rect.inflate(20, 20)
 
-            #animacja ikon
+            # animacja ikon
             if self.anim_offset < self.max_offset:
                 self.anim_offset += 2
         
@@ -158,19 +159,45 @@ class Button2:
 # TWORZENIE PRZYCISKÓW
 btn_start = Button(300, 250, 200, 50, "START")
 btn_exit = Button(300, 350, 200, 50, "WYJŚCIE")
-btn_autorzy = Button(300, 450, 200, 50, "CREDITS")
+btn_settings = Button(300, 450, 200, 50, "USTAWIENIA")
 
 btn_bj = Button2(50, 200, 200, 200, "Blackjack", icon_renderer=BlackjackIcon())
 btn_g2 = Button2(300, 200, 200, 200, "Gra 2")
 btn_g3 = Button2(550, 200, 200, 200, "Gra 3")
-btn_back = Button(250, 500, 300, 60, "BACK")
+btn_back = Button(250, 500, 300, 60, "COFNIJ")
+btn_licenses = Button(250, 150, 300, 50, "LICENCJE")
+btn_instructions = Button(250, 220, 300, 50, "INSTRUKCJE")
+btn_fullscreen = Button(250, 290, 300, 50, "PEŁNY EKRAN")
+btn_yes = Button(250, 300, 140, 50, "TAK")
+btn_no = Button(410, 300, 140, 50, "NIE")
 
 state = "MENU"
 
 active_game = None
 
+def draw_settings(): # Funkcja do rysowania 'USTAWIENIA'
+    if bg_image:
+        screen.blit(bg_image, (0, 0))
+    else:
+        screen.fill(GRAY)
+        
+    # Tytuł okna 
+    settings_title = font.render("USTAWIENIA", True, WHITE)
+    screen.blit(settings_title, (310, 50))
+    
+    # Rysowanie przycisków opcji
+    btn_instructions.draw(screen)
+    btn_fullscreen.draw(screen)
+    btn_licenses.draw(screen)
 
-def draw_menu():
+    # Przycisk powrotu 
+    btn_back.draw(screen)
+    
+    # Miejsce na mikser głośności 
+   # vol_text = font.render(f"Głośność: {int(volume * 100)}%", True, WHITE)
+   # screen.blit(vol_txt, (300, 380))
+
+def draw_menu(): # Rysowanie MENU 
     if bg_image:
         screen.blit(bg_image, (0, 0))
     else:
@@ -178,12 +205,7 @@ def draw_menu():
     
     btn_start.draw(screen)
     btn_exit.draw(screen)
-    btn_autorzy.draw(screen)
-
-
-# Przyciski do komunikatu wyjścia
-btn_yes = Button(250, 300, 140, 50, "TAK")
-btn_no = Button(410, 300, 140, 50, "NIE")
+    btn_settings.draw(screen)
 
 def draw_exit(): # Funkcja, która potwierdza wyjście z gry 
    
@@ -207,7 +229,7 @@ def draw_exit(): # Funkcja, która potwierdza wyjście z gry
     btn_no.draw(screen)
 
 
-def draw_game_placeholder():
+def draw_game_placeholder(): # Funkcja do blackjacka 
     if bg_image:
         screen.blit(bg_image, (0, 0))
     else:
@@ -220,7 +242,7 @@ def draw_game_placeholder():
     screen.blit(text, (300, 75))
 
 
-def draw_credits():
+def draw_credits(): # Funkcja rysująca odnośnie użytych praw autorskich
     screen.fill(WHITE)
     title_text = font.render("CREDITS", True, BLACK)
     screen.blit(title_text, (350, 50))
@@ -239,7 +261,7 @@ btn_credits_back = Button(300, 500, 200, 50, "BACK")
 credits_text = []
 
 
-def load_credits():
+def load_credits(): # Wczytaj autorów
     lines = []
     try:
         with open("CREDITS.txt", "r", encoding="utf-8") as f:
@@ -262,9 +284,12 @@ while running:
         if state == "MENU":
             if btn_start.is_clicked(event):
                 state = "GRY"
-
-            if btn_autorzy.is_clicked(event):
-                state = "CREDITS"
+            
+            if btn_settings.is_clicked(event):
+                state = "SETTINGS"
+            
+            if btn_settings.is_clicked(event):
+                state = "SETTINGS"
 
             if btn_exit.is_clicked(event):
                 state = "EXIT" 
@@ -283,9 +308,6 @@ while running:
 
             if btn_start.is_clicked(event):
                 state = "GRY"
-
-            if btn_autorzy.is_clicked(event):
-                state = "CREDITS"
 
             if btn_exit.is_clicked(event):
                 running = False
@@ -321,11 +343,23 @@ while running:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     state = "MENU"
+        elif state == "SETTINGS": # Co się dzieje po kliknięciu "USTAWIENIA"
+            if btn_back.is_clicked(event):
+                state = "MENU"
+
+            if btn_fullscreen.is_clicked(event):
+                print("Przełączam na tryb Pełnoekranowy")  # Prosta zmiana trybu
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    state = "MENU"
 
     if state == "MENU":
         draw_menu()
     elif state == "EXIT":
         draw_exit()
+    elif state == "SETTINGS":
+        draw_settings()
     elif state == "GRY":
         draw_game_placeholder()
     elif state == "GRA":
