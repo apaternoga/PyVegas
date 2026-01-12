@@ -2,6 +2,9 @@ import pygame
 import os
 from constants import WHITE, BLACK, GRAY, DARK_GRAY
 
+class Manager:
+    sm = None
+
 class Button:
     def __init__(self, x, y, width, height, text):
         if x == -1:
@@ -11,12 +14,12 @@ class Button:
         self.color = GRAY
         self.is_hovered = False
 
-    def draw(self, surface, font, s_hover=None):
+    def draw(self, surface, font):
         mouse_pos = pygame.mouse.get_pos()
         if self.rect.collidepoint(mouse_pos):
             current_color = DARK_GRAY
             if not self.is_hovered:
-                if s_hover: s_hover.play()
+                if Manager.sm: Manager.sm.play_sound("hover")
                 self.is_hovered = True
         else:
             current_color = self.color
@@ -26,10 +29,10 @@ class Button:
         text_rect = text_surf.get_rect(center=self.rect.center)
         surface.blit(text_surf, text_rect)
 
-    def is_clicked(self, event, s_click=None):
+    def is_clicked(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if self.rect.collidepoint(event.pos):
-                if s_click: s_click.play()
+                if Manager.sm: Manager.sm.play_sound("click")
                 return True
         return False
 
@@ -46,14 +49,14 @@ class Button2:
         self.text_color = (255, 255, 255)
         self.is_hovered = False 
         
-    def draw(self, surface, font, s_hover=None):
+    def draw(self, surface, font):
         mouse_pos = pygame.mouse.get_pos()
         if self.original_rect.collidepoint(mouse_pos):
             current_color = self.hover_color
             self.rect = self.original_rect.inflate(20, 20)
             if self.anim_offset < self.max_offset: self.anim_offset += 2
             if not self.is_hovered:
-                if s_hover: s_hover.play()
+                if Manager.sm: Manager.sm.play_sound("hover")
                 self.is_hovered = True
         else:
             if self.anim_offset > 0: self.anim_offset -= 2
@@ -68,10 +71,10 @@ class Button2:
         text_rect = text_surf.get_rect(midbottom=(self.rect.centerx, self.rect.bottom - 30))
         surface.blit(text_surf, text_rect)
 
-    def is_clicked(self, event, s_click=None):
+    def is_clicked(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if self.rect.collidepoint(event.pos):
-                if s_click: s_click.play()
+                if Manager.sm: Manager.sm.play_sound("click")
                 return True
         return False
 

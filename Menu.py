@@ -1,155 +1,109 @@
 import os, pygame, sys
-from games import blackjack
 from games.blackjack import Card
 from constants import *
 from ui_elements import Button, Button2, BlackjackIcon, Slider 
 import screens
+from core.settings import *
 
-# Zmienne muzyczne
-is_muted = False
-saved_volume = 0.1
-current_playlist = "Brak"
+class Menu:
+    def __init__(self, screen, sound_manager):
 
-# Suwak
-vol_slider = Slider(100, 360, 600, saved_volume)
+        self.screen=screen
+        try:
+            self.bg_image = pygame.image.load(os.path.join("assets", "tlo_menu.jpg")).convert()
+            self.bg_image = pygame.transform.scale(self.bg_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
+        except:
+            self.bg_image = None
 
-pygame.init()
-screen = pygame.display.set_mode((800, 600), pygame.SCALED)
-pygame.display.set_caption("Nasza Gra - Menu")
-font = pygame.font.SysFont("Arial", 38)
-font_small = pygame.font.SysFont("Arial", 35)
-font_smaller = pygame.font.SysFont("Arial", 30)
+        # Sound Manager
+        self.sm = sound_manager
+        self.sm.play_music()
+        # Suwak
+        self.vol_slider = Slider(100, 360, 600, self.sm.volume)
 
-# Dźwięki
-try:
-    s_hover = pygame.mixer.Sound(os.path.join("assets", "hover.wav"))
-    s_click = pygame.mixer.Sound(os.path.join("assets", "click.wav"))
-except:
-    class Dummy:
-        def play(self): pass
-    s_hover = s_click = Dummy()
+        self.font = pygame.font.SysFont("Arial", 38)
+        self.font_small = pygame.font.SysFont("Arial", 35)
+        self.font_smaller = pygame.font.SysFont("Arial", 30)
 
-bg_image = None
-try:
-    loaded_bg = pygame.image.load(os.path.join("assets", "tlo_menu.jpg"))
-    bg_image = pygame.transform.scale(loaded_bg, (800, 600))
-except: pass
+        self.is_fullscreen = False
 
-# Tworzenie przycisków
-btns = {
-    'start': Button(-1, 250, 200, 50, "START"),
-    'exit': Button(-1, 350, 200, 50, "WYJŚCIE"),
-    'settings': Button(-1, 450, 200, 50, "USTAWIENIA"),
-    'back': Button(-1, 500, 300, 60, "COFNIJ"),
-    'yes': Button(250, 300, 140, 50, "TAK"),
-    'no': Button(410, 300, 140, 50, "NIE"),
-    'instr': Button(-1, 150, 400, 50, "INSTRUKCJE"),
-    'full': Button(-1, 220, 400, 50, "PEŁNY EKRAN/OKNO"),
-    'lic': Button(-1, 290, 400, 50, "LICENCJE"),
-    'music_m': Button(-1, 360, 400, 50, "MUZYKA"),
-    't1': Button(150, 200, 240, 50, "JAZZ MIX"),
-    't2': Button(410, 200, 240, 50, "LOFI CHILL"),
-    'stop': Button(-1, 420, 360, 50, "WYCISZ/PRZYWRÓĆ MUZYKĘ"),
-    'bj': Button2(50, 200, 200, 200, "Blackjack", icon_renderer=BlackjackIcon(Card)),
-    'g2': Button2(300, 200, 200, 200, "Gra 2"),
-    'g3': Button2(550, 200, 200, 200, "Gra 3"),
-    'playlist1' : Button(100, 230, 290, 50, "JAZZ MIX"),
-    'playlist2' : Button(410, 230, 290, 50, "LOFI CASINO"),
-    'mute' : Button(-1, 440, 360, 50, "WYCISZ / ODDAJ GŁOS")
-}
+        # Tworzenie przycisków
+        self.btns = {
+            'start': Button(-1, 250, 200, 50, "START"),
+            'exit': Button(-1, 350, 200, 50, "WYJŚCIE"),
+            'settings': Button(-1, 450, 200, 50, "USTAWIENIA"),
+            'back': Button(-1, 500, 300, 60, "COFNIJ"),
+            'yes': Button(250, 300, 140, 50, "TAK"),
+            'no': Button(410, 300, 140, 50, "NIE"),
+            'instr': Button(-1, 150, 400, 50, "INSTRUKCJE"),
+            'full': Button(-1, 220, 400, 50, "PEŁNY EKRAN/OKNO"),
+            'lic': Button(-1, 290, 400, 50, "LICENCJE"),
+            'music_m': Button(-1, 360, 400, 50, "MUZYKA"),
+            't1': Button(150, 200, 240, 50, "JAZZ MIX"),
+            't2': Button(410, 200, 240, 50, "LOFI CHILL"),
+            'stop': Button(-1, 420, 360, 50, "WYCISZ/PRZYWRÓĆ MUZYKĘ"),
+            'bj': Button2(50, 200, 200, 200, "Blackjack", icon_renderer=BlackjackIcon(Card)),
+            'g2': Button2(300, 200, 200, 200, "Gra 2"),
+            'g3': Button2(550, 200, 200, 200, "Gra 3"),
+            'playlist1' : Button(100, 230, 290, 50, "JAZZ MIX"),
+            'playlist2' : Button(410, 230, 290, 50, "LOFI CASINO"),
+            'mute' : Button(-1, 440, 360, 50, "WYCISZ / ODDAJ GŁOS")
+        }
 
-state = "MENU"
-volume = 0.1
-current_track = "Brak"
-is_fullscreen = False
-active_game = None
-running = True
+        self.state = "MENU"
 
-# --- AUTOSTART MUZYKI ---
-try:
-    pygame.mixer.music.load(os.path.join("assets", "jazz_playlist.mp3"))
-    pygame.mixer.music.set_volume(volume) 
-    pygame.mixer.music.play(-1)           
-except:
-    print("Ostrzeżenie: Nie udało się włączyć muzyki na starcie (brak pliku?)")
 
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT: running = False
+    def update(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT: return "EXIT_APP"
 
-        if state == "MENU":
-            if btns['start'].is_clicked(event, s_click): state = "GRY"
-            if btns['settings'].is_clicked(event, s_click): state = "SETTINGS"
-            if btns['exit'].is_clicked(event, s_click): state = "EXIT"
-        
-        elif state == "EXIT":
-            if btns['yes'].is_clicked(event, s_click): running = False
-            if btns['no'].is_clicked(event, s_click): state = "MENU"
+            if self.state == "MENU":
+                if self.btns['start'].is_clicked(event): self.state = "GRY"
+                if self.btns['settings'].is_clicked(event): self.state = "SETTINGS"
+                if self.btns['exit'].is_clicked(event): self.state = "EXIT"
 
-        elif state == "GRY":
-            if btns['bj'].is_clicked(event, s_click):
-                active_game = blackjack.BlackjackGame(screen)
-                state = "GRA"
-            if btns['back'].is_clicked(event, s_click): state = "MENU"
+            elif self.state == "EXIT":
+                if self.btns['yes'].is_clicked(event): return "EXIT_APP"
+                if self.btns['no'].is_clicked(event): self.state = "MENU"
+            elif self.state == "GRY":
+                if self.btns['bj'].is_clicked(event):
+                    return "START_BLACKJACK"
+                if self.btns['back'].is_clicked(event): self.state = "MENU"
+            elif self.state == "SETTINGS":
+                if self.btns['music_m'].is_clicked(event): self.state = "SETTINGS_MUSIC"
+                if self.btns['full'].is_clicked(event): self.state = "FULLSCREEN"
+                if self.btns['back'].is_clicked(event): self.state = "MENU"
+            elif self.state == "FULLSCREEN":
+                if self.btns['yes'].is_clicked(event):
+                    self.is_fullscreen = not self.is_fullscreen
+                    f = (pygame.FULLSCREEN | pygame.SCALED) if self.is_fullscreen else pygame.SCALED
+                    self.screen = pygame.display.set_mode((800, 600), f)
+                    self.state = "SETTINGS"
+                if self.btns['no'].is_clicked(event): self.state = "SETTINGS"
 
-        elif state == "SETTINGS":
-            if btns['music_m'].is_clicked(event, s_click): state = "SETTINGS_MUSIC"
-            if btns['full'].is_clicked(event, s_click): state = "FULLSCREEN"
-            if btns['back'].is_clicked(event, s_click): state = "MENU"
+            elif self.state == "SETTINGS_MUSIC":
+                if self.btns['back'].is_clicked(event): self.state = "SETTINGS"
 
-        elif state == "FULLSCREEN":
-            if btns['yes'].is_clicked(event, s_click):
-                is_fullscreen = not is_fullscreen
-                f = (pygame.FULLSCREEN | pygame.SCALED) if is_fullscreen else pygame.SCALED
-                screen = pygame.display.set_mode((800, 600), f)
-                state = "SETTINGS"
-            if btns['no'].is_clicked(event, s_click): state = "SETTINGS"
+                if self.vol_slider.handle_event(event):
+                    self.sm.set_volume(self.vol_slider.value)
 
-        elif state == "SETTINGS_MUSIC":
-            if btns['back'].is_clicked(event, s_click): state = "SETTINGS"
-            
-            if vol_slider.handle_event(event):
-                volume = vol_slider.value
-                if not is_muted:
-                    pygame.mixer.music.set_volume(volume)
+                if self.btns['t1'].is_clicked(event):
+                    self.sm.play_music("jazz_playlist.mp3")
 
-            # TUTAJ: Dodane ładowanie plików
-            if btns['t1'].is_clicked(event, s_click):
-                try:
-                    pygame.mixer.music.load(os.path.join("assets", "jazz_playlist.mp3"))
-                    pygame.mixer.music.play(-1)
-                    pygame.mixer.music.set_volume(volume)
-                    is_muted = False
-                except: print("Brak pliku jazz_playlist.mp3")
+                if self.btns['t2'].is_clicked(event):
+                    self.sm.play_music("lofi_playlist.mp3")
 
-            if btns['t2'].is_clicked(event, s_click):
-                try:
-                    pygame.mixer.music.load(os.path.join("assets", "lofi_playlist.mp3"))
-                    pygame.mixer.music.play(-1)
-                    pygame.mixer.music.set_volume(volume)
-                    is_muted = False
-                except: print("Brak pliku lofi_playlist.mp3")
+                if self.btns['stop'].is_clicked(event):
+                    self.sm.toggle_mute()
+        return None
 
-            if btns['stop'].is_clicked(event, s_click):
-                is_muted = not is_muted
-                pygame.mixer.music.set_volume(0 if is_muted else volume)
-
-        elif state == "GRA":
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                state = "GRY"; active_game = None
-            if active_game: active_game.handle_input(event)
-
-    # RYSOWANIE
-    if state == "MENU": screens.draw_menu(screen, bg_image, btns, font)
-    elif state == "EXIT": screens.draw_exit(screen, bg_image, btns, font, font_small)
-    elif state == "SETTINGS": screens.draw_settings(screen, bg_image, btns, font)
-    elif state == "SETTINGS_MUSIC": screens.draw_settings_music(screen, bg_image, btns, font, font_smaller, volume, vol_slider, is_muted)
-    elif state == "FULLSCREEN": screens.draw_fullscreen(screen, btns, font_smaller, is_fullscreen)
-    elif state == "GRY": screens.draw_game_placeholder(screen, bg_image, btns, font)
-    elif state == "GRA":
-        if active_game: active_game.draw()
-        else: screens.draw_game_placeholder(screen, bg_image, btns, font)
-
-    pygame.display.flip()
-
-pygame.quit()
+    def draw(self):
+        vol = self.sm.volume
+        muted = self.sm.muted
+        # RYSOWANIE
+        if self.state == "MENU": screens.draw_menu(self.screen, self.bg_image, self.btns, self.font)
+        elif self.state == "EXIT": screens.draw_exit(self.screen, self.bg_image, self.btns, self.font, self.font_small)
+        elif self.state == "SETTINGS": screens.draw_settings(self.screen, self.bg_image, self.btns, self.font)
+        elif self.state == "SETTINGS_MUSIC": screens.draw_settings_music(self.screen, self.bg_image, self.btns, self.font, self.font_smaller, vol, self.vol_slider, muted)
+        elif self.state == "FULLSCREEN": screens.draw_fullscreen(self.screen, self.btns, self.font_smaller, self.is_fullscreen)
+        elif self.state == "GRY": screens.draw_game_placeholder(self.screen, self.bg_image, self.btns, self.font)

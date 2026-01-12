@@ -126,7 +126,7 @@ class Hand:
             card.draw(screen,start_x+(i*110),start_y,hidden=is_hidden)
 
 class BlackjackGame:
-    def __init__(self,screen):
+    def __init__(self,screen, sound_manager):
         self.screen=screen #referencja do glownego okna gry, tym sie zajmujemy juz w mainie
         self.font=pygame.font.SysFont('Arial',30)
         self.small_font=pygame.font.SysFont('Arial',20)
