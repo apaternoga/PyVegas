@@ -7,7 +7,7 @@ import screens
 
 # Zmienne muzyczne
 is_muted = False
-saved_volume = 0.5
+saved_volume = 0.1
 current_playlist = "Brak"
 
 # Suwak
@@ -47,9 +47,9 @@ btns = {
     'full': Button(-1, 220, 400, 50, "PEŁNY EKRAN/OKNO"),
     'lic': Button(-1, 290, 400, 50, "LICENCJE"),
     'music_m': Button(-1, 360, 400, 50, "MUZYKA"),
-    't1': Button(150, 200, 240, 50, "UTWÓR 1"),
-    't2': Button(410, 200, 240, 50, "UTWÓR 2"),
-    'stop': Button(-1, 420, 340, 50, "WYCISZ MUZYKĘ"),
+    't1': Button(150, 200, 240, 50, "JAZZ MIX"),
+    't2': Button(410, 200, 240, 50, "LOFI CHILL"),
+    'stop': Button(-1, 420, 360, 50, "WYCISZ/PRZYWRÓĆ MUZYKĘ"),
     'bj': Button2(50, 200, 200, 200, "Blackjack", icon_renderer=BlackjackIcon(Card)),
     'g2': Button2(300, 200, 200, 200, "Gra 2"),
     'g3': Button2(550, 200, 200, 200, "Gra 3"),
@@ -59,11 +59,19 @@ btns = {
 }
 
 state = "MENU"
-volume = 0.5
+volume = 0.1
 current_track = "Brak"
 is_fullscreen = False
 active_game = None
 running = True
+
+# --- AUTOSTART MUZYKI ---
+try:
+    pygame.mixer.music.load(os.path.join("assets", "jazz_playlist.mp3"))
+    pygame.mixer.music.set_volume(volume) 
+    pygame.mixer.music.play(-1)           
+except:
+    print("Ostrzeżenie: Nie udało się włączyć muzyki na starcie (brak pliku?)")
 
 while running:
     for event in pygame.event.get():
@@ -100,21 +108,31 @@ while running:
         elif state == "SETTINGS_MUSIC":
             if btns['back'].is_clicked(event, s_click): state = "SETTINGS"
             
-            # Ruch suwakiem automatycznie odcisza
             if vol_slider.handle_event(event):
                 volume = vol_slider.value
-                pygame.mixer.music.set_volume(volume)
-                is_muted = False 
+                if not is_muted:
+                    pygame.mixer.music.set_volume(volume)
 
+            # TUTAJ: Dodane ładowanie plików
             if btns['t1'].is_clicked(event, s_click):
-                is_muted = False # Włączenie nowej muzyki odcisza
+                try:
+                    pygame.mixer.music.load(os.path.join("assets", "jazz_playlist.mp3"))
+                    pygame.mixer.music.play(-1)
+                    pygame.mixer.music.set_volume(volume)
+                    is_muted = False
+                except: print("Brak pliku jazz_playlist.mp3")
+
+            if btns['t2'].is_clicked(event, s_click):
+                try:
+                    pygame.mixer.music.load(os.path.join("assets", "lofi_playlist.mp3"))
+                    pygame.mixer.music.play(-1)
+                    pygame.mixer.music.set_volume(volume)
+                    is_muted = False
+                except: print("Brak pliku lofi_playlist.mp3")
 
             if btns['stop'].is_clicked(event, s_click):
                 is_muted = not is_muted
-                if is_muted:
-                    pygame.mixer.music.set_volume(0)
-                else:
-                    pygame.mixer.music.set_volume(volume)
+                pygame.mixer.music.set_volume(0 if is_muted else volume)
 
         elif state == "GRA":
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
