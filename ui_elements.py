@@ -85,3 +85,34 @@ class BlackjackIcon:
         draw_y = center_y - (h / 2) - 30
         self.card1.draw(surface, center_x - offset -30, draw_y, w, h)
         self.card2.draw(surface, center_x + offset -30, draw_y, w, h)
+
+class Slider:
+    def __init__(self, x, y, width, initial_val):
+        self.rect = pygame.Rect(x, y, width, 10)
+        self.handle_rect = pygame.Rect(x + (width * initial_val) - 10, y - 5, 20, 20)
+        self.dragging = False
+        self.value = initial_val
+
+    def draw(self, surface):
+        # Rysowanie linii suwaka
+        pygame.draw.rect(surface, (100, 100, 100), self.rect, border_radius=5)
+        # Rysowanie aktywnej części (kolor niebieski)
+        active_rect = pygame.Rect(self.rect.x, self.rect.y, self.rect.width * self.value, 10)
+        pygame.draw.rect(surface, (52, 152, 219), active_rect, border_radius=5)
+        # Rysowanie uchwytu
+        pygame.draw.circle(surface, (255, 255, 255), self.handle_rect.center, 10)
+
+    def handle_event(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if self.handle_rect.collidepoint(event.pos):
+                self.dragging = True
+        elif event.type == pygame.MOUSEBUTTONUP:
+            self.dragging = False
+        elif event.type == pygame.MOUSEMOTION:
+            if self.dragging:
+                # Ograniczenie ruchu uchwytu do szerokości paska
+                self.handle_rect.centerx = max(self.rect.left, min(event.pos[0], self.rect.right))
+                # Obliczanie wartości 0.0 - 1.0
+                self.value = (self.handle_rect.centerx - self.rect.left) / self.rect.width
+                return True # Informacja, że wartość się zmieniła
+        return False

@@ -2,8 +2,16 @@ import os, pygame, sys
 from games import blackjack
 from games.blackjack import Card
 from constants import *
-from ui_elements import Button, Button2, BlackjackIcon
+from ui_elements import Button, Button2, BlackjackIcon, Slider 
 import screens
+
+# Zmienne muzyczne
+is_muted = False
+saved_volume = 0.5
+current_playlist = "Brak"
+
+# Suwak
+vol_slider = Slider(100, 360, 600, saved_volume)
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600), pygame.SCALED)
@@ -44,7 +52,10 @@ btns = {
     'stop': Button(-1, 420, 340, 50, "WYCISZ MUZYKĘ"),
     'bj': Button2(50, 200, 200, 200, "Blackjack", icon_renderer=BlackjackIcon(Card)),
     'g2': Button2(300, 200, 200, 200, "Gra 2"),
-    'g3': Button2(550, 200, 200, 200, "Gra 3")
+    'g3': Button2(550, 200, 200, 200, "Gra 3"),
+    'playlist1' : Button(100, 230, 290, 50, "JAZZ MIX"),
+    'playlist2' : Button(410, 230, 290, 50, "LOFI CASINO"),
+    'mute' : Button(-1, 440, 360, 50, "WYCISZ / ODDAJ GŁOS")
 }
 
 state = "MENU"
@@ -88,16 +99,22 @@ while running:
 
         elif state == "SETTINGS_MUSIC":
             if btns['back'].is_clicked(event, s_click): state = "SETTINGS"
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RIGHT: 
-                    volume = min(1.0, volume + 0.1)
-                    pygame.mixer.music.set_volume(volume)
-                if event.key == pygame.K_LEFT: 
-                    volume = max(0.0, volume - 0.1)
-                    pygame.mixer.music.set_volume(volume)
+            
+            # Ruch suwakiem automatycznie odcisza
+            if vol_slider.handle_event(event):
+                volume = vol_slider.value
+                pygame.mixer.music.set_volume(volume)
+                is_muted = False 
+
+            if btns['t1'].is_clicked(event, s_click):
+                is_muted = False # Włączenie nowej muzyki odcisza
+
             if btns['stop'].is_clicked(event, s_click):
-                pygame.mixer.music.stop()
-                current_track = "Wyciszono"
+                is_muted = not is_muted
+                if is_muted:
+                    pygame.mixer.music.set_volume(0)
+                else:
+                    pygame.mixer.music.set_volume(volume)
 
         elif state == "GRA":
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
@@ -108,7 +125,7 @@ while running:
     if state == "MENU": screens.draw_menu(screen, bg_image, btns, font)
     elif state == "EXIT": screens.draw_exit(screen, bg_image, btns, font, font_small)
     elif state == "SETTINGS": screens.draw_settings(screen, bg_image, btns, font)
-    elif state == "SETTINGS_MUSIC": screens.draw_settings_music(screen, bg_image, btns, font, volume, current_track)
+    elif state == "SETTINGS_MUSIC": screens.draw_settings_music(screen, bg_image, btns, font, font_smaller, volume, vol_slider, is_muted)
     elif state == "FULLSCREEN": screens.draw_fullscreen(screen, btns, font_smaller, is_fullscreen)
     elif state == "GRY": screens.draw_game_placeholder(screen, bg_image, btns, font)
     elif state == "GRA":

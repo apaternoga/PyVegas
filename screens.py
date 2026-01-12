@@ -19,22 +19,32 @@ def draw_settings(screen, bg_image, btns, font):
     btns['music_m'].draw(screen, font)
     btns['back'].draw(screen, font)
 
-def draw_settings_music(screen, bg_image, btns, font, volume, current_track):
-    if bg_image: screen.blit(bg_image, (0, 0))
-    else: screen.fill(GRAY)
-    title_surf = font.render("MUZYKA", True, WHITE)
+def draw_settings_music(screen, bg_image, btns, font, font_smaller, volume, vol_slider, is_muted):
+    if bg_image:
+        screen.blit(bg_image, (0, 0))
+    else:
+        screen.fill((200, 200, 200))
+    
+    title_surf = font.render("MUZYKA", True, (255, 255, 255))
     screen.blit(title_surf, title_surf.get_rect(center=(400, 70)))
-    vol_text = font.render(f"Głośność: {int(volume * 100)}%", True, WHITE)
-    screen.blit(vol_text, vol_text.get_rect(center=(400, 140)))
-    pygame.draw.rect(screen, BLACK, (200, 170, 400, 20))
-    pygame.draw.rect(screen, (52, 152, 219), (200, 170, 400 * volume, 20))
-    info_text = font.render(f"Aktualnie gra: {current_track}", True, WHITE)
-    screen.blit(info_text, info_text.get_rect(center=(400, 270)))
+    
+    # LOGIKA IKONKA VS PROCENTY
+    if is_muted:
+        # Rysujemy ikonkę na środku zamiast tekstu
+        draw_speaker_icon(screen, 385, 130, True)
+    else:
+        # Rysujemy procenty i małą ikonkę obok
+        vol_surf = font.render(f"Głośność: {int(volume * 100)}%", True, (255, 255, 255))
+        vol_rect = vol_surf.get_rect(center=(400, 140))
+        screen.blit(vol_surf, vol_rect)
+        draw_speaker_icon(screen, vol_rect.right + 10, vol_rect.top + 5, False)
+
+    vol_slider.draw(screen)
     btns['t1'].draw(screen, font)
     btns['t2'].draw(screen, font)
-    btns['stop'].draw(screen, font)
+    btns['stop'].draw(screen, font_smaller)
     btns['back'].draw(screen, font)
-
+    
 def draw_exit(screen, bg_image, btns, font, font_small):
     draw_menu(screen, bg_image, btns, font)
     overlay = pygame.Surface((800, 600)); overlay.set_alpha(180); overlay.fill(BLACK)
@@ -66,3 +76,16 @@ def draw_game_placeholder(screen, bg_image, btns, font):
     btns['g2'].draw(screen, font)
     btns['g3'].draw(screen, font)
     btns['back'].draw(screen, font)
+
+def draw_speaker_icon(screen, x, y, muted):
+ 
+    pygame.draw.rect(screen, (255, 255, 255), (x, y + 5, 10, 10))
+    pygame.draw.polygon(screen, (255, 255, 255), [
+        (x + 10, y + 5), (x + 20, y), 
+        (x + 20, y + 20), (x + 10, y + 15)
+    ])
+    if muted:
+        pygame.draw.line(screen, (255, 0, 0), (x - 5, y - 5), (x + 25, y + 25), 3)
+        pygame.draw.line(screen, (255, 0, 0), (x + 25, y - 5), (x - 5, y + 25), 3)
+    else:
+        pygame.draw.arc(screen, (255, 255, 255), (x + 15, y, 15, 20), -1, 1, 2)
