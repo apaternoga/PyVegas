@@ -351,7 +351,7 @@ class BlackjackGame:
         
         self.text_anim_progress = 0.0
 
-        self.message = "Place your bet, then press DEAL."
+        self.message = "Please place your bet (↑ / ↓), then press DEAL."
         self.chips = STARTING_MONEY
         self.current_bet = 10
         self.insurance_bet = 0
@@ -699,7 +699,7 @@ class BlackjackGame:
 
     def reset_game(self):
         self.state = "betting"
-        self.message = "Place your bet, then press DEAL."
+        self.message = "Please place your bet (↑ / ↓), then press DEAL."
         if self.chips < 10:
             self.chips = STARTING_MONEY
             self.message = "Bankroll reset."
