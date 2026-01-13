@@ -10,8 +10,13 @@ class Button:
         if x == -1:
             x = (800 - width) // 2
         self.rect = pygame.Rect(x, y, width, height)
+        self.rect2 = pygame.Rect(x-3, y-3, width+6, height+6)
         self.text = text
         self.color = GRAY
+        #kolor podswietlenia - rozowy, ostatnia wartosc to przezroczystosc
+        self.shadow_color = (200, 60, 140, 75)         # normalny 
+        self.shadow_hover_color = (255, 105, 180, 120)  # po najechaniu
+        self.current_shadow = self.shadow_color
         self.is_hovered = False
 
     def draw(self, surface, font):
@@ -20,11 +25,16 @@ class Button:
             current_color = DARK_GRAY
             if not self.is_hovered:
                 if Manager.sm: Manager.sm.play_sound("hover")
+                self.current_shadow = self.shadow_hover_color
                 self.is_hovered = True
         else:
             current_color = self.color
+            self.current_shadow = self.shadow_color
             self.is_hovered = False
-        pygame.draw.rect(surface, current_color, self.rect)
+        shadow_surface = pygame.Surface((self.rect2.width, self.rect2.height), pygame.SRCALPHA) #cien
+        pygame.draw.rect(shadow_surface, self.current_shadow, shadow_surface.get_rect(), border_radius=12)
+        surface.blit(shadow_surface, self.rect2.topleft)
+        pygame.draw.rect(surface, current_color, self.rect, border_radius=8) #przycisk
         text_surf = font.render(self.text, True, BLACK)
         text_rect = text_surf.get_rect(center=self.rect.center)
         surface.blit(text_surf, text_rect)
@@ -54,12 +64,12 @@ class Button2:
         if self.original_rect.collidepoint(mouse_pos):
             current_color = self.hover_color
             self.rect = self.original_rect.inflate(20, 20)
-            if self.anim_offset < self.max_offset: self.anim_offset += 2
+            if self.anim_offset < self.max_offset: self.anim_offset += 6
             if not self.is_hovered:
                 if Manager.sm: Manager.sm.play_sound("hover")
                 self.is_hovered = True
         else:
-            if self.anim_offset > 0: self.anim_offset -= 2
+            if self.anim_offset > 0: self.anim_offset -= 6
             current_color = self.base_color
             self.rect = self.original_rect.copy()
             self.is_hovered = False

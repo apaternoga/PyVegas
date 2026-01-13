@@ -19,7 +19,7 @@ class Menu:
         self.sm = sound_manager
         self.sm.play_music()
         # Suwak
-        self.vol_slider = Slider(100, 360, 600, self.sm.volume)
+        self.vol_slider = Slider(100, 330, 600, self.sm.volume_music)
 
         self.font = pygame.font.SysFont("Arial", 38)
         self.font_small = pygame.font.SysFont("Arial", 35)
@@ -41,7 +41,7 @@ class Menu:
             'music_m': Button(-1, 360, 400, 50, "MUZYKA"),
             't1': Button(150, 200, 240, 50, "JAZZ MIX"),
             't2': Button(410, 200, 240, 50, "LOFI CHILL"),
-            'stop': Button(-1, 420, 360, 50, "WYCISZ/PRZYWRÓĆ MUZYKĘ"),
+            'stop': Button(-1, 400, 360, 50, "WYCISZ/PRZYWRÓĆ MUZYKĘ"),
             'bj': Button2(50, 200, 200, 200, "Blackjack", icon_renderer=BlackjackIcon(Card)),
             'g2': Button2(300, 200, 200, 200, "Gra 2"),
             'g3': Button2(550, 200, 200, 200, "Gra 3"),
@@ -85,7 +85,7 @@ class Menu:
                 if self.btns['back'].is_clicked(event): self.state = "SETTINGS"
 
                 if self.vol_slider.handle_event(event):
-                    self.sm.set_volume(self.vol_slider.value)
+                    self.sm.set_volume_music(self.vol_slider.value)
 
                 if self.btns['t1'].is_clicked(event):
                     self.sm.play_music("jazz_playlist.mp3")
@@ -95,15 +95,17 @@ class Menu:
 
                 if self.btns['stop'].is_clicked(event):
                     self.sm.toggle_mute()
+                    self.vol_slider.value = self.sm.volume_music
+                    self.vol_slider.handle_rect.centerx = self.vol_slider.rect.left + int(self.vol_slider.rect.width * self.vol_slider.value)
         return None
 
     def draw(self):
-        vol = self.sm.volume
+        vol_music = self.sm.volume_music
         muted = self.sm.muted
         # RYSOWANIE
         if self.state == "MENU": screens.draw_menu(self.screen, self.bg_image, self.btns, self.font)
         elif self.state == "EXIT": screens.draw_exit(self.screen, self.bg_image, self.btns, self.font, self.font_small)
         elif self.state == "SETTINGS": screens.draw_settings(self.screen, self.bg_image, self.btns, self.font)
-        elif self.state == "SETTINGS_MUSIC": screens.draw_settings_music(self.screen, self.bg_image, self.btns, self.font, self.font_smaller, vol, self.vol_slider, muted)
+        elif self.state == "SETTINGS_MUSIC": screens.draw_settings_music(self.screen, self.bg_image, self.btns, self.font, self.font_smaller, vol_music, self.vol_slider, muted)
         elif self.state == "FULLSCREEN": screens.draw_fullscreen(self.screen, self.btns, self.font_smaller, self.is_fullscreen)
         elif self.state == "GRY": screens.draw_game_placeholder(self.screen, self.bg_image, self.btns, self.font)
