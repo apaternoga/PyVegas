@@ -24,6 +24,9 @@ class CrashGame :
         self.crash_sfx_path = os.path.abspath(
             os.path.join(os.path.dirname(__file__), "..", "assets", "crash", "crash_explosion.mp3")
         )
+        self.cashout_sfx_path = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "..", "assets", "crash", "cashout.mp3")
+        )
         try:
             pygame.mixer.music.load(self.music_path)
         except pygame.error:
@@ -32,6 +35,10 @@ class CrashGame :
             self.crash_sfx = pygame.mixer.Sound(self.crash_sfx_path)
         except pygame.error:
             self.crash_sfx = None
+        try:
+            self.cashout_sfx = pygame.mixer.Sound(self.cashout_sfx_path)
+        except pygame.error:
+            self.cashout_sfx = None
 
         # Stan portfela (Tymczasowy, docelowo pobierany z globalnego gracza)
         self.balance = 1000
@@ -154,6 +161,8 @@ class CrashGame :
         if self.state == "RUNNING":
 
             # Dodanie do historii obecnego wyniku przy sukcesie
+            if self.cashout_sfx:
+                self.cashout_sfx.play()
 
             self.game_history.append((self.current_multiplier, True))
             if len(self.game_history) > 10: self.game_history.pop(0)
