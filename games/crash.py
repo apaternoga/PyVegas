@@ -21,10 +21,17 @@ class CrashGame :
         self.music_path = os.path.abspath(
             os.path.join(os.path.dirname(__file__), "..", "assets", "crash", "crash_low_to_high.mp3")
         )
+        self.crash_sfx_path = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "..", "assets", "crash", "crash_explosion.mp3")
+        )
         try:
             pygame.mixer.music.load(self.music_path)
         except pygame.error:
             self.music_path = None
+        try:
+            self.crash_sfx = pygame.mixer.Sound(self.crash_sfx_path)
+        except pygame.error:
+            self.crash_sfx = None
 
         # Stan portfela (Tymczasowy, docelowo pobierany z globalnego gracza)
         self.balance = 1000
@@ -188,6 +195,8 @@ class CrashGame :
             # Sprawdzenie czy nastąpił wybuch
             if self.current_multiplier >= self.target_crash :
                 self.current_multiplier = self.target_crash  # Ustawiamy na wynik końcowy
+                if self.crash_sfx:
+                    self.crash_sfx.play()
                 self.game_history.append((self.target_crash, False))  # Dodanie do historii wyniku przy crashu
                 if len(self.game_history) > 10: self.game_history.pop(0) # Tylko 10 ostatnich wynikow naraz
                 self.state = "CRASHED"
