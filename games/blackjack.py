@@ -55,6 +55,13 @@ class Card:
         self.target_y = 300
         # predkosc 0.1 to 10% dystansu na klatke
         self.speed = 0.1
+        # UI DLA INSURANCE
+        # Środek ekranu
+        cx, cy = SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2
+        
+        # Przyciski będą wewnątrz okienka
+        self.btn_ins_yes = Button("YES", cx - 110, cy + 20, 100, 50, color=(50, 150, 50), text_color=WHITE) # Zielony
+        self.btn_ins_no = Button("NO", cx + 10, cy + 20, 100, 50, color=(150, 50, 50), text_color=WHITE)   # Czerwony
 
     def __str__(self):
         return f"{self.rank} of {self.suit}"
@@ -415,6 +422,15 @@ class BlackjackGame:
             text_color=BLACK,
         )
 
+        # UI DLA INSURANCE
+        # Środek ekranu
+        cx, cy = SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2
+        
+        # Przyciski będą wewnątrz okienka
+        self.btn_ins_yes = Button("YES", cx - 110, cy + 20, 100, 50, color=(50, 150, 50), text_color=WHITE) # Zielony
+        self.btn_ins_no = Button("NO", cx + 10, cy + 20, 100, 50, color=(150, 50, 50), text_color=WHITE)   # Czerwony
+
+
     # NOWA FUNKCJA: obsluguje logike oparta na czasie (zamiast time.wait)
     def update(self):
         current_time = pygame.time.get_ticks()
@@ -444,11 +460,18 @@ class BlackjackGame:
                     
                     self.last_timer = current_time # Reset stopera
                 else:
-                    # Koniec rozdawania, sprawdzamy Blackjacka
-                    self.state = "player_turn"
-                    self.message = "Your Turn." # ZMIANA: Kropka zamiast wykrzyknika (spokojniej)
-                    if self.check_initial_blackjack():
-                        return
+                    # Koniec rozdawania
+                    # INSURANCE CHECK
+                    # Sprawdzamy czy krupier ma ASA (karta index 1)
+                    if self.dealer_hand.cards[1].rank == "Ace":
+                        self.state = "insurance"
+                        self.message = "Dealer shows Ace."
+                    else:
+                        # Brak Asa - normalna gra
+                        self.state = "player_turn"
+                        self.message = "Your Turn." # ZMIANA: Kropka zamiast wykrzyknika (spokojniej)
+                        if self.check_initial_blackjack():
+                            return
 
         # LOGIKA KRUPIERA - przeniesiona tutaj, aby nie blokować gry
         elif self.state == "dealer_turn":
@@ -500,6 +523,45 @@ class BlackjackGame:
                  return True
         return False
 
+    #NOWA FUNKCJA DO ROZSTRZYGANIA INSURANCE
+    def resolve_insurance(self, take_insurance):
+        insurance_cost = self.current_bet // 2
+        
+        if take_insurance:
+            if self.chips >= insurance_cost:
+                self.chips -= insurance_cost
+                self.insurance_bet = insurance_cost
+                self.message = "Insurance taken."
+            else:
+                self.message = "Insufficient funds for insurance."
+                take_insurance = False
+
+        # Sprawdzamy zakrytą kartę krupiera (index 0)
+        hidden_card_value = values[self.dealer_hand.cards[0].rank]
+        dealer_has_bj = (hidden_card_value == 10)
+        
+        if dealer_has_bj:
+            # KRUPIER MA BLACKJACKA
+            if take_insurance:
+                payout = self.insurance_bet * 3
+                self.chips += payout
+                self.message = "Insurance Pays! Dealer has Blackjack."
+            else:
+                self.message = "Dealer has Blackjack."
+            
+            self.finish_round()
+        else:
+            # KRUPIER NIE MA BLACKJACKA
+            if take_insurance:
+                self.message = "Dealer no Blackjack. Insurance lost."
+            else:
+                self.message = "Dealer no Blackjack. Your Turn."
+            
+            self.state = "player_turn"
+            
+            if self.check_initial_blackjack():
+                return
+
     # funkcja odpowiadajaca za wcisniecia klawiszy ORAZ myszki
     def handle_input(self, event):
         # system obstawiania
@@ -523,6 +585,14 @@ class BlackjackGame:
                     self.start_round()
                 else:
                     self.message = "Insufficient funds." 
+
+        # OBSŁUGA INSURANCE
+        elif self.state == "insurance":
+            if self.btn_ins_yes.is_clicked(event):
+                self.resolve_insurance(True)
+            elif self.btn_ins_no.is_clicked(event):
+                self.resolve_insurance(False)
+
         # ruch gracza dobiera (HIT) lub nie dobiera(STAY)
         elif self.state == "player_turn":
             current_hand = self.player_hands[self.current_hand_index]
@@ -705,6 +775,37 @@ class BlackjackGame:
             self.chips = STARTING_MONEY
             self.message = "Bankroll reset."
 
+    def draw_insurance_popup(self):
+        
+        dimmer = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+        dimmer.set_alpha(150) #polprzezroczyste tlo
+        dimmer.fill((0, 0, 0)) 
+        self.screen.blit(dimmer, (0, 0))
+
+        # ramka okienka
+        cx, cy = SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2
+        popup_w, popup_h = 400, 200
+        popup_rect = pygame.Rect(cx - popup_w // 2, cy - popup_h // 2, popup_w, popup_h)
+        
+        pygame.draw.rect(self.screen, DARK_PANEL, popup_rect, border_radius=15)
+        pygame.draw.rect(self.screen, GOLD, popup_rect, 3, border_radius=15)
+
+        # tekst
+        cost = self.current_bet // 2
+        title_surf = self.label_font.render("Insurance?", True, GOLD)
+        # informacja o koscie i wyplacie
+        info_surf = self.small_font.render(f"Cost: {cost}  |  Pays 2:1", True, WHITE)
+
+        title_rect = title_surf.get_rect(center=(cx, cy - 50))
+        info_rect = info_surf.get_rect(center=(cx, cy - 20))
+
+        self.screen.blit(title_surf, title_rect)
+        self.screen.blit(info_surf, info_rect)
+
+        # przyciski
+        self.btn_ins_yes.draw(self.screen)
+        self.btn_ins_no.draw(self.screen)
+
     # funkcja renderujaca - rysuje ona wszystko na ekranie w kazdej klatce
     def draw(self):
         self.screen.fill(GREEN_FELT)
@@ -844,3 +945,6 @@ class BlackjackGame:
                 self.btn_surrender.draw(self.screen)
         elif self.state == "game_over":
              self.btn_deal.draw(self.screen)
+        
+        if self.state == "insurance":
+            self.draw_insurance_popup()
