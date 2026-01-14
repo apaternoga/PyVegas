@@ -124,11 +124,11 @@ class CrashGame :
      
 
         if amount <= 0:
-            self.show_error("Minimalna stawka zakladu to $1")
+            self.show_error("Minimum bet is $1")
             return
    
         if amount > self.balance:
-            self.show_error("Niewystarczajace srodki na koncie!")
+            self.show_error("Insufficient balance!")
             return
 
 
@@ -138,11 +138,11 @@ class CrashGame :
                 ac_val = float(self.auto_cashout_text)
                 if ac_val < 1.01:
                     self.auto_cashout_text = "1.01"  # Automatyczna korekta
-                    self.show_error("Min. autocashout to 1.01x")
+                    self.show_error("Min auto-cashout is 1.01x")
                     return
             except ValueError:
                 self.auto_cashout_text = "1.01"
-                self.show_error("Nieprawidlowy format mnoznika!")
+                self.show_error("Invalid multiplier format!")
         if amount > 0 and self.balance >= amount:
             self.balance -= amount
             self.current_bet = amount
@@ -335,27 +335,27 @@ class CrashGame :
         self.screen.blit(text_surf, text_rect)
 
         # 2. Rysowanie informacji o stanie (UI)
-        balance_text = self.font_small.render(f"Portfel: {self.balance} $", True, WHITE)
+        balance_text = self.font_small.render(f"Balance: {self.balance} $", True, WHITE)
         self.screen.blit(balance_text, (20, 20))
 
         # 3. Instrukcje na dole ekranu
         msg = ""
         if self.state == "BETTING" :
-            msg = "Nacisnij SPACJE aby postawic"
+            msg = "Press SPACE to bet"
         elif self.state == "RUNNING" :
-            msg = f"Nacisnij SPACJE aby wyplacic! (Wygrana: {int(self.current_bet * self.current_multiplier)}$)"
+            msg = f"Press SPACE to cash out! (Win: {int(self.current_bet * self.current_multiplier)}$)"
         elif self.state == "CRASHED" :
-            msg = f"PRZEGRANA! Przegrales. Wynik to {self.target_crash:.2f}x. Spacja = Nowa gra"
+            msg = f"LOSS! You lost. Result: {self.target_crash:.2f}x. SPACE = New game"
         elif self.state == "SUCCESS" :
-            msg = f"WYGRANA! Zgarnales {int(self.current_bet * self.cashout_point)}$. Spacja = Nowa gra"
+            msg = f"WIN! You got {int(self.current_bet * self.cashout_point)}$. SPACE = New game"
 
         instr_surf = self.font_small.render(msg, True, GRAY)
         instr_rect = instr_surf.get_rect(center=(self.screen.get_width() // 2, self.screen.get_height() - 50))
         self.screen.blit(instr_surf, instr_rect)
      
 
-        self.draw_button(self.btn_bet_rect, "POSTAW", GREEN, self.state != "RUNNING")
-        self.draw_button(self.btn_cash_rect, "WYPLAC", YELLOW, self.state == "RUNNING")
+        self.draw_button(self.btn_bet_rect, "BET", GREEN, self.state != "RUNNING")
+        self.draw_button(self.btn_cash_rect, "CASH OUT", YELLOW, self.state == "RUNNING")
 
 
         # Komunikaty bledu
@@ -376,7 +376,7 @@ class CrashGame :
         pygame.draw.rect(self.screen, box_color, self.bet_input_rect, 2)
 
         # Napis pomocniczy
-        label = self.font_small.render("STAWKA: ", True, WHITE)
+        label = self.font_small.render("BET: ", True, WHITE)
         self.screen.blit(label, (self.bet_input_rect.x, self.bet_input_rect.y - 35))
 
         #Tekst w okineku ze znakiem dolara
@@ -389,7 +389,7 @@ class CrashGame :
         pygame.draw.rect(self.screen, (30, 30, 30), self.auto_cashout_rect)
         pygame.draw.rect(self.screen, auto_cashout_box_color, self.auto_cashout_rect, 2)
 
-        auto_cashout_label = self.font_small.render("AUTO-CASHOUT:", True, WHITE)
+        auto_cashout_label = self.font_small.render("AUTO CASHOUT:", True, WHITE)
         self.screen.blit(auto_cashout_label, (self.auto_cashout_rect.x, self.auto_cashout_rect.y - 35))
 
         auto_cashout_val_surf = self.font_small.render(self.auto_cashout_text + " x", True, WHITE)
