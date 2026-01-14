@@ -30,7 +30,15 @@ class CrashGame :
         #Ustalanie przez gracza wysokosci zakladu
         self.bet_input_text = "10" #to jest domyslna wysokosc zakladu
         self.bet_input_rect = pygame.Rect(540, 600, 150, 40) #pozycja okienka gdzie mozna wpisac wysokosc zaklad
-        
+
+        # Autocashout
+        self.auto_cashout_text = "1.00"
+        self.auto_cashout_rect = pygame.Rect(690, 600, 150, 40)
+        self.auto_cashout_on = False
+        self.auto_cashout_toggle_rect = pygame.Rect(850, 600, 70, 40) # Kwadracik do odznaczenia czy ma byc autocashout czy nie
+
+        self.active_input = "BET" # BET lub AUTO - ktore okienko edytujemy
+       
         #Komunikaty bledu zwiazane z wysokoscia zakladu
         self.error_msg = ""
         self.error_timer = 0    
@@ -79,14 +87,38 @@ class CrashGame :
         if self.state == "RUNNING":
             return
 
+        # Walidacja stawki zakladu:
+        try:
+            amount = int(self.bet_input_text)
+        except ValueError:
+            amount = 0
+
         #podawana jest wysokosc zakladu przez gracza
         amount = int(self.bet_input_text) if self.bet_input_text != "" else 0
         
         #zaklad musi byc liczba dodatnia i nie moze byc wiekszy od stanu konta gracza
-        
+     
+
+        if amount <= 0:
+            self.show_error("Minimalna stawka zakladu to $1")
+            return
+   
         if amount > self.balance:
             self.show_error("Niewystarczajace srodki na koncie!")
-    
+            return
+
+
+        # Walidacja autocashout
+        if self.auto_cashout_on:
+            try:
+                ac_val = float(self.auto_cashout_text)
+                if ac_val < 1.01:
+                    self.auto_cashout_text = "1.01"  # Automatyczna korekta
+                    self.show_error("Min. autocashout to 1.01x")
+                    return
+            except ValueError:
+                self.auto_cashout_text = "1.01"
+                self.show_error("Nieprawidlowy format mnoznika!")
         if amount > 0 and self.balance >= amount:
             self.balance -= amount
             self.current_bet = amount
@@ -112,6 +144,7 @@ class CrashGame :
             self.cashout_point = self.current_multiplier
             win_amount = int(self.current_bet * self.cashout_point)
             self.balance += win_amount
+            #self.growth_speed = 0.01 # Reset predkosci takze przy sukcesie
 
     def update(self) :
         """Logika gry wykonywana w każdej klatce (60 razy na sekunde)"""
@@ -127,6 +160,16 @@ class CrashGame :
             self.current_multiplier += self.growth_speed
             self.history.append(self.current_multiplier) # Dodanie obecnego mnoznika do historii wykresu
 
+
+        # Logika autocashout
+            if self.auto_cashout_on and self.state == "RUNNING":
+                try:
+                    limit = float(self.auto_cashout_text)
+                    if self.current_multiplier >= limit:
+                        self.cash_out()
+                except ValueError: 
+                    pass
+
             # Przyspieszamy animację im wyżej jesteśmy (dla emocji)
             if self.current_multiplier > 2.0 : self.growth_speed = 0.02
             if self.current_multiplier > 5.0 : self.growth_speed = 0.05
@@ -140,34 +183,63 @@ class CrashGame :
                 self.state = "CRASHED"
                 self.growth_speed = 0.01  # Reset prędkości na przyszłość
 
+        if self.state == "SUCCESS": self.growth_speed = 0.01 
+
     def handle_input(self, event) :
         """Obsługa klawiszy specyficzna dla Crasha"""
         if event.type == pygame.KEYDOWN :
+            #target_attr = "bet_input_text" if self.active_input == "BET" else "auto_cashout_text"
+            #current_val = getattr(self, target_attr)
+
             if self.state != "RUNNING":
-                if event.key == pygame.K_BACKSPACE:                  #mozna usunac tekst z okienka
-                    self.bet_input_text = self.bet_input_text[:-1]
-                elif event.unicode.isdigit():
-                    if len(self.bet_input_text) < 8:                  #limit dlugosci wartosci zakladu
-                        self.bet_input_text += event.unicode
+                if self.active_input == "BET":
+                    
+                    if event.key == pygame.K_BACKSPACE:                  #mozna usunac tekst z okienka
+                        self.bet_input_text = self.bet_input_text[:-1]
+                    elif event.unicode.isdigit():
+                        if len(self.bet_input_text) < 8:                  #limit dlugosci wartosci zakladu
+                            self.bet_input_text += event.unicode
+
+                elif self.active_input == "AUTO":
+                    if event.key == pygame.K_BACKSPACE: 
+                        self.auto_cashout_text = self.auto_cashout_text[:-1]
+                     # Pozwalamy na cyfry i kropke dla mnoznika
+                    elif event.unicode.isdigit():
+                        if len(self.auto_cashout_text) < 4:
+                            self.auto_cashout_text += event.unicode
+                    elif event.unicode == ".":
+                        if "." not in self.auto_cashout_text: 
+                            if len(self.auto_cashout_text) < 4:
+                                self.auto_cashout_text += event.unicode
+
             # SPACJA obsługuje akcje w zależności od stanu
             if event.key == pygame.K_SPACE :
                 if self.state == "RUNNING":
                     self.cash_out()
                 else:
                     self.start_round()
+
         if event.type == pygame.MOUSEBUTTONDOWN:
+             # Przyciski akcji
             if event.button == 1:
                 if self.btn_bet_rect.collidepoint(event.pos):
                     self.start_round()
                 if self.btn_cash_rect.collidepoint(event.pos):
                     self.cash_out()
-        
-
+           # Wybor okienka do pisania 
+                if self.bet_input_rect.collidepoint(event.pos):
+                    self.active_input = "BET"
+                if self.auto_cashout_rect.collidepoint(event.pos):
+                    self.active_input = "AUTO"
+             
+           # Wlacznik On/Off
+                if self.auto_cashout_toggle_rect.collidepoint(event.pos):
+                    self.auto_cashout_on = not self.auto_cashout_on
 
     def draw_button(self, rect, text, color, active):
         mouse_pos = pygame.mouse.get_pos()
         draw_color = color
-        if not active:
+        if not active:          # Przyciski maja inne kolory kiedy user najedzie na nie kursorem 
             draw_color = GRAY
         elif rect.collidepoint(mouse_pos):
             draw_color = (min(color[0]+30, 255), min(color[1]+30, 255), min(color[2]+30, 255))
@@ -258,12 +330,8 @@ class CrashGame :
         # Komunikaty bledu
         if self.error_msg:
             err_surf = self.font_small.render(self.error_msg, True, RED)
-            """# Pozycja: pod okienkiem 
-            err_rect = err_surf.get_rect(center=(
-                self.screen.get_width() // 2, 
-                self.bet_input_rect.y + self.bet_input_rect.height + 30
-            ))"""
-            err_pos_x = self.bet_input_rect.x + self.bet_input_rect.width + 20
+           
+            err_pos_x = self.bet_input_rect.x + self.bet_input_rect.width - 625
             err_pos_y = self.bet_input_rect.y + 5
 
             self.screen.blit(err_surf, (err_pos_x, err_pos_y))
@@ -283,6 +351,28 @@ class CrashGame :
         #Tekst w okineku ze znakiem dolara
         val_surf = self.font_small.render(self.bet_input_text + " $", True, WHITE)
         self.screen.blit(val_surf, (self.bet_input_rect.x + 10, self.bet_input_rect.y + 5))
+
+
+        # Okienko autocashout
+        auto_cashout_box_color = (50, 150, 255) if self.active_input == "AUTO" else (100, 100, 100)
+        pygame.draw.rect(self.screen, (30, 30, 30), self.auto_cashout_rect)
+        pygame.draw.rect(self.screen, auto_cashout_box_color, self.auto_cashout_rect, 2)
+
+        auto_cashout_label = self.font_small.render("AUTO-CASHOUT:", True, WHITE)
+        self.screen.blit(auto_cashout_label, (self.auto_cashout_rect.x, self.auto_cashout_rect.y - 35))
+
+        auto_cashout_val_surf = self.font_small.render(self.auto_cashout_text + " x", True, WHITE)
+        self.screen.blit(auto_cashout_val_surf, (self.auto_cashout_rect.x + 10, self.auto_cashout_rect.y + 5))
+
+
+        # Przycisk On/Off
+        toggle_color = (50, 220, 50) if self.auto_cashout_on else (220, 50, 50)
+        pygame.draw.rect(self.screen, toggle_color, self.auto_cashout_toggle_rect, border_radius = 5)
+
+        status_text = "ON" if self.auto_cashout_on else "OFF"
+        status_surf = self.font_small.render(status_text, True, WHITE)
+        self.screen.blit(status_surf, (self.auto_cashout_toggle_rect.x + 5, self.auto_cashout_toggle_rect.y+5)) 
+ 
 
 # --- FUNKCJA STARTOWA ---
 def run_crash_game(screen) :
@@ -321,4 +411,5 @@ if __name__ == "__main__" :
     run_crash_game(screen)
 
     pygame.quit()
+
 
