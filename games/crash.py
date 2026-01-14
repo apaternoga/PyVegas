@@ -1,3 +1,4 @@
+import os
 import pygame
 import random
 
@@ -15,6 +16,15 @@ class CrashGame :
         self.screen = screen
         self.font_big = pygame.font.SysFont(None, 120)
         self.font_small = pygame.font.SysFont(None, 40)
+        if not pygame.mixer.get_init():
+            pygame.mixer.init()
+        self.music_path = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "..", "assets", "crash", "crash_low_to_high.mp3")
+        )
+        try:
+            pygame.mixer.music.load(self.music_path)
+        except pygame.error:
+            self.music_path = None
 
         # Stan portfela (Tymczasowy, docelowo pobierany z globalnego gracza)
         self.balance = 1000
@@ -159,9 +169,9 @@ class CrashGame :
             # Zwiększamy mnożnik
             self.current_multiplier += self.growth_speed
             self.history.append(self.current_multiplier) # Dodanie obecnego mnoznika do historii wykresu
-
-
-        # Logika autocashout
+            if self.music_path and not pygame.mixer.music.get_busy():
+                pygame.mixer.music.play(-1)
+            # Logika autocashout
             if self.auto_cashout_on and self.state == "RUNNING":
                 try:
                     limit = float(self.auto_cashout_text)
@@ -182,6 +192,9 @@ class CrashGame :
                 if len(self.game_history) > 10: self.game_history.pop(0) # Tylko 10 ostatnich wynikow naraz
                 self.state = "CRASHED"
                 self.growth_speed = 0.01  # Reset prędkości na przyszłość
+        else:
+            if pygame.mixer.music.get_busy():
+                pygame.mixer.music.stop()
 
         if self.state == "SUCCESS": self.growth_speed = 0.01 
 
