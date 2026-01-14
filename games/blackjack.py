@@ -553,8 +553,9 @@ class BlackjackGame:
             elif self.btn_split.is_clicked(event):
                 if (
                     len(current_hand.cards) == 2
-                    and current_hand.cards[0].rank == current_hand.cards[1].rank
+                    and values[current_hand.cards[0].rank] == values[current_hand.cards[1].rank]
                     and self.chips >= self.current_bet
+                    and len(self.player_hands) < 2
                 ):
                     action = "split"
             elif self.btn_surrender.is_clicked(event):
@@ -833,8 +834,9 @@ class BlackjackGame:
 
             if (
                 len(current_hand.cards) == 2
-                and current_hand.cards[0].rank == current_hand.cards[1].rank
+                and values[current_hand.cards[0].rank] == values[current_hand.cards[1].rank]
                 and self.chips >= self.current_bet
+                and len(self.player_hands) < 2
             ):
                 self.btn_split.draw(self.screen)
 
