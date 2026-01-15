@@ -361,6 +361,7 @@ class BlackjackGame:
         self.chips = STARTING_MONEY
         self.current_bet = 10
         self.insurance_bet = 0
+        self.wait_timer = 0
     
         # LOGIKA PRZYCISKÓW
         btn_y = SCREEN_HEIGHT - 75 
@@ -436,6 +437,14 @@ class BlackjackGame:
     def update(self):
         current_time = pygame.time.get_ticks()
 
+        # Sprawdź opóźnienie przed przejściem do dealera
+        if self.wait_timer > 0 and current_time >= self.wait_timer:
+            self.wait_timer = 0
+            self.state = "dealer_turn"
+            self.message = "Dealer's Turn."
+            self.sm.play_sound("card_place3")
+            self.last_timer = current_time
+
         # obsluga animacji
         # tekst sie pojawia dopiero w fazie obstawiania
         if self.state != "betting":
@@ -465,7 +474,7 @@ class BlackjackGame:
                     # Koniec rozdawania
                     # INSURANCE CHECK
                     # Sprawdzamy czy krupier ma ASA (karta index 1)
-                    if self.dealer_hand.cards[1].rank == "Ace":
+                    if len(self.dealer_hand.cards) >= 2 and self.dealer_hand.cards[1].rank == "Ace":
                         self.state = "insurance"
                         self.message = "Dealer shows Ace."
                     else:
@@ -564,6 +573,7 @@ class BlackjackGame:
             
             if self.check_initial_blackjack():
                 return
+            
 
     # funkcja odpowiadajaca za wcisniecia klawiszy ORAZ myszki
     def handle_input(self, event):
@@ -642,7 +652,7 @@ class BlackjackGame:
                 current_hand.add_card(self.deck.deal())
                 self.sm.play_sound("card_place3")
                 if current_hand.value > 21:
-                    self.next_hand_or_dealer()
+                    self.next_hand_or_dealer(wait=True)
 
             elif action == "stand":  # jesli s dobieramy karte dealerowi
                 self.next_hand_or_dealer()
@@ -658,7 +668,7 @@ class BlackjackGame:
                     # dla uproszczenia przyjmujemy ze current bet to stawka na JEDNA reke (tutaj zmodyfikowana)
                     current_hand.add_card(self.deck.deal())
                     self.sm.play_sound("card_place2")
-                    self.next_hand_or_dealer() # Po double zawsze koniec tury tej ręki
+                    self.next_hand_or_dealer(wait=True) # Po double zawsze koniec tury tej ręki
                 else:
                     self.message = "Double down unavailable." 
 
@@ -702,7 +712,7 @@ class BlackjackGame:
         self.player_hands.insert(self.current_hand_index + 1, new_hand)
         self.message = "Hands Split." 
 
-    def next_hand_or_dealer(self):
+    def next_hand_or_dealer(self, wait=False):
         if self.current_hand_index < len(self.player_hands) - 1:
             self.current_hand_index += 1
             
@@ -711,10 +721,14 @@ class BlackjackGame:
                  # Jeśli kolejna ręka ma 21, przechodzimy dalej (opcjonalnie)
                  self.next_hand_or_dealer()
         else:
-            self.state = "dealer_turn"
-            self.message = "Dealer's Turn." 
-            self.sm.play_sound("card_place3")
-            self.last_timer = pygame.time.get_ticks() # Resetujemy timer dla dealera
+            if wait:
+                self.wait_timer = pygame.time.get_ticks() + 800
+                self.message = "Bust! Waiting for dealer..."
+            else:
+                self.state = "dealer_turn"
+                self.message = "Dealer's Turn." 
+                self.sm.play_sound("card_place3")
+                self.last_timer = pygame.time.get_ticks() # Resetujemy timer dla dealera
 
     # funkcja wywolywana gdy krupier konczy (zamiast starego dealer_logic)
     def finish_round(self):
