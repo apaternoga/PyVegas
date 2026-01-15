@@ -55,13 +55,6 @@ class Card:
         self.target_y = 300
         # predkosc 0.1 to 10% dystansu na klatke
         self.speed = 0.1
-        # UI DLA INSURANCE
-        # Środek ekranu
-        cx, cy = SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2
-        
-        # Przyciski będą wewnątrz okienka
-        self.btn_ins_yes = Button("YES", cx - 110, cy + 20, 100, 50, color=(50, 150, 50), text_color=WHITE) # Zielony
-        self.btn_ins_no = Button("NO", cx + 10, cy + 20, 100, 50, color=(150, 50, 50), text_color=WHITE)   # Czerwony
 
     def __str__(self):
         return f"{self.rank} of {self.suit}"
@@ -227,7 +220,7 @@ class Card:
 
 
 class Button:
-    def __init__(self, text, x, y, w, h, color=GOLD, text_color=BLACK):
+    def __init__(self, text, x, y, w, h, color=GOLD, text_color=BLACK, sm=None):
         self.text = text
         self.rect = pygame.Rect(x, y, w, h)
         self.color = color
@@ -237,11 +230,15 @@ class Button:
         self.font = pygame.font.SysFont("Arial", 20, bold=True)
         self.is_hovered = False
         self.label_font = pygame.font.SysFont("Arial", 26, bold=True)
+        self.sm = sm
 
     def draw(self, screen):
         # Efekt podswietlenia po najechaniu
         mouse_pos = pygame.mouse.get_pos()
-        self.is_hovered = self.rect.collidepoint(mouse_pos)
+        if (self.is_hovered != self.rect.collidepoint(mouse_pos)):
+            self.is_hovered = self.rect.collidepoint(mouse_pos)
+            if self.sm:
+                self.sm.play_sound("hover")
 
         current_color = self.hover_color if self.is_hovered else self.color
 
@@ -258,9 +255,10 @@ class Button:
     def is_clicked(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if self.rect.collidepoint(event.pos):
+                if self.sm:
+                    self.sm.play_sound("click")
                 return True
         return False
-
 
 class Deck:
 
@@ -334,10 +332,11 @@ class Hand:
             card.draw(screen, target_x, target_y, hidden=is_hidden)
 
 class BlackjackGame:
-    def __init__(self, screen):
+    def __init__(self, screen, sound_manager):
         self.screen = (
             screen  # referencja do glownego okna gry, tym sie zajmujemy juz w mainie
         )
+        self.sm = sound_manager
         self.font = pygame.font.SysFont("Arial", 30, bold=True)
         self.small_font = pygame.font.SysFont("Arial", 20)
         self.label_font = pygame.font.SysFont("Arial", 22, bold=True)
@@ -353,8 +352,8 @@ class BlackjackGame:
         
         self.deal_queue = []
         self.last_timer = 0
-        self.deal_interval = 200
-        self.dealer_interval = 800
+        self.deal_interval = 200    #200
+        self.dealer_interval = 800  #800
         
         self.text_anim_progress = 0.0
 
@@ -381,22 +380,22 @@ class BlackjackGame:
         current_x = start_x
 
         # HIT
-        self.btn_hit = Button("HIT", current_x, btn_y, btn_w_std, 50)
+        self.btn_hit = Button("HIT", current_x, btn_y, btn_w_std, 50, sm=self.sm)
         current_x += btn_w_std + spacing  
 
         # STAND
-        self.btn_stand = Button("STAND", current_x, btn_y, btn_w_std, 50)
+        self.btn_stand = Button("STAND", current_x, btn_y, btn_w_std, 50, sm=self.sm)
         current_x += btn_w_std + spacing
 
         # DOUBLE
         self.btn_double = Button(
-            "DOUBLE", current_x, btn_y, btn_w_std, 50, color=(200, 150, 50)
+            "DOUBLE", current_x, btn_y, btn_w_std, 50, color=(200, 150, 50), sm=self.sm
         )
         current_x += btn_w_std + spacing
 
         # SPLIT
         self.btn_split = Button(
-            "SPLIT", current_x, btn_y, btn_w_std, 50, color=(200, 150, 50)
+            "SPLIT", current_x, btn_y, btn_w_std, 50, color=(200, 150, 50), sm=self.sm
         )
         current_x += btn_w_std + spacing
 
@@ -409,6 +408,7 @@ class BlackjackGame:
             50,
             color=(150, 50, 50),
             text_color=WHITE,
+            sm=self.sm
         )
 
         # Przycisk DEAL
@@ -420,6 +420,7 @@ class BlackjackGame:
             50,
             color=WHITE,
             text_color=BLACK,
+            sm=self.sm
         )
 
         # UI DLA INSURANCE
@@ -427,8 +428,8 @@ class BlackjackGame:
         cx, cy = SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2
         
         # Przyciski będą wewnątrz okienka
-        self.btn_ins_yes = Button("YES", cx - 110, cy + 20, 100, 50, color=(50, 150, 50), text_color=WHITE) # Zielony
-        self.btn_ins_no = Button("NO", cx + 10, cy + 20, 100, 50, color=(150, 50, 50), text_color=WHITE)   # Czerwony
+        self.btn_ins_yes = Button("YES", cx - 110, cy + 20, 100, 50, color=(50, 150, 50), text_color=WHITE, sm=self.sm) # Zielony
+        self.btn_ins_no = Button("NO", cx + 10, cy + 20, 100, 50, color=(150, 50, 50), text_color=WHITE, sm=self.sm)   # Czerwony
 
 
     # NOWA FUNKCJA: obsluguje logike oparta na czasie (zamiast time.wait)
@@ -447,7 +448,7 @@ class BlackjackGame:
 
         # rozdawanie kart sekwencjami
         if self.state == "dealing":
-            if current_time - self.last_timer > self.deal_interval:
+            if current_time - self.last_timer > self.deal_interval+300:
                 if len(self.deal_queue) > 0:
                     # Pobieramy kto ma dostać kartę
                     target = self.deal_queue.pop(0)
@@ -457,7 +458,8 @@ class BlackjackGame:
                         self.player_hands[0].add_card(card)
                     elif target == "dealer":
                         self.dealer_hand.add_card(card)
-                    
+                    a=random.randint(1,4) 
+                    self.sm.play_sound("deal"+str(a))
                     self.last_timer = current_time # Reset stopera
                 else:
                     # Koniec rozdawania
@@ -484,6 +486,7 @@ class BlackjackGame:
                 # Soft 17 czyli kiedy dealer ma 17 ale liczony z asem
                 if self.dealer_hand.value < 17 or (self.dealer_hand.value == 17 and self.dealer_hand.aces > 0):
                     self.dealer_hand.add_card(self.deck.deal())
+                    self.sm.play_sound("card_place1")
                     self.message = "Dealer hits..."
                 else:
                     # Krupier skończył, sprawdzamy wyniki
@@ -637,6 +640,7 @@ class BlackjackGame:
                 action == "hit"
             ):  # jesli gracz kliknie h dodajemy mu karte do reki i sprawdzamy czy przekroczyl wartosc 21
                 current_hand.add_card(self.deck.deal())
+                self.sm.play_sound("card_place3")
                 if current_hand.value > 21:
                     self.next_hand_or_dealer()
 
@@ -653,6 +657,7 @@ class BlackjackGame:
                     # w prawdziwej grze kazda reka po splicie ma wlasny zaklad
                     # dla uproszczenia przyjmujemy ze current bet to stawka na JEDNA reke (tutaj zmodyfikowana)
                     current_hand.add_card(self.deck.deal())
+                    self.sm.play_sound("card_place2")
                     self.next_hand_or_dealer() # Po double zawsze koniec tury tej ręki
                 else:
                     self.message = "Double down unavailable." 
@@ -690,6 +695,7 @@ class BlackjackGame:
         # Dobieramy po jednej karcie do obu rozdzielonych rąk
         current_hand.add_card(self.deck.deal())
         new_hand.add_card(self.deck.deal())
+        self.sm.play_sound("card_place4")
 
         # wstawiamy nowa reke zaraz po aktualnej rece w liscie,
         # dzieki czemu gra płynnie przejdzie do niej w nastepnym kroku petli
@@ -707,6 +713,7 @@ class BlackjackGame:
         else:
             self.state = "dealer_turn"
             self.message = "Dealer's Turn." 
+            self.sm.play_sound("card_place3")
             self.last_timer = pygame.time.get_ticks() # Resetujemy timer dla dealera
 
     # funkcja wywolywana gdy krupier konczy (zamiast starego dealer_logic)
@@ -730,6 +737,7 @@ class BlackjackGame:
             if hand.value > 21:
                 # Fura (przegrana)
                 current_part += "Bust."
+                self.sm.play_sound("lose")
             
             elif player_is_bj:
                 if dealer_is_bj:
@@ -741,20 +749,24 @@ class BlackjackGame:
                     win_amount = hand.bet + int(hand.bet * 1.5)
                     self.chips += win_amount
                     current_part += "Blackjack!"
+                    self.sm.play_sound("win")
             
             elif self.dealer_hand.value > 21:
                 # Dealer fura (wygrana)
                 self.chips += hand.bet * 2
                 current_part += "Win!"
+                self.sm.play_sound("win")
             
             elif hand.value > self.dealer_hand.value:
                 # Wygrana punktowa
                 self.chips += hand.bet * 2
                 current_part += "Win!"
+                self.sm.play_sound("win")
             
             elif hand.value < self.dealer_hand.value:
                 # Przegrana punktowa
                 current_part += "Loss."
+                self.sm.play_sound("lose")
             
             else:
                 # Remis
