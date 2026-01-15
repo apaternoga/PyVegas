@@ -3,7 +3,7 @@ import sys
 
 #importy z innych plikow
 from core.settings import *
-from assets.sound_manager import SoundManager
+from core.sound_manager import SoundManager
 from Menu import Menu
 from games.blackjack import BlackjackGame
 from ui_elements import Manager

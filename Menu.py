@@ -30,8 +30,8 @@ class Menu:
         # Tworzenie przycisków
         self.btns = {
             'start': Button(-1, 250, 200, 50, "START"),
-            'exit': Button(-1, 350, 200, 50, "WYJŚCIE"),
-            'settings': Button(-1, 450, 200, 50, "USTAWIENIA"),
+            'exit': Button(-1, 450, 200, 50, "WYJŚCIE"),
+            'settings': Button(-1, 350, 200, 50, "USTAWIENIA"),
             'back': Button(-1, 500, 300, 60, "COFNIJ"),
             'yes': Button(250, 300, 140, 50, "TAK"),
             'no': Button(410, 300, 140, 50, "NIE"),
