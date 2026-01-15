@@ -2,7 +2,11 @@ import pygame
 import os
 from constants import WHITE, BLACK, GRAY, DARK_GRAY, WIDTH
 
-# Mój przycisk główny do ustawień (Patryk)
+
+class Manager:
+    sm = None
+
+    # Mój przycisk główny do ustawień (Patryk)
 class Button:
     def __init__(self, x, y, width, height, text):
         self.text = text
@@ -14,12 +18,12 @@ class Button:
         self.color = GRAY
         self.is_hovered = False
 
-    def draw(self, surface, font, s_hover=None):
+    def draw(self, surface, font):
         mouse_pos = pygame.mouse.get_pos()
         if self.rect.collidepoint(mouse_pos):
             current_color = DARK_GRAY
             if not self.is_hovered:
-                if s_hover: s_hover.play()
+                if Manager.sm: Manager.sm.play_sound('hover')
                 self.is_hovered = True
         else:
             current_color = self.color
@@ -37,10 +41,10 @@ class Button:
         text_rect = text_surf.get_rect(center=(text_x, text_y))
         surface.blit(text_surf, text_rect)
 
-    def is_clicked(self, event, s_click=None):
+    def is_clicked(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if self.rect.collidepoint(event.pos):
-                if s_click: s_click.play()
+                if Manager.sm: Manager.sm.play_sound('click')
                 return True
         return False
 
@@ -58,14 +62,14 @@ class Button2:
         self.text_color = (255, 255, 255)
         self.is_hovered = False 
         
-    def draw(self, surface, font, s_hover=None):
+    def draw(self, surface, font):
         mouse_pos = pygame.mouse.get_pos()
         if self.original_rect.collidepoint(mouse_pos):
             current_color = self.hover_color
             self.rect = self.original_rect.inflate(20, 20)
             if self.anim_offset < self.max_offset: self.anim_offset += 2
             if not self.is_hovered:
-                if s_hover: s_hover.play()
+                if Manager.sm: Manager.sm.play_sound('hover')
                 self.is_hovered = True
         else:
             if self.anim_offset > 0: self.anim_offset -= 2
@@ -85,10 +89,10 @@ class Button2:
         text_rect = text_surf.get_rect(midbottom=(self.rect.centerx, self.rect.bottom - 30))
         surface.blit(text_surf, text_rect)
 
-    def is_clicked(self, event, s_click=None):
+    def is_clicked(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if self.rect.collidepoint(event.pos):
-                if s_click: s_click.play()
+                if Manager.sm: Manager.sm.play_sound('click')
                 return True
         return False
 
@@ -119,6 +123,9 @@ class Slider:
         self.value = initial_val
 
     def draw(self, surface):
+        # Aktualizuj pozycję uchwytu na podstawie wartości
+        self.handle_rect.centerx = self.rect.left + (self.rect.width * self.value)
+        
         # Tło suwaka (szary pasek)
         pygame.draw.rect(surface, (100, 100, 100), self.rect, border_radius=5)
         # Aktywny pasek (niebieski)

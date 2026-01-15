@@ -1,8 +1,8 @@
 # Ustawienia ekranu
-SCREEN_WIDTH= 800
-SCREEN_HEIGHT = 600
+SCREEN_WIDTH= 1280
+SCREEN_HEIGHT = 720
 FPS = 60
-CAPTION = "Pygames - Team 9"
+CAPTION = "PyVegas"
 
 # Kolory (R,G,B)
 WHITE=(255,255,255)

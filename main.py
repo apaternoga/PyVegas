@@ -19,7 +19,6 @@ def main():
     sm.load_blackjack_sounds() #przeniesc potem
 
     Manager.sm = sm
-    Manager.sm = sm
 
     #tworzenie 'screen', czyli glownego okna gry o rozmiarach podanych w settings.py
     screen=pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))

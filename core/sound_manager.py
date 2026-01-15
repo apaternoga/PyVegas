@@ -129,7 +129,7 @@ class SoundManager:
             if self._ensure_mixer():
                 pygame.mixer.music.set_volume(0.0)
         else:
-            self.volume_music = self.previous_volume_music or 0.5
+            self.volume_music = self.previous_volume_music or 0.1
             if self._ensure_mixer():
                 pygame.mixer.music.set_volume(self.volume_music)
 
