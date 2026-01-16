@@ -917,7 +917,7 @@ class BlackjackGame:
                 x_pos = start_x + (i * gap)
                 hand.draw(self.screen, x_pos, player_cards_y)
 
-            # 2. RYSOWANIE NAPISÓW (z fadem i CIENIEM)
+           # 2. RYSOWANIE NAPISÓW (z fadem i CIENIEM)
             
             def draw_label_with_shadow(text, x, y, alpha):
                 # 1. Cień
@@ -933,7 +933,27 @@ class BlackjackGame:
                 self.screen.blit(label, label_rect)
 
             # Napis Krupiera
-            draw_label_with_shadow("Dealer", dealer_x, dealer_cards_y, current_alpha)
+            dealer_text = "Dealer"
+            
+            # Dodajemy licznik (z obsluga ukrytej karty)
+            if len(self.dealer_hand.cards) > 0:
+                if hide_dealer:
+                    # JESLI KARTA JEST UKRYTA:
+                    # Wyswietlamy wynik TYLKO jesli mamy juz druga karte (te odkryta).
+                    # Jesli krupier ma tylko 1 karte (zakryta), nie dopisujemy nic.
+                    if len(self.dealer_hand.cards) >= 2:
+                        visible_card = self.dealer_hand.cards[1]
+                        # Pobieramy wartosc tylko tej widocznej karty
+                        visible_val = values[visible_card.rank]
+                        dealer_text += f": {visible_val}"
+                    else:
+                        dealer_text += ": ?"
+                else:
+                    # JESLI KARTY SA ODKRYTE (Dealer Turn / Game Over):
+                    # Pokazujemy pelna wartosc reki (suma wszystkich kart)
+                    dealer_text += f": {self.dealer_hand.value}"
+
+            draw_label_with_shadow(dealer_text, dealer_x, dealer_cards_y, current_alpha)
 
             # Napisy Gracza
             for i in range(len(self.player_hands)):
@@ -941,10 +961,16 @@ class BlackjackGame:
                 gap = 600
                 x_pos = start_x + (i * gap)
                 
+                # pobieramy obiekt reki zeby znac jej wartosc
+                current_hand_obj = self.player_hands[i]
+
                 if len(self.player_hands) > 1:
                     label_text = f"Hand {i + 1}"
                 else:
                     label_text = "Player"
+                
+                # dodajemy wynik do labela po dwukropku
+                label_text += f": {current_hand_obj.value}"
 
                 draw_label_with_shadow(label_text, x_pos, player_cards_y, current_alpha)
 
