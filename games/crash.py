@@ -28,10 +28,12 @@ class CrashGame:
         # Paths (games/crash.py -> assets/crash/)
         base_dir = os.path.dirname(__file__)
         asset_dir = os.path.abspath(os.path.join(base_dir, "..", "assets", "crash"))
+        sounds_dir = os.path.abspath(os.path.join(base_dir, "..", "assets", "sounds"))
 
         self.music_file = os.path.join(asset_dir, "crash_climb_riser.mp3")
         path_crash = os.path.join(asset_dir, "crash_explosion.mp3")
         path_cashout = os.path.join(asset_dir, "cashout.mp3")
+        path_select = os.path.join(sounds_dir, "select_001.ogg")
 
         # Load sounds
         try:
@@ -45,6 +47,9 @@ class CrashGame:
 
         self.sfx_cashout = None
         try: self.sfx_cashout = pygame.mixer.Sound(path_cashout)
+        except: pass
+        self.sfx_select = None
+        try: self.sfx_select = pygame.mixer.Sound(path_select)
         except: pass
 
         # Fonts
@@ -237,11 +242,14 @@ class CrashGame:
 
                 if self.rect_btn_half.collidepoint(event.pos):
                     self._apply_bet_multiplier(0.5)
+                    if self.sfx_select: self.sfx_select.play()
                 if self.rect_btn_double.collidepoint(event.pos):
                     self._apply_bet_multiplier(2.0)
+                    if self.sfx_select: self.sfx_select.play()
                 
                 if self.rect_toggle_auto.collidepoint(event.pos):
                     self.auto_cashout_on = not self.auto_cashout_on
+                    if self.sfx_select: self.sfx_select.play()
                 
                 if self.rect_btn_action.collidepoint(event.pos):
                     if self.state == "RUNNING": self.cash_out()
