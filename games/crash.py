@@ -29,17 +29,15 @@ class CrashGame:
         base_dir = os.path.dirname(__file__)
         asset_dir = os.path.abspath(os.path.join(base_dir, "..", "assets", "crash"))
 
-        self.tick_sfx_path = os.path.join(asset_dir, "crash_loop_ticking.mp3")
+        self.music_file = os.path.join(asset_dir, "crash_climb_riser.mp3")
         path_crash = os.path.join(asset_dir, "crash_explosion.mp3")
         path_cashout = os.path.join(asset_dir, "cashout.mp3")
 
         # Load sounds
-        self.tick_sfx = None
-        self.tick_channel = pygame.mixer.Channel(0)
         try:
-            self.tick_sfx = pygame.mixer.Sound(self.tick_sfx_path)
+            pygame.mixer.music.load(self.music_file)
         except:
-            self.tick_sfx = None
+            self.music_file = None
 
         self.sfx_crash = None
         try: self.sfx_crash = pygame.mixer.Sound(path_crash)
@@ -98,7 +96,6 @@ class CrashGame:
 
         self.error_msg = ""
         self.error_timer = 0
-        self.next_tick_ms = 0
 
     def draw_rounded_rect(self, surface, color, rect, radius=10):
         pygame.draw.rect(surface, color, rect, border_radius=radius)
@@ -178,7 +175,12 @@ class CrashGame:
         self.last_delta = 0.0
         
         # Audio
-        self.next_tick_ms = pygame.time.get_ticks()
+        if self.music_file:
+            try:
+                pygame.mixer.music.rewind()
+                pygame.mixer.music.play(-1)
+            except:
+                pass
 
     def cash_out(self):
         if self.state == "RUNNING":
@@ -196,22 +198,14 @@ class CrashGame:
         if self.error_timer > 0: self.error_timer -= 1
         else: self.error_msg = ""
 
-        # Stop ticking if ended
-        if self.state != "RUNNING" and self.tick_channel.get_busy():
-            self.tick_channel.stop()
+        # Stop theme if ended
+        if self.state != "RUNNING" and pygame.mixer.music.get_busy():
+            pygame.mixer.music.stop()
 
         if self.state == "RUNNING":
             self.growth_speed *= 1.005
             self.current_multiplier += self.growth_speed
             
-            # Speed up ticks as multiplier rises
-            if self.tick_sfx:
-                now = pygame.time.get_ticks()
-                interval_ms = int(max(60, 450 / (self.current_multiplier ** 0.5)))
-                if now >= self.next_tick_ms:
-                    self.tick_channel.play(self.tick_sfx)
-                    self.next_tick_ms = now + interval_ms
-
             # Graph points
             if self.current_multiplier > self.history_points[-1] + 0.02:
                 self.history_points.append(self.current_multiplier)
@@ -355,8 +349,9 @@ class CrashGame:
         pygame.draw.rect(self.screen, COLORS["accent_green"], self.rect_btn_half, 1, border_radius=6)
         pygame.draw.rect(self.screen, COLORS["accent_green"], self.rect_btn_double, 1, border_radius=6)
 
-        t_half = self.font_ui.render("1/2x", True, COLORS["text_white"])
-        t_double = self.font_ui.render("2x", True, COLORS["text_white"])
+        small_font = pygame.font.SysFont("Verdana", 12)
+        t_half = small_font.render("0.5x", True, COLORS["text_white"])
+        t_double = small_font.render("2x", True, COLORS["text_white"])
         self.screen.blit(t_half, t_half.get_rect(center=self.rect_btn_half.center))
         self.screen.blit(t_double, t_double.get_rect(center=self.rect_btn_double.center))
 

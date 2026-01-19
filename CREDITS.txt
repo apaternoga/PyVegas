@@ -1,5 +1,9 @@
-Mechanika Gry Crash
+Gra Crash
    Funkcja: _generate_crash_point
    Opis: Implementacja algorytmu losowania opartego na Odwrotnej Dystrybuancie (Inverse Probability Distribution).
    Źródło: Zaimplementowano na podstawie otwartego kodu źródłowego Bustabit.
    Link: https://github.com/bustabit/bustabit-web-server
+
+   Muzyka w tle została wygenerowana przy użyciu narzędzia Suno AI (https://suno.com/). Utwór: Crash Climb Riser, Data generacji: 19.01.2026.
+
+   Efekty dźwiękowe zostały pobrane ze strony https://pixabay.com (https://pixabay.com/service/license-summary/)
