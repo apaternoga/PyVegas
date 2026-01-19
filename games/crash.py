@@ -29,7 +29,7 @@ class CrashGame:
         base_dir = os.path.dirname(__file__)
         asset_dir = os.path.abspath(os.path.join(base_dir, "..", "assets", "crash"))
 
-        self.music_file = os.path.join(asset_dir, "crash_low_to_high.mp3")
+        self.music_file = os.path.join(asset_dir, "crash_loop_ticking.mp3")
         path_crash = os.path.join(asset_dir, "crash_explosion.mp3")
         path_cashout = os.path.join(asset_dir, "cashout.mp3")
 
