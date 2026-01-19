@@ -29,15 +29,17 @@ class CrashGame:
         base_dir = os.path.dirname(__file__)
         asset_dir = os.path.abspath(os.path.join(base_dir, "..", "assets", "crash"))
 
-        self.music_file = os.path.join(asset_dir, "crash_loop_ticking.mp3")
+        self.tick_sfx_path = os.path.join(asset_dir, "crash_loop_ticking.mp3")
         path_crash = os.path.join(asset_dir, "crash_explosion.mp3")
         path_cashout = os.path.join(asset_dir, "cashout.mp3")
 
         # Load sounds
+        self.tick_sfx = None
+        self.tick_channel = pygame.mixer.Channel(0)
         try:
-            pygame.mixer.music.load(self.music_file)
-        except: 
-            self.music_file = None
+            self.tick_sfx = pygame.mixer.Sound(self.tick_sfx_path)
+        except:
+            self.tick_sfx = None
 
         self.sfx_crash = None
         try: self.sfx_crash = pygame.mixer.Sound(path_crash)
@@ -85,6 +87,7 @@ class CrashGame:
 
         self.error_msg = ""
         self.error_timer = 0
+        self.next_tick_ms = 0
 
     def draw_rounded_rect(self, surface, color, rect, radius=10):
         pygame.draw.rect(surface, color, rect, border_radius=radius)
@@ -138,11 +141,7 @@ class CrashGame:
         self.growth_speed = 0.002
         
         # Audio
-        if self.music_file and not pygame.mixer.music.get_busy():
-            try:
-                pygame.mixer.music.rewind()
-                pygame.mixer.music.play(-1)
-            except: pass
+        self.next_tick_ms = pygame.time.get_ticks()
 
     def cash_out(self):
         if self.state == "RUNNING":
@@ -159,15 +158,22 @@ class CrashGame:
         if self.error_timer > 0: self.error_timer -= 1
         else: self.error_msg = ""
 
-        # Stop music if ended
-        if self.state != "RUNNING":
-            if pygame.mixer.music.get_busy():
-                pygame.mixer.music.stop()
+        # Stop ticking if ended
+        if self.state != "RUNNING" and self.tick_channel.get_busy():
+            self.tick_channel.stop()
 
         if self.state == "RUNNING":
             self.growth_speed *= 1.005
             self.current_multiplier += self.growth_speed
             
+            # Speed up ticks as multiplier rises
+            if self.tick_sfx:
+                now = pygame.time.get_ticks()
+                interval_ms = int(max(60, 450 / (self.current_multiplier ** 0.5)))
+                if now >= self.next_tick_ms:
+                    self.tick_channel.play(self.tick_sfx)
+                    self.next_tick_ms = now + interval_ms
+
             # Graph points
             if self.current_multiplier > self.history_points[-1] + 0.02:
                 self.history_points.append(self.current_multiplier)
