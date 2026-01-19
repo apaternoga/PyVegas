@@ -664,10 +664,11 @@ class BlackjackGame:
                 elif event.key == pygame.K_UP:
                     if self.chips >= self.current_bet + 10:
                         self.current_bet += 10
+                        self.sm.play_sound("chips_stack")
                 elif event.key == pygame.K_DOWN:
                     if self.chips > 10:
                         self.current_bet -= 10
-
+                        self.sm.play_sound("chips_stack")
             # obsluga myszki dla przycisku rozdaj
             if self.btn_deal.is_clicked(event):
                 if self.chips >= self.current_bet:
