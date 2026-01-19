@@ -1,64 +1,76 @@
 <div align="center">
-<h1>PyGames</h1>
 
-<p >Zestaw gier karcianych i losowych napisanych w Pythonie</p>
+# PyGames
+
+Zestaw gier karcianych i losowych napisanych w Pythonie
+
+<img src="assets/pyvegas.png" alt="PyVegas / PyVegas baner" width="700" />
+
 </div>
 
-<h2>Spis tresci</h2>
+## Spis treści
+- [Wprowadzenie](#wprowadzenie)
+- [Zaimplementowanie funkcjonalności](#zaimplementowane-funkcjonalności)
+- [Intrukcja uruchomienia (KROK PO KROKU)](#intrukcja-uruchomienia-krok-po-kroku)
+- [Struktura plików](#struktura-plików)
+- [Autorzy i podział zadań](#autorzy-i-podział-zadań)
+- [Źródła](#źródła)
 
-<h2>Wprowadzenie</h2>
+## Wprowadzenie
 
-<h2>Zaimplemetowane funkcjonalności</h2>
-<ul>
-<li><b>Menu główne aplikacji</b> - uruchomienie programu, wybór dostępnej gry oraz wyjście z aplikacji.</li>
-<li><b>Modułowa budowa projektu</b> - logika gier znajduje się w <code>games/</code>, a elementy wspólne (menu, obsługa wejścia) w <code>core/</code>.</li>
-<li><b>Obsługa zasobów</b> - wykorzystanie plików z katalogu <code>assets/</code> (np. grafiki, dźwięki, czcionki - zależnie od gry).</li>
-<li><b>Blackjack:</b>
-<ul>
-<li>rozdawanie kart graczowi i krupierowi</li>
-<li>zliczanie punktów oraz rozstrzyganie wyniku rundy (wygrana/przegrana/remis)</li>
-<li>podstawowe akcje gracza w trakcie rundy (np. dobierz/pasuj - zgodnie z zasadami gry)</li>
-</ul>
-</li>
-<li><b>Crash:</b>
-<ul>
-<li>mechanika rosnącego mnożnika, który w losowym momencie "crashuje"</li>
-<li>możliwość wypłaty przed crashem oraz obliczanie wygranej na podstawie aktualnego mnożnika</li>
-</ul>
-</li>
-<li><b>Komunikaty i stan rozgrywki</b> - prezentowanie wyniku, informacji o aktualnym stanie oraz możliwość rozpoczęcia kolejnej rundy.</li>
-</ul>
+PyVegas to projekt powstały w ramach studiów informatycznych realizowany w Pythonie, którego celem jest stworzenie jednej, prostej aplikacji zbierającej kilka mini-gier w jednym miejscu. Program udostępnia wspólne **menu główne**, z którego można uruchomić wybraną grę, śledzić przebieg rozgrywki i w każdej chwili wrócić do wyboru kolejnej pozycji.
 
-<h2>Intrukcja uruchomienia (KROK PO KROKU)</h2>
-<p>Aby projekt zadziałał poprawnie na komputerze trzeba wykonać następujące kroki w terminalu:</p>
-<ul>
-<li>Sklonować repozytorium przy pomocy polecenia:<br /><code>git clone https://github.com/apaternoga/pygames.git</code></li>
-<li>Wejść do folderu pygames:<br /><code>cd pygames</code></li>
-<li>Pobrać wszystkie brakujące zasoby:<br /><code>pip install -r requirements.txt</code></li>
-<li>Uruchomić grę:<br /><code>python main.py</code></li>
-</ul>
+Projekt został zaprojektowany w sposób **modułowy**: każda gra posiada własną logikę w katalogu `games/`, natomiast elementy współdzielone (np. nawigacja, obsługa wejścia, wspólne komponenty) są wydzielone do `core/`. Dodatkowo repozytorium zawiera katalog `assets/` przeznaczony na zasoby wykorzystywane w grach (np. grafiki, dźwięki, czcionki). Taka struktura ułatwia rozwój projektu oraz dodawanie kolejnych gier bez przebudowy całej aplikacji.
 
-<h2>Struktura plików</h2>
-<ul>
-<li><b>main.py</b> - punkt wejścia projektu (uruchamia aplikację i startuje gry)</li>
-<li><b>games/</b> - implementacje gier (logika poszczególnych mini-gier)</li>
-<li><b>core/</b> - wspólne elementy projektu (menu, obsługa wejścia)</li>
-<li><b>assets/</b> - zasoby (grafiki, dźwięki, czcionki)</li>
-<li><b>requirements.txt</b> - zależności do instalacji przez pip</li>
-<li><b>INSTRUKCJA.txt</b> - dodatkowa instrukcja, opis działania</li>
-<li><b>CREDITS.txt</b> - źródła </li>
-<li><b>LICENSE</b> - licencja projektu</li>
-</ul>
+Aktualnie w zestawie znajdują się m.in.:
+- **Blackjack** - klasyczna gra karciana przeciwko krupierowi,
+- **Crash** - gra losowa oparta o rosnący mnożniki i decyzję o wypłacie w odpowiednim momencie.
 
-<h2>Autorzy i podział zadań</h2>
-<ul>
-<li><b>Adrian Paternoga</b> - Blackjack</li>
-<li><b>Adam Zalewski</b> - Crash</li>
-<li><b>Filip Liskowski</b> - README</li>
-<li><b>Miłosz Kiedrzyński</b> - </li>
-<li><b>Patryk Iżbicki</b> - </li>
-</ul>
+## Zaimplementowane funkcjonalności
 
-<h2>Źródła</h2>
+- **Menu główne aplikacji** - uruchomienie programu, wybór dostępnej gry oraz wyjście z aplikacji.
+- **Modułowa budowa projektu** - logika gier znajduje się w `games/`, a elementy wspólne (menu, obsługa wejścia) w `core/`.
+- **Obsługa zasobów** - wykorzystanie plików z katalogu `assets/` (np. grafiki, dźwięki, czcionki - zależnie od gry).
+- **Blackjack:**
+  - rozdawanie kart graczowi i krupierowi
+  - zliczanie punktów oraz rozstrzyganie wyniku rundy (wygrana/przegrana/remis)
+  - podstawowe akcje gracza w trakcie rundy (np. dobierz/pasuj - zgodnie z zasadami gry)
+- **Crash:**
+  - mechanika rosnącego mnożnika, który w losowym momencie "crashuje"
+  - możliwość wypłaty przed crashem oraz obliczanie wygranej na podstawie aktualnego mnożnika
+- **Komunikaty i stan rozgrywki** - prezentowanie wyniku, informacji o aktualnym stanie oraz możliwość rozpoczęcia kolejnej rundy.
 
-<h2>Licencja</h2>
+## Intrukcja uruchomienia (KROK PO KROKU)
+
+Aby projekt zadziałał poprawnie na komputerze trzeba wykonać następujące kroki w terminalu:
+
+- Sklonować repozytorium przy pomocy polecenia:
+  `git clone https://github.com/apaternoga/pygames.git`
+- Wejść do folderu pygames:
+  `cd pygames`
+- Pobrać wszystkie brakujące zasoby:
+  `pip install -r requirements.txt`
+- Uruchomić grę:
+  `python main.py`
+
+## Struktura plików
+
+- **main.py** - punkt wejścia projektu (uruchamia aplikację i startuje gry)
+- **games/** - implementacje gier (logika poszczególnych mini-gier)
+- **core/** - wspólne elementy projektu (menu, obsługa wejścia)
+- **assets/** - zasoby (grafiki, dźwięki, czcionki)
+- **requirements.txt** - zależności do instalacji przez pip
+- **INSTRUKCJA.txt** - dodatkowa instrukcja, opis działania
+- **CREDITS.txt** - źródła
+- **LICENSE** - licencja projektu
+
+## Autorzy i podział zadań
+
+- **Adrian Paternoga** - Blackjack
+- **Adam Zalewski** - Crash
+- **Filip Liskowski** - README
+- **Miłosz Kiedrzyński** - 
+- **Patryk Iżbicki** - 
+- **Borys Kaczka** - 
+
+## Źródła
