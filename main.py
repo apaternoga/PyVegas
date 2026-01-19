@@ -5,7 +5,7 @@ import sys
 from core.settings import *
 from core.sound_manager import SoundManager
 from Menu import Menu
-from games.blackjack import BlackjackGame
+from games.blackjack import BlackjackGame, Card, Button, Deck, Hand
 from ui_elements import Manager
 
 def main():
@@ -47,12 +47,13 @@ def main():
 
             if action == "EXIT_APP":
                 running = False
-            elif action == "START_BLACKJACK":
+            elif action == "BLACKJACK":
                 game = BlackjackGame(screen, sm)
                 app_state = "GAME"
 
         elif app_state == "GAME":
             if game:
+                game.update()
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT: running = False
                     if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:

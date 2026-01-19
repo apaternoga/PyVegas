@@ -1,6 +1,5 @@
 import os, pygame, sys
 from games import blackjack
-from games.blackjack import Card
 from constants import *
 from ui_elements import Button, Button2, BlackjackIcon, Slider 
 import screens
@@ -51,7 +50,7 @@ class Menu:
             't2':       Button(650, 230, 300, 55, "LOFI CHILL"),
             'stop':     Button(-1, 450, 400, 50, "SOUND ON / OFF"),
 
-            'bj':       Button2(310, 250, 200, 200, "Blackjack", icon_renderer=BlackjackIcon(Card)),
+            'bj':       Button2(310, 250, 200, 200, "Blackjack", icon_renderer=BlackjackIcon()),
             'g2':       Button2(540, 250, 200, 200, "Gra 2"),
             'g3':       Button2(770, 250, 200, 200, "Gra 3")
         }
@@ -83,8 +82,7 @@ class Menu:
             if self.btns['no'].is_clicked(event): self.state = "MENU"
 
         elif self.state == "GRY":
-            if self.btns['bj'].is_clicked(event):
-                return "BLACKJACK"
+            if self.btns['bj'].is_clicked(event): return "BLACKJACK"
             if self.btns['back'].is_clicked(event): self.state = "MENU"
 
         elif self.state == "SETTINGS":

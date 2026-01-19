@@ -1,6 +1,7 @@
 import pygame
 import os
 from constants import WHITE, BLACK, GRAY, DARK_GRAY, WIDTH
+from games.blackjack import Card
 
 
 class Manager:
@@ -56,7 +57,7 @@ class Button2:
         self.text = text
         self.icon_renderer = icon_renderer 
         self.anim_offset = 0 
-        self.max_offset = 40 
+        self.max_offset = 50 
         self.base_color = (52, 152, 219)
         self.hover_color = (41, 128, 185)
         self.text_color = (255, 255, 255)
@@ -67,12 +68,12 @@ class Button2:
         if self.original_rect.collidepoint(mouse_pos):
             current_color = self.hover_color
             self.rect = self.original_rect.inflate(20, 20)
-            if self.anim_offset < self.max_offset: self.anim_offset += 2
+            if self.anim_offset < self.max_offset: self.anim_offset += 4
             if not self.is_hovered:
                 if Manager.sm: Manager.sm.play_sound('hover')
                 self.is_hovered = True
         else:
-            if self.anim_offset > 0: self.anim_offset -= 2
+            if self.anim_offset > 0: self.anim_offset -= 4
             current_color = self.base_color
             self.rect = self.original_rect.copy()
             self.is_hovered = False
@@ -82,7 +83,7 @@ class Button2:
         
         # Rysowanie ikony dokładnie na środku przycisku
         if self.icon_renderer:
-            self.icon_renderer.draw(surface, self.rect.centerx, self.rect.centery, self.anim_offset)
+            self.icon_renderer.draw(surface, self.rect.centerx, self.rect.centery, self.anim_offset, self.is_hovered)
             
         # Centrowanie tekstu w dolnej części przycisku
         text_surf = font.render(self.text, True, self.text_color)
@@ -97,19 +98,20 @@ class Button2:
         return False
 
 class BlackjackIcon:
-    def __init__(self, card_class):
-        self.card1 = card_class("Spades", "Ace")
-        self.card2 = card_class("Hearts", "Jack")
+    def __init__(self):
+        self.card1 = Card("Spades", "Ace")
+        self.card2 = Card("Hearts", "Jack")
         
-    def draw(self, surface, center_x, center_y, offset):
-        scale = 0.65
-        h, w = 150*scale, 100*scale
-        draw_y = center_y - (h / 2) - 20
+    def draw(self, surface, center_x, center_y, offset, is_hovered):
+        if is_hovered: scale =75 
+        else: scale = 70
+        h, w = 150*scale//100, 100*scale//100
+        draw_y = center_y - (h / 2) -35
         
         # Centrowanie kart
         # Karta 1 w lewo, Karta 2 w prawo
-        self.card1.draw(surface, center_x - (w / 2) - offset + 10, draw_y, w, h)
-        self.card2.draw(surface, center_x - (w / 2) + offset + 15, draw_y, w, h)
+        self.card1.draw(surface, center_x - (w / 2) - offset, draw_y, hidden=False, sc=scale)
+        self.card2.draw(surface, center_x - (w / 2) + offset, draw_y, hidden=False, sc=scale)
 
 class Slider:
     def __init__(self, x, y, width, initial_val):
