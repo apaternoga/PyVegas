@@ -75,7 +75,10 @@ class Card:
             self.y += dy * self.speed
 
     # ZMIANA: draw teraz pobiera target zamiast zwyklego x i y
-    def draw(self, screen, target_x, target_y, hidden=False):
+    def draw(self, screen, target_x, target_y, hidden=False, sc=100):
+        scale = sc / 100
+        w=100*scale
+        h=150*scale
         # ustawiamy cel i aktualizujemy pozycje
         self.target_x = target_x
         self.target_y = target_y
@@ -84,23 +87,24 @@ class Card:
         # do rysowania uzywamy aktualnej (tej aktualizowanej)
         x = int(self.x)
         y = int(self.y)
+        
 
         # Rysujemy cień: daje on efekt głębi
-        shadow_rect = pygame.Rect(x + 2, y + 2, 100, 150)
-        pygame.draw.rect(screen, (0, 0, 0, 100), shadow_rect, border_radius=8)
+        shadow_rect = pygame.Rect(x + 2, y + 2, w, h)
+        pygame.draw.rect(screen, (0, 0, 0, w), shadow_rect, border_radius=8)
 
         # Główny kształt karty
-        rect = pygame.Rect(x, y, 100, 150)
+        rect = pygame.Rect(x, y, w, h) 
         pygame.draw.rect(screen, WHITE, rect, border_radius=8)
         pygame.draw.rect(screen, BLACK, rect, 2, border_radius=8)
 
         # Jeśli ukryta (karta dealera)
         if hidden:
             # Wzór na "plecach" karty
-            inner_rect = pygame.Rect(x + 5, y + 5, 90, 140)
-            pygame.draw.rect(screen, RED, inner_rect, border_radius=5)
+            inner_rect = pygame.Rect(x + int(5*scale), y + int(5*scale), w - int(10*scale), h - int(10*scale))
+            pygame.draw.rect(screen, RED, inner_rect, border_radius=int(5*scale))
             # Znak zapytania
-            font_hidden = pygame.font.SysFont("Times New Roman", 60, bold=True)
+            font_hidden = pygame.font.SysFont("Times New Roman", int(60*scale), bold=True)
             text_surf = font_hidden.render("?", True, WHITE)
             text_rect = text_surf.get_rect(center=rect.center)
             screen.blit(text_surf, text_rect)
@@ -133,15 +137,19 @@ class Card:
         rank_str = str(rank_short)
 
         # Czcionki
-        font_corner = pygame.font.SysFont("Arial", 18, bold=True)
-        font_pip = pygame.font.SysFont("Segoe UI Symbol", 28)  # Do małych symboli
-        font_face = pygame.font.SysFont("Times New Roman", 60)  # Do figur
+        size1 = 18 *sc//100
+        size2 = 28 *sc//100
+        size3 = 60 *sc//100
+        
+        font_corner = pygame.font.SysFont("Arial", size1, bold=True)
+        font_pip = pygame.font.SysFont("Segoe UI Symbol", size2)  # Do małych symboli
+        font_face = pygame.font.SysFont("Times New Roman", size3)  # Do figur
 
         # --- RYSOWANIE ROGÓW ---
 
         # Lewy górny
-        screen.blit(font_corner.render(rank_str, True, color), (x + 5, y + 5))
-        screen.blit(font_corner.render(suit_icon, True, color), (x + 5, y + 25))
+        screen.blit(font_corner.render(rank_str, True, color), (x + int(5*scale), y + int(5*scale)))
+        screen.blit(font_corner.render(suit_icon, True, color), (x + int(5*scale), y + int(25*scale)))
 
         # Prawy dolny
         corner_rank_surf = font_corner.render(rank_str, True, color)
@@ -150,10 +158,10 @@ class Card:
         corner_suit_surf = pygame.transform.rotate(corner_suit_surf, 180)
 
         screen.blit(
-            corner_rank_surf, (x + 95 - corner_rank_surf.get_width(), y + 145 - 20)
+            corner_rank_surf, (x + w*95//100 - corner_rank_surf.get_width(), y + h*125//150)
         )
         screen.blit(
-            corner_suit_surf, (x + 95 - corner_suit_surf.get_width(), y + 145 - 40)
+            corner_suit_surf, (x + w*95//100 - corner_suit_surf.get_width(), y + h*105//150)
         )
 
         # Pozycje
@@ -254,16 +262,16 @@ class Card:
         else:
             # FIGURY (J, Q, K, A)
             if rank_short == "A":
-                font_ace = pygame.font.SysFont("Segoe UI Symbol", 80)
+                font_ace = pygame.font.SysFont("Segoe UI Symbol", 80*sc//100)
                 pip_surf = font_ace.render(suit_icon, True, color)
-                pip_rect = pip_surf.get_rect(center=(x + 50, y + 75))
+                pip_rect = pip_surf.get_rect(center=(x + w//2, y + h//2))
                 screen.blit(pip_surf, pip_rect)
             else:
                 # Dla figur (J, Q, K) ramka i litera
-                pygame.draw.rect(screen, color, (x + 20, y + 30, 60, 90), 1)
+                pygame.draw.rect(screen, color, (x + int(20*scale), y + int(30*scale), int(60*scale), int(90*scale)), 1)
 
                 face_surf = font_face.render(rank_str, True, color)
-                face_rect = face_surf.get_rect(center=(x + 50, y + 75))
+                face_rect = face_surf.get_rect(center=(x + w//2, y + h//2))
                 screen.blit(face_surf, face_rect)
 
 
