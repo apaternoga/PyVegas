@@ -17,7 +17,7 @@ def draw_settings(screen, bg_image, btns, font):
         screen.fill(GRAY)
         
     # Tytuł sekcji
-    title_surf = font.render("USTAWIENIA", True, WHITE)
+    title_surf = font.render("SETTINGS", True, WHITE)
     screen.blit(title_surf, title_surf.get_rect(center=(1280 // 2, 80)))
     
     # Rysowanie istniejących przycisków
@@ -32,18 +32,18 @@ def draw_settings_music(screen, bg_image, btns, font, font_smaller, volume, vol_
     else: screen.fill(BLACK)
     
     # Tytuł na środku
-    title = font.render("MUZYKA", True, WHITE)
+    title = font.render("MUSIC", True, WHITE)
     screen.blit(title, title.get_rect(center=(1280 // 2, 80)))
     
     # Tekst głośności
-    vol_label = f"Głośność: {int(volume * 100)}%"
+    vol_label = f"VOLUME: {int(volume * 100)}%"
     vol_surf = font_smaller.render(vol_label, True, WHITE)
 
     total_width = vol_surf.get_width() + 20 + 30
     start_x = (1280 - total_width) // 2
     
     # 3. Rysowanie tekstu
-    screen.blit(vol_surf, (start_x, 150))
+    screen.blit(vol_surf, (start_x, 143))
     
     # 4. Rysowanie ikonki obok tekstu jeśli wyciszony
     draw_speaker_icon(screen, start_x + vol_surf.get_width() + 20, 150, is_muted)
@@ -61,7 +61,7 @@ def draw_exit(screen, bg_image, btns, font, font_small):
     if bg_image:
         screen.blit(bg_image, (0, 0))
     else:
-        screen.fill((147, 112, 219)) # Opcjonalne fioletowe tło, gdyby obrazek nie wypalił
+        screen.fill((147, 112, 219)) 
 
     # Rysowanie wyśrodkowanego białego okienka komunikatu
     rect_w, rect_h = 800, 300
@@ -81,7 +81,7 @@ def draw_exit(screen, bg_image, btns, font, font_small):
     btns['yes'].draw(screen, font)
     btns['no'].draw(screen, font)
 
- # Przełączanie na fullscreen'a
+# Przełączanie na fullscreen'a
 def draw_fullscreen(screen, btns, font_smaller, is_fullscreen):
     overlay = pygame.Surface((WIDTH, HEIGHT)); overlay.set_alpha(180); overlay.fill(BLACK)
     screen.blit(overlay, (0, 0))
