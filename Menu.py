@@ -17,9 +17,9 @@ vol_slider = Slider(-1, 360, 600, saved_volume)
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN | pygame.SCALED)
 pygame.display.set_caption("Nasza Gra - Menu")
-font = pygame.font.SysFont("Arial", 38)
-font_small = pygame.font.SysFont("Arial", 35)
-font_smaller = pygame.font.SysFont("Arial", 30)
+font = pygame.font.Font(os.path.join("assets", "LuckiestGuy-Regular.ttf"), 55)
+font_small = pygame.font.Font(os.path.join("assets", "LuckiestGuy-Regular.ttf"), 50)
+font_smaller = pygame.font.Font(os.path.join("assets", "LuckiestGuy-Regular.ttf"), 45)
 
 # Dźwięki
 try:
