@@ -1,11 +1,12 @@
 import pygame
 import os
-from constants import WHITE, BLACK, GRAY, DARK_GRAY
+from constants import WHITE, BLACK, GRAY, DARK_GRAY, WIDTH
 
 class Button:
     def __init__(self, x, y, width, height, text):
+        # Automatyczne centrowanie w poziomie, jeśli x == -1
         if x == -1:
-            x = (800 - width) // 2
+            x = (WIDTH - width) // 2
         self.rect = pygame.Rect(x, y, width, height)
         self.text = text
         self.color = GRAY
@@ -21,7 +22,10 @@ class Button:
         else:
             current_color = self.color
             self.is_hovered = False
-        pygame.draw.rect(surface, current_color, self.rect)
+        
+        pygame.draw.rect(surface, current_color, self.rect, border_radius=8)
+        
+        # Centrowanie tekstu wewnątrz przycisku
         text_surf = font.render(self.text, True, BLACK)
         text_rect = text_surf.get_rect(center=self.rect.center)
         surface.blit(text_surf, text_rect)
@@ -50,6 +54,7 @@ class Button2:
         mouse_pos = pygame.mouse.get_pos()
         if self.original_rect.collidepoint(mouse_pos):
             current_color = self.hover_color
+            # Inflate powiększa prostokąt symetrycznie względem środka
             self.rect = self.original_rect.inflate(20, 20)
             if self.anim_offset < self.max_offset: self.anim_offset += 2
             if not self.is_hovered:
@@ -60,10 +65,15 @@ class Button2:
             current_color = self.base_color
             self.rect = self.original_rect.copy()
             self.is_hovered = False
+            
         pygame.draw.rect(surface, current_color, self.rect, border_radius=15)
         pygame.draw.rect(surface, (255, 255, 255), self.rect, 3, border_radius=15)
+        
+        # Rysowanie ikony dokładnie na środku przycisku
         if self.icon_renderer:
             self.icon_renderer.draw(surface, self.rect.centerx, self.rect.centery, self.anim_offset)
+            
+        # Centrowanie tekstu w dolnej części przycisku
         text_surf = font.render(self.text, True, self.text_color)
         text_rect = text_surf.get_rect(midbottom=(self.rect.centerx, self.rect.bottom - 30))
         surface.blit(text_surf, text_rect)
@@ -79,28 +89,37 @@ class BlackjackIcon:
     def __init__(self, card_class):
         self.card1 = card_class("Spades", "Ace")
         self.card2 = card_class("Hearts", "Jack")
+        
     def draw(self, surface, center_x, center_y, offset):
         scale = 0.65
         h, w = 150*scale, 100*scale
-        draw_y = center_y - (h / 2) - 30
-        self.card1.draw(surface, center_x - offset -30, draw_y, w, h)
-        self.card2.draw(surface, center_x + offset -30, draw_y, w, h)
+        # Przesunięcie w górę, aby zrobić miejsce na tekst pod ikoną
+        draw_y = center_y - (h / 2) - 20
+        
+        # Poprawione centrowanie kart (rozchodzą się symetrycznie od środka)
+        # Karta 1 w lewo, Karta 2 w prawo
+        self.card1.draw(surface, center_x - (w / 2) - offset + 10, draw_y, w, h)
+        self.card2.draw(surface, center_x - (w / 2) + offset + 15, draw_y, w, h)
 
 class Slider:
     def __init__(self, x, y, width, initial_val):
+        # Jeśli x == -1, suwak też się wyśrodkuje względem ekranu
+        if x == -1:
+            x = (WIDTH - width) // 2
         self.rect = pygame.Rect(x, y, width, 10)
+        # Uchwyt centruje się na podstawie wartości początkowej
         self.handle_rect = pygame.Rect(x + (width * initial_val) - 10, y - 5, 20, 20)
         self.dragging = False
         self.value = initial_val
 
     def draw(self, surface):
-        # Rysowanie linii suwaka
+        # Tło suwaka (szary pasek)
         pygame.draw.rect(surface, (100, 100, 100), self.rect, border_radius=5)
-        # Rysowanie aktywnej części (kolor niebieski)
+        # Aktywny pasek (niebieski)
         active_rect = pygame.Rect(self.rect.x, self.rect.y, self.rect.width * self.value, 10)
         pygame.draw.rect(surface, (52, 152, 219), active_rect, border_radius=5)
-        # Rysowanie uchwytu
-        pygame.draw.circle(surface, (255, 255, 255), self.handle_rect.center, 10)
+        # Uchwyt (kółko) - rysujemy na środku handle_rect
+        pygame.draw.circle(surface, (255, 255, 255), self.handle_rect.center, 12)
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -110,9 +129,9 @@ class Slider:
             self.dragging = False
         elif event.type == pygame.MOUSEMOTION:
             if self.dragging:
-                # Ograniczenie ruchu uchwytu do szerokości paska
+                # Ograniczenie ruchu do szerokości paska
                 self.handle_rect.centerx = max(self.rect.left, min(event.pos[0], self.rect.right))
-                # Obliczanie wartości 0.0 - 1.0
+                # Przeliczenie pozycji na wartość 0.0 - 1.0
                 self.value = (self.handle_rect.centerx - self.rect.left) / self.rect.width
-                return True # Informacja, że wartość się zmieniła
+                return True
         return False

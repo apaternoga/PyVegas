@@ -7,14 +7,14 @@ import screens
 
 # Zmienne muzyczne
 is_muted = False
-saved_volume = 0.1
+saved_volume = 0.05
 current_playlist = "Brak"
 
 # Suwak
-vol_slider = Slider(100, 360, 600, saved_volume)
+vol_slider = Slider(-1, 360, 600, saved_volume)
 
 pygame.init()
-screen = pygame.display.set_mode((800, 600), pygame.SCALED)
+screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN | pygame.SCALED)
 pygame.display.set_caption("Nasza Gra - Menu")
 font = pygame.font.SysFont("Arial", 38)
 font_small = pygame.font.SysFont("Arial", 35)
@@ -32,34 +32,39 @@ except:
 bg_image = None
 try:
     loaded_bg = pygame.image.load(os.path.join("assets", "tlo_menu.jpg"))
-    bg_image = pygame.transform.scale(loaded_bg, (800, 600))
+    bg_image = pygame.transform.scale(loaded_bg, (WIDTH, HEIGHT))
 except: pass
 
-# Tworzenie przycisków
 btns = {
-    'start': Button(-1, 250, 200, 50, "START"),
-    'exit': Button(-1, 350, 200, 50, "WYJŚCIE"),
+    # Menu Główne (zostaje bez zmian)
+    'start':    Button(-1, 250, 200, 50, "START"),
+    'exit':     Button(-1, 350, 200, 50, "WYJŚCIE"),
     'settings': Button(-1, 450, 200, 50, "USTAWIENIA"),
-    'back': Button(-1, 500, 300, 60, "COFNIJ"),
-    'yes': Button(250, 300, 140, 50, "TAK"),
-    'no': Button(410, 300, 140, 50, "NIE"),
-    'instr': Button(-1, 150, 400, 50, "INSTRUKCJE"),
-    'full': Button(-1, 220, 400, 50, "PEŁNY EKRAN/OKNO"),
-    'lic': Button(-1, 290, 400, 50, "LICENCJE"),
-    'music_m': Button(-1, 360, 400, 50, "MUZYKA"),
-    't1': Button(150, 200, 240, 50, "JAZZ MIX"),
-    't2': Button(410, 200, 240, 50, "LOFI CHILL"),
-    'stop': Button(-1, 420, 360, 50, "WYCISZ/PRZYWRÓĆ MUZYKĘ"),
-    'bj': Button2(50, 200, 200, 200, "Blackjack", icon_renderer=BlackjackIcon(Card)),
-    'g2': Button2(300, 200, 200, 200, "Gra 2"),
-    'g3': Button2(550, 200, 200, 200, "Gra 3"),
-    'playlist1' : Button(100, 230, 290, 50, "JAZZ MIX"),
-    'playlist2' : Button(410, 230, 290, 50, "LOFI CASINO"),
-    'mute' : Button(-1, 440, 360, 50, "WYCISZ / ODDAJ GŁOS")
+    
+    # Ustawienia - Wyregulowane odstępy (co 100 pikseli)
+    'instr':    Button(-1, 200, 400, 55, "INSTRUKCJE"),
+    'lic':      Button(-1, 300, 400, 55, "LICENCJE"),
+    'music_m':  Button(-1, 400, 400, 55, "MUZYKA"),
+    'back':     Button(-1, 580, 300, 60, "COFNIJ"), # Przycisk powrotu na dole
+    
+    # Wyjście
+    'yes':      Button(490, 420, 140, 50, "TAK"),
+    'no':       Button(650, 420, 140, 50, "NIE"),
+
+    # Muzyka
+    't1':       Button(390, 230, 240, 50, "JAZZ MIX"),
+    't2':       Button(650, 230, 240, 50, "LOFI CHILL"),
+    'stop':     Button(-1, 450, 400, 50, "WYCISZ / PRZYWRÓĆ MUZYKĘ"),
+
+    # Minigierki
+    'bj':       Button2(310, 250, 200, 200, "Blackjack", icon_renderer=BlackjackIcon(Card)),
+    'g2':       Button2(540, 250, 200, 200, "Gra 2"),
+    'g3':       Button2(770, 250, 200, 200, "Gra 3")
 }
 
 state = "MENU"
-volume = 0.1
+volume = 0.05
+
 current_track = "Brak"
 is_fullscreen = False
 active_game = None
@@ -94,14 +99,13 @@ while running:
 
         elif state == "SETTINGS":
             if btns['music_m'].is_clicked(event, s_click): state = "SETTINGS_MUSIC"
-            if btns['full'].is_clicked(event, s_click): state = "FULLSCREEN"
             if btns['back'].is_clicked(event, s_click): state = "MENU"
 
         elif state == "FULLSCREEN":
             if btns['yes'].is_clicked(event, s_click):
                 is_fullscreen = not is_fullscreen
                 f = (pygame.FULLSCREEN | pygame.SCALED) if is_fullscreen else pygame.SCALED
-                screen = pygame.display.set_mode((800, 600), f)
+                screen = pygame.display.set_mode((WIDTH, HEIGHT), f)
                 state = "SETTINGS"
             if btns['no'].is_clicked(event, s_click): state = "SETTINGS"
 
