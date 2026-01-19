@@ -34,6 +34,7 @@ class CrashGame:
         path_crash = os.path.join(asset_dir, "crash_explosion.mp3")
         path_cashout = os.path.join(asset_dir, "cashout.mp3")
         path_select = os.path.join(sounds_dir, "select_001.ogg")
+        path_hover = os.path.join(sounds_dir, "hover.wav")
 
         # Load sounds
         try:
@@ -50,6 +51,9 @@ class CrashGame:
         except: pass
         self.sfx_select = None
         try: self.sfx_select = pygame.mixer.Sound(path_select)
+        except: pass
+        self.sfx_hover = None
+        try: self.sfx_hover = pygame.mixer.Sound(path_hover)
         except: pass
 
         # Fonts
@@ -84,26 +88,47 @@ class CrashGame:
         panel_y = self.H - 200
         self.rect_panel_bg = pygame.Rect(0, panel_y, self.W, 200)
         
-        margin = 60
-        input_w = 160
-        btn_w = 70
+        margin = 40
+        input_w = 240
+        btn_w = 110
         gap = 10
 
         bet_x = margin
         auto_x = self.W - margin - input_w - gap - btn_w
 
-        self.rect_input_bet = pygame.Rect(bet_x, panel_y + 60, input_w, 50)
-        self.rect_btn_double = pygame.Rect(self.rect_input_bet.right + gap, self.rect_input_bet.y, btn_w, 22)
-        self.rect_btn_half = pygame.Rect(self.rect_input_bet.right + gap, self.rect_input_bet.y + 28, btn_w, 22)
-        self.rect_input_auto = pygame.Rect(auto_x, panel_y + 60, input_w, 50)
-        self.rect_toggle_auto = pygame.Rect(self.rect_input_auto.right + gap, panel_y + 65, btn_w, 40)
-        self.rect_btn_action = pygame.Rect(center_x - 100, panel_y + 130, 200, 55)
+        base_center_y = panel_y + 105
+
+        self.rect_input_bet = pygame.Rect(bet_x, base_center_y - 36, input_w, 72)
+        self.rect_btn_double = pygame.Rect(self.rect_input_bet.right + gap, self.rect_input_bet.y, btn_w, 32)
+        self.rect_btn_half = pygame.Rect(self.rect_input_bet.right + gap, self.rect_input_bet.y + 40, btn_w, 32)
+        self.rect_input_auto = pygame.Rect(auto_x, base_center_y - 36, input_w, 72)
+        self.rect_toggle_auto = pygame.Rect(self.rect_input_auto.right + gap, base_center_y - 30, btn_w, 60)
+        self.rect_btn_action = pygame.Rect(center_x - 150, base_center_y - 40, 300, 80)
 
         self.error_msg = ""
         self.error_timer = 0
+        self.hover_states = {
+            "half": False,
+            "double": False,
+            "toggle": False,
+            "action": False,
+        }
 
     def draw_rounded_rect(self, surface, color, rect, radius=10):
         pygame.draw.rect(surface, color, rect, border_radius=radius)
+
+    def draw_inner_glow(self, rect, color, alpha=70, radius=8):
+        overlay = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 0))
+        glow_color = (color[0], color[1], color[2], alpha)
+        pygame.draw.rect(overlay, glow_color, overlay.get_rect(), border_radius=radius)
+        self.screen.blit(overlay, (rect.x, rect.y))
+
+    def _handle_hover(self, key, hovered):
+        if hovered and not self.hover_states.get(key, False):
+            if self.sfx_hover:
+                self.sfx_hover.play()
+        self.hover_states[key] = hovered
 
     def draw_gradient_bg(self):
         self.screen.fill(COLORS["bg_dark"])
@@ -313,6 +338,7 @@ class CrashGame:
         # Panel bg
         pygame.draw.rect(self.screen, COLORS["bg_panel"], self.rect_panel_bg)
         pygame.draw.line(self.screen, (60, 70, 90), (0, self.rect_panel_bg.y), (self.W, self.rect_panel_bg.y), 1)
+        mouse_pos = pygame.mouse.get_pos()
 
         # Balance
         lbl = self.font_ui.render("BALANCE", True, COLORS["text_gray"])
@@ -341,7 +367,7 @@ class CrashGame:
 
         # Input: Bet
         lbl_bet = self.font_ui.render("BET AMOUNT", True, COLORS["text_gray"])
-        self.screen.blit(lbl_bet, (self.rect_input_bet.x, self.rect_input_bet.y - 30))
+        self.screen.blit(lbl_bet, lbl_bet.get_rect(center=(self.rect_input_bet.centerx, self.rect_input_bet.y - 15)))
         
         col_border = COLORS["accent_green"] if self.active_input == "BET" else COLORS["input_bg"]
         self.draw_rounded_rect(self.screen, COLORS["input_bg"], self.rect_input_bet, 8)
@@ -349,11 +375,19 @@ class CrashGame:
             pygame.draw.rect(self.screen, col_border, self.rect_input_bet, 2, border_radius=8)
         
         txt_bet = self.font_mono.render(f"{self.bet_input_text}", True, COLORS["text_white"])
-        self.screen.blit(txt_bet, (self.rect_input_bet.x + 10, self.rect_input_bet.y + 12))
+        self.screen.blit(txt_bet, txt_bet.get_rect(center=self.rect_input_bet.center))
 
         # Bet quick buttons
+        hover_half = self.rect_btn_half.collidepoint(mouse_pos)
+        hover_double = self.rect_btn_double.collidepoint(mouse_pos)
+        self._handle_hover("half", hover_half)
+        self._handle_hover("double", hover_double)
         self.draw_rounded_rect(self.screen, COLORS["input_bg"], self.rect_btn_half, 6)
         self.draw_rounded_rect(self.screen, COLORS["input_bg"], self.rect_btn_double, 6)
+        if hover_half:
+            self.draw_inner_glow(self.rect_btn_half, COLORS["accent_green"], alpha=70, radius=6)
+        if hover_double:
+            self.draw_inner_glow(self.rect_btn_double, COLORS["accent_green"], alpha=70, radius=6)
         pygame.draw.rect(self.screen, COLORS["accent_green"], self.rect_btn_half, 1, border_radius=6)
         pygame.draw.rect(self.screen, COLORS["accent_green"], self.rect_btn_double, 1, border_radius=6)
 
@@ -365,7 +399,7 @@ class CrashGame:
 
         # Input: Auto
         lbl_auto = self.font_ui.render("AUTO CASHOUT", True, COLORS["text_gray"])
-        self.screen.blit(lbl_auto, (self.rect_input_auto.x, self.rect_input_auto.y - 30))
+        self.screen.blit(lbl_auto, lbl_auto.get_rect(center=(self.rect_input_auto.centerx, self.rect_input_auto.y - 15)))
         
         col_border = COLORS["accent_green"] if self.active_input == "AUTO" else COLORS["input_bg"]
         self.draw_rounded_rect(self.screen, COLORS["input_bg"], self.rect_input_auto, 8)
@@ -373,11 +407,15 @@ class CrashGame:
             pygame.draw.rect(self.screen, col_border, self.rect_input_auto, 2, border_radius=8)
             
         txt_auto = self.font_mono.render(f"{self.auto_cashout_text} x", True, COLORS["text_white"])
-        self.screen.blit(txt_auto, (self.rect_input_auto.x + 10, self.rect_input_auto.y + 12))
+        self.screen.blit(txt_auto, txt_auto.get_rect(center=self.rect_input_auto.center))
 
         # Toggle switch
+        hover_toggle = self.rect_toggle_auto.collidepoint(mouse_pos)
+        self._handle_hover("toggle", hover_toggle)
         t_col = COLORS["accent_green"] if self.auto_cashout_on else COLORS["bg_dark"]
         self.draw_rounded_rect(self.screen, t_col, self.rect_toggle_auto, 20)
+        if hover_toggle:
+            self.draw_inner_glow(self.rect_toggle_auto, COLORS["accent_green"], alpha=70, radius=20)
         kx = self.rect_toggle_auto.x + 35 if self.auto_cashout_on else self.rect_toggle_auto.x + 5
         pygame.draw.circle(self.screen, COLORS["text_white"], (kx + 10, self.rect_toggle_auto.centery), 12)
 
@@ -395,10 +433,14 @@ class CrashGame:
              b_col = COLORS["accent_green"]
              b_txt = "NEXT ROUND"
 
+        hover_action = self.rect_btn_action.collidepoint(mouse_pos)
+        self._handle_hover("action", hover_action)
         s_rect = self.rect_btn_action.copy()
         s_rect.y += 4
         self.draw_rounded_rect(self.screen, (20,20,20), s_rect, 15)
         self.draw_rounded_rect(self.screen, b_col, self.rect_btn_action, 15)
+        if hover_action:
+            self.draw_inner_glow(self.rect_btn_action, COLORS["text_white"], alpha=60, radius=15)
         
         t_btn = self.font_ui.render(b_txt, True, COLORS["bg_dark"])
         tr = t_btn.get_rect(center=self.rect_btn_action.center)
