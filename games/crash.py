@@ -72,6 +72,7 @@ class CrashGame:
         self.cashout_point = 0.0
         self.growth_speed = 0.01
         self.history_points = [1.0]
+        self.last_delta = 0.0
         
         # Rects
         center_x = self.W // 2
@@ -80,9 +81,19 @@ class CrashGame:
         panel_y = self.H - 200
         self.rect_panel_bg = pygame.Rect(0, panel_y, self.W, 200)
         
-        self.rect_input_bet = pygame.Rect(center_x - 220, panel_y + 60, 140, 50)
-        self.rect_input_auto = pygame.Rect(center_x + 80, panel_y + 60, 140, 50)
-        self.rect_toggle_auto = pygame.Rect(center_x + 230, panel_y + 65, 60, 40)
+        margin = 60
+        input_w = 160
+        btn_w = 70
+        gap = 10
+
+        bet_x = margin
+        auto_x = self.W - margin - input_w - gap - btn_w
+
+        self.rect_input_bet = pygame.Rect(bet_x, panel_y + 60, input_w, 50)
+        self.rect_btn_double = pygame.Rect(self.rect_input_bet.right + gap, self.rect_input_bet.y, btn_w, 22)
+        self.rect_btn_half = pygame.Rect(self.rect_input_bet.right + gap, self.rect_input_bet.y + 28, btn_w, 22)
+        self.rect_input_auto = pygame.Rect(auto_x, panel_y + 60, input_w, 50)
+        self.rect_toggle_auto = pygame.Rect(self.rect_input_auto.right + gap, panel_y + 65, btn_w, 40)
         self.rect_btn_action = pygame.Rect(center_x - 100, panel_y + 130, 200, 55)
 
         self.error_msg = ""
@@ -112,6 +123,31 @@ class CrashGame:
         self.error_msg = msg
         self.error_timer = 120
 
+    def _parse_amount(self, text):
+        try:
+            return float(text)
+        except:
+            return 0.0
+
+    def _format_amount(self, value):
+        if value <= 0:
+            return "0"
+        if value.is_integer():
+            return str(int(value))
+        return f"{value:.2f}".rstrip("0").rstrip(".")
+
+    def _apply_bet_multiplier(self, factor):
+        if self.state == "RUNNING":
+            return
+        amount = self._parse_amount(self.bet_input_text)
+        if amount <= 0:
+            amount = 1.0
+        amount *= factor
+        if self.balance > 0:
+            amount = min(amount, self.balance)
+        self.bet_input_text = self._format_amount(amount)
+        self.active_input = "BET"
+
     def start_round(self):
         if self.state == "RUNNING": return
         
@@ -139,6 +175,7 @@ class CrashGame:
         self.history_points = [1.0]
         self.state = "RUNNING"
         self.growth_speed = 0.002
+        self.last_delta = 0.0
         
         # Audio
         self.next_tick_ms = pygame.time.get_ticks()
@@ -151,6 +188,7 @@ class CrashGame:
             self.cashout_point = self.current_multiplier
             win = self.current_bet * self.cashout_point
             self.balance += win
+            self.last_delta = win
             self.game_history.append((self.cashout_point, True))
             if len(self.game_history) > 12: self.game_history.pop(0)
 
@@ -191,6 +229,7 @@ class CrashGame:
                 self.state = "CRASHED"
                 
                 if self.sfx_crash: self.sfx_crash.play()
+                self.last_delta = -self.current_bet
                 
                 self.game_history.append((self.target_crash, False))
                 if len(self.game_history) > 12: self.game_history.pop(0)
@@ -201,6 +240,11 @@ class CrashGame:
                 if self.rect_input_bet.collidepoint(event.pos): self.active_input = "BET"
                 elif self.rect_input_auto.collidepoint(event.pos): self.active_input = "AUTO"
                 else: self.active_input = None
+
+                if self.rect_btn_half.collidepoint(event.pos):
+                    self._apply_bet_multiplier(0.5)
+                if self.rect_btn_double.collidepoint(event.pos):
+                    self._apply_bet_multiplier(2.0)
                 
                 if self.rect_toggle_auto.collidepoint(event.pos):
                     self.auto_cashout_on = not self.auto_cashout_on
@@ -273,6 +317,12 @@ class CrashGame:
         val = self.font_mono.render(f"${self.balance:.2f}", True, COLORS["text_white"])
         self.screen.blit(lbl, (20, 20))
         self.screen.blit(val, (20, 50))
+        if self.last_delta != 0:
+            delta_color = COLORS["accent_green"] if self.last_delta > 0 else COLORS["accent_red"]
+            sign = "+" if self.last_delta > 0 else "-"
+            delta_text = f"{sign}${abs(int(self.last_delta))}"
+            delta = self.font_ui.render(delta_text, True, delta_color)
+            self.screen.blit(delta, (20, 80))
 
         # History pills
         hx = 250
@@ -298,6 +348,17 @@ class CrashGame:
         
         txt_bet = self.font_mono.render(f"{self.bet_input_text}", True, COLORS["text_white"])
         self.screen.blit(txt_bet, (self.rect_input_bet.x + 10, self.rect_input_bet.y + 12))
+
+        # Bet quick buttons
+        self.draw_rounded_rect(self.screen, COLORS["input_bg"], self.rect_btn_half, 6)
+        self.draw_rounded_rect(self.screen, COLORS["input_bg"], self.rect_btn_double, 6)
+        pygame.draw.rect(self.screen, COLORS["accent_green"], self.rect_btn_half, 1, border_radius=6)
+        pygame.draw.rect(self.screen, COLORS["accent_green"], self.rect_btn_double, 1, border_radius=6)
+
+        t_half = self.font_ui.render("1/2x", True, COLORS["text_white"])
+        t_double = self.font_ui.render("2x", True, COLORS["text_white"])
+        self.screen.blit(t_half, t_half.get_rect(center=self.rect_btn_half.center))
+        self.screen.blit(t_double, t_double.get_rect(center=self.rect_btn_double.center))
 
         # Input: Auto
         lbl_auto = self.font_ui.render("AUTO CASHOUT", True, COLORS["text_gray"])
@@ -342,8 +403,9 @@ class CrashGame:
         
         if self.state == "RUNNING":
             w_val = int(self.current_bet * self.current_multiplier)
-            t_sub = self.font_ui.render(f"+ ${w_val}", True, (50,50,50))
-            self.screen.blit(t_sub, (self.rect_btn_action.right + 15, self.rect_btn_action.y + 15))
+            t_sub = self.font_ui.render(f"+ ${w_val}", True, COLORS["accent_green"])
+            t_rect = t_sub.get_rect(midleft=(self.rect_btn_action.right + 12, self.rect_btn_action.centery))
+            self.screen.blit(t_sub, t_rect)
 
 
         # Center Text
@@ -353,7 +415,6 @@ class CrashGame:
         
         d_val = f"{self.current_multiplier:.2f}x"
         if self.state == "CRASHED": d_val = f"CRASHED @ {self.target_crash:.2f}x"
-             
         t_main = self.font_main.render(d_val, True, m_col)
         r_main = t_main.get_rect(center=(self.W // 2, self.H // 2 - 50))
         self.screen.blit(t_main, r_main)
