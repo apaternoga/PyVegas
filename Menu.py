@@ -40,18 +40,18 @@ except: pass
 btns = {
     # Menu Główne
     'start':    Button(-1, 250, 200, 50, "START"),
-    'exit':     Button(-1, 350, 200, 50, "WYJŚCIE"),
-    'settings': Button(-1, 450, 200, 50, "USTAWIENIA"),
+    'exit':     Button(1080, 650, 160, 65, "EXIT"),
+    'settings': Button(-1, 450, 200, 50, "SETTINGS"),
     
     # Ustawienia 
     'instr':    Button(-1, 200, 400, 55, "INSTRUKCJE"),
     'lic':      Button(-1, 300, 400, 55, "LICENCJE"),
     'music_m':  Button(-1, 400, 400, 55, "MUZYKA"),
-    'back':     Button(-1, 580, 300, 60, "COFNIJ"), # Przycisk powrotu na dole
+    'back':     Button(-1, 580, 300, 60, "COFNIJ"), 
     
     # Wyjście
-    'yes':      Button(490, 420, 140, 50, "TAK"),
-    'no':       Button(650, 420, 140, 50, "NIE"),
+    'yes':      Button(490, 420, 140, 50, "YES"),
+    'no':       Button(650, 420, 140, 50, "NO"),
 
     # Muzyka
     't1':       Button(390, 230, 240, 50, "JAZZ MIX"),

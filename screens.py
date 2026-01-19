@@ -57,22 +57,27 @@ def draw_settings_music(screen, bg_image, btns, font, font_smaller, volume, vol_
 
 # Rysowanie stanu wyjścia     
 def draw_exit(screen, bg_image, btns, font, font_small):
-    # Overlay przyciemniający
-    overlay = pygame.Surface((1280, 720), pygame.SRCALPHA)
-    overlay.fill((0, 0, 0, 180))
-    screen.blit(overlay, (0, 0))
-    
-    # Białe okno komunikatu na środku
+    # Tło to samo co po włączeniu gry
+    if bg_image:
+        screen.blit(bg_image, (0, 0))
+    else:
+        screen.fill((147, 112, 219)) # Opcjonalne fioletowe tło, gdyby obrazek nie wypalił
+
+    # Rysowanie wyśrodkowanego białego okienka komunikatu
     rect_w, rect_h = 800, 300
     rect_x = (1280 - rect_w) // 2
     rect_y = (720 - rect_h) // 2
-    pygame.draw.rect(screen, WHITE, (rect_x, rect_y, rect_w, rect_h), border_radius=15)
-    pygame.draw.rect(screen, BLACK, (rect_x, rect_y, rect_w, rect_h), 3, border_radius=15)
     
-    # Napis wyśrodkowany w oknie
-    text = font_small.render("CZY NA PEWNO CHCESZ WYJŚĆ Z GRY?", True, BLACK)
-    screen.blit(text, text.get_rect(center=(1280 // 2, rect_y + 80)))
+    # Rysowanie ramki okna - białe wypełnienie i czarna obwódka
+    pygame.draw.rect(screen, (255, 255, 255), (rect_x, rect_y, rect_w, rect_h), border_radius=25)
+    pygame.draw.rect(screen, (0, 0, 0), (rect_x, rect_y, rect_w, rect_h), 5, border_radius=25) # Błękitna ramka
     
+    # Napis z pytaniem
+    text_surf = font_small.render("ARE YOU SURE YOU WANT TO EXIT?", True, (0, 0, 0))
+    text_rect = text_surf.get_rect(center=(1280 // 2, rect_y + 80))
+    screen.blit(text_surf, text_rect)
+    
+    # Przyciski tak i nie
     btns['yes'].draw(screen, font)
     btns['no'].draw(screen, font)
 

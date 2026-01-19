@@ -5,6 +5,7 @@ from constants import WHITE, BLACK, GRAY, DARK_GRAY, WIDTH
 # Mój przycisk główny do ustawień (Patryk)
 class Button:
     def __init__(self, x, y, width, height, text):
+        self.text = text
         # Automatyczne centrowanie w poziomie jeśli x == -1
         if x == -1:
             x = (WIDTH - width) // 2
@@ -25,10 +26,15 @@ class Button:
             self.is_hovered = False
         
         pygame.draw.rect(surface, current_color, self.rect, border_radius=8)
+
+        if self.text == "EXIT":
+         pygame.draw.rect(surface, BLACK, self.rect, 2, border_radius=8)
         
         # Centrowanie tekstu wewnątrz przycisku
         text_surf = font.render(self.text, True, BLACK)
-        text_rect = text_surf.get_rect(center=self.rect.center)
+        text_x = self.rect.centerx
+        text_y = self.rect.centery + 5
+        text_rect = text_surf.get_rect(center=(text_x, text_y))
         surface.blit(text_surf, text_rect)
 
     def is_clicked(self, event, s_click=None):
