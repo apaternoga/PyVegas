@@ -416,8 +416,12 @@ class CrashGame:
         self.draw_rounded_rect(self.screen, t_col, self.rect_toggle_auto, 20)
         if hover_toggle:
             self.draw_inner_glow(self.rect_toggle_auto, COLORS["accent_green"], alpha=70, radius=20)
-        kx = self.rect_toggle_auto.x + 35 if self.auto_cashout_on else self.rect_toggle_auto.x + 5
-        pygame.draw.circle(self.screen, COLORS["text_white"], (kx + 10, self.rect_toggle_auto.centery), 12)
+        knob_radius = 14
+        if self.auto_cashout_on:
+            kx = self.rect_toggle_auto.right - knob_radius - 6
+        else:
+            kx = self.rect_toggle_auto.x + knob_radius + 6
+        pygame.draw.circle(self.screen, COLORS["text_white"], (kx, self.rect_toggle_auto.centery), knob_radius)
 
         # Action Button
         b_col = COLORS["accent_green"]
