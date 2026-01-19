@@ -64,7 +64,6 @@ btns = {
 
 state = "MENU"
 volume = 0.05
-
 current_track = "Brak"
 is_fullscreen = False
 active_game = None
