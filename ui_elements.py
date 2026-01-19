@@ -2,9 +2,10 @@ import pygame
 import os
 from constants import WHITE, BLACK, GRAY, DARK_GRAY, WIDTH
 
+# Mój przycisk główny do ustawień (Patryk)
 class Button:
     def __init__(self, x, y, width, height, text):
-        # Automatyczne centrowanie w poziomie, jeśli x == -1
+        # Automatyczne centrowanie w poziomie jeśli x == -1
         if x == -1:
             x = (WIDTH - width) // 2
         self.rect = pygame.Rect(x, y, width, height)
@@ -37,6 +38,7 @@ class Button:
                 return True
         return False
 
+# Przycisk wewnątrz gierek po kliknięciu start
 class Button2:
     def __init__(self, x, y, width, height, text, icon_renderer=None):
         self.original_rect = pygame.Rect(x, y, width, height)
@@ -54,7 +56,6 @@ class Button2:
         mouse_pos = pygame.mouse.get_pos()
         if self.original_rect.collidepoint(mouse_pos):
             current_color = self.hover_color
-            # Inflate powiększa prostokąt symetrycznie względem środka
             self.rect = self.original_rect.inflate(20, 20)
             if self.anim_offset < self.max_offset: self.anim_offset += 2
             if not self.is_hovered:
@@ -93,17 +94,16 @@ class BlackjackIcon:
     def draw(self, surface, center_x, center_y, offset):
         scale = 0.65
         h, w = 150*scale, 100*scale
-        # Przesunięcie w górę, aby zrobić miejsce na tekst pod ikoną
         draw_y = center_y - (h / 2) - 20
         
-        # Poprawione centrowanie kart (rozchodzą się symetrycznie od środka)
+        # Centrowanie kart
         # Karta 1 w lewo, Karta 2 w prawo
         self.card1.draw(surface, center_x - (w / 2) - offset + 10, draw_y, w, h)
         self.card2.draw(surface, center_x - (w / 2) + offset + 15, draw_y, w, h)
 
 class Slider:
     def __init__(self, x, y, width, initial_val):
-        # Jeśli x == -1, suwak też się wyśrodkuje względem ekranu
+        # Jeśli x == -1, suwak wyśrodkuje względem ekranu
         if x == -1:
             x = (WIDTH - width) // 2
         self.rect = pygame.Rect(x, y, width, 10)
@@ -118,7 +118,7 @@ class Slider:
         # Aktywny pasek (niebieski)
         active_rect = pygame.Rect(self.rect.x, self.rect.y, self.rect.width * self.value, 10)
         pygame.draw.rect(surface, (52, 152, 219), active_rect, border_radius=5)
-        # Uchwyt (kółko) - rysujemy na środku handle_rect
+        # Uchwyt (kółko) - rysowanie na środku handle_rect
         pygame.draw.circle(surface, (255, 255, 255), self.handle_rect.center, 12)
 
     def handle_event(self, event):

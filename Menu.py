@@ -10,9 +10,10 @@ is_muted = False
 saved_volume = 0.05
 current_playlist = "Brak"
 
-# Suwak
+# Ustawienie Suwaka
 vol_slider = Slider(-1, 360, 600, saved_volume)
 
+# Ustawienia ekranu i czcionki
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN | pygame.SCALED)
 pygame.display.set_caption("Nasza Gra - Menu")
@@ -29,6 +30,7 @@ except:
         def play(self): pass
     s_hover = s_click = Dummy()
 
+# Ładowanie tła i innych plików
 bg_image = None
 try:
     loaded_bg = pygame.image.load(os.path.join("assets", "tlo_menu.jpg"))
@@ -36,12 +38,12 @@ try:
 except: pass
 
 btns = {
-    # Menu Główne (zostaje bez zmian)
+    # Menu Główne
     'start':    Button(-1, 250, 200, 50, "START"),
     'exit':     Button(-1, 350, 200, 50, "WYJŚCIE"),
     'settings': Button(-1, 450, 200, 50, "USTAWIENIA"),
     
-    # Ustawienia - Wyregulowane odstępy (co 100 pikseli)
+    # Ustawienia 
     'instr':    Button(-1, 200, 400, 55, "INSTRUKCJE"),
     'lic':      Button(-1, 300, 400, 55, "LICENCJE"),
     'music_m':  Button(-1, 400, 400, 55, "MUZYKA"),
@@ -62,6 +64,7 @@ btns = {
     'g3':       Button2(770, 250, 200, 200, "Gra 3")
 }
 
+# Jakieś zmienne (niektóre niepotrzebne!)
 state = "MENU"
 volume = 0.05
 current_track = "Brak"
@@ -77,6 +80,7 @@ try:
 except:
     print("Ostrzeżenie: Nie udało się włączyć muzyki na starcie (brak pliku?)")
 
+# Główna pętla z różnymi stanami gry 
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT: running = False
@@ -116,7 +120,7 @@ while running:
                 if not is_muted:
                     pygame.mixer.music.set_volume(volume)
 
-            # TUTAJ: Dodane ładowanie plików
+            # Ładowanie plików
             if btns['t1'].is_clicked(event, s_click):
                 try:
                     pygame.mixer.music.load(os.path.join("assets", "jazz_playlist.mp3"))
