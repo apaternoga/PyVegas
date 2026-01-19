@@ -446,11 +446,6 @@ class CrashGame:
         tr = t_btn.get_rect(center=self.rect_btn_action.center)
         self.screen.blit(t_btn, tr)
         
-        if self.state == "RUNNING":
-            w_val = int(self.current_bet * self.current_multiplier)
-            t_sub = self.font_ui.render(f"+ ${w_val}", True, COLORS["accent_green"])
-            t_rect = t_sub.get_rect(midleft=(self.rect_btn_action.right + 12, self.rect_btn_action.centery))
-            self.screen.blit(t_sub, t_rect)
 
 
         # Center Text
