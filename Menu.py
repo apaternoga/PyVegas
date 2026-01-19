@@ -12,10 +12,15 @@ class Menu:
         
         # --- SOUND MANAGER ---
         self.sm = sound_manager
-        self.sm.play_music("jazz_playlist.mp3")
+        if not pygame.mixer.music.get_busy():
+            self.sm.play_music("jazz_playlist.mp3")
 
         self.state = "MENU"
         self.active_game = None
+        
+        # --- ZMIENNE SCROLLOWANIA ---
+        self.instr_scroll = 0      # Pozycja tekstu
+        self.is_dragging = False   # Czy trzymamy suwak myszką?
         
         # Suwak inicjujemy głośnością pobraną z Sound Managera
         current_vol = getattr(self.sm, 'volume_music', 0.1) 
@@ -43,6 +48,8 @@ class Menu:
             'music_m':  Button(-1, 400, 400, 55, "MUSIC"),
             'back':     Button(-1, 580, 300, 60, "BACK"), 
             
+            'back_instr': Button(-1, 620, 300, 60, "BACK"),
+
             'yes':      Button(490, 420, 140, 50, "YES"),
             'no':       Button(650, 420, 140, 50, "NO"),
 
@@ -56,22 +63,22 @@ class Menu:
         }
 
     def update(self):
-
-        event= pygame.event.poll()
+        event = pygame.event.poll()
 
         if event.type == pygame.QUIT:
             return "EXIT_APP"
 
+        # --- GRA ---
         if self.state == "GRA" and self.active_game:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 self.state = "GRY"
                 self.active_game = None
-                
                 self.sm.play_music("jazz_playlist.mp3")
             else:
                 self.active_game.handle_input(event)
             return True
 
+        # --- MENU ---
         if self.state == "MENU":
             if self.btns['start'].is_clicked(event): self.state = "GRY"
             if self.btns['settings'].is_clicked(event): self.state = "SETTINGS"
@@ -87,28 +94,81 @@ class Menu:
 
         elif self.state == "SETTINGS":
             if self.btns['music_m'].is_clicked(event): self.state = "SETTINGS_MUSIC"
+            
+            if self.btns['instr'].is_clicked(event): 
+                self.state = "INSTRUCTIONS"
+                self.instr_scroll = 0 
+                self.is_dragging = False
+
             if self.btns['back'].is_clicked(event): self.state = "MENU"
+
+        # --- INSTRUKCJE (LOGIKA MYSZKI) ---
+        elif self.state == "INSTRUCTIONS":
+            if self.btns['back_instr'].is_clicked(event):
+                self.state = "SETTINGS"
+            
+            # Parametry paska (MUSZĄ BYĆ IDENTYCZNE JAK W screens.py)
+            viewport_y = 100            
+            viewport_h = HEIGHT - 220   
+            
+            scrollbar_x = (WIDTH - 200) + 100 + 10 # Pozycja X paska
+            thumb_height = 60
+            
+            max_scroll = 480
+
+            # 1. Obsługa kółka myszy (Scroll Wheel)
+            if event.type == pygame.MOUSEWHEEL:
+                self.instr_scroll -= event.y * 20 
+
+            # 2. Kliknięcie myszką (złapanie suwaka)
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1: # Lewy przycisk
+                    # Obliczamy gdzie aktualnie jest suwak
+                    progress = self.instr_scroll / max_scroll if max_scroll > 0 else 0
+                    thumb_y = viewport_y + progress * (viewport_h - thumb_height)
+                    
+                    # Tworzymy prostokąt suwaka do sprawdzenia kolizji
+                    # (dajemy ciut szerszy obszar X dla wygody klikania)
+                    thumb_rect = pygame.Rect(scrollbar_x - 5, thumb_y, 25, thumb_height) 
+                    
+                    if thumb_rect.collidepoint(event.pos):
+                        self.is_dragging = True
+
+            # 3. Puszczenie myszki
+            elif event.type == pygame.MOUSEBUTTONUP:
+                self.is_dragging = False
+
+            # 4. Ruch myszką (gdy trzymamy suwak)
+            elif event.type == pygame.MOUSEMOTION:
+                if self.is_dragging:
+                    rel_y = event.rel[1] # O ile ruszyła się myszka w pionie
+                    
+                    # Przeliczamy piksele myszki na wartość scrolla
+                    track_len = viewport_h - thumb_height
+                    if track_len > 0:
+                        scroll_change = (rel_y / track_len) * max_scroll
+                        self.instr_scroll += scroll_change
+
+            # Zabezpieczenia zakresu
+            if self.instr_scroll < 0: self.instr_scroll = 0
+            if self.instr_scroll > max_scroll: self.instr_scroll = max_scroll
 
         elif self.state == "SETTINGS_MUSIC":
             if self.btns['back'].is_clicked(event): self.state = "SETTINGS"
             
-            # Obsługa suwaka - przekazujemy wartość do Sound Managera
             if self.vol_slider.handle_event(event):
                 self.sm.set_volume_music(self.vol_slider.value)
 
-            # Zmiana playlisty
             if self.btns['t1'].is_clicked(event):
                 self.sm.play_music("jazz_playlist.mp3")
             
             if self.btns['t2'].is_clicked(event):
                 self.sm.play_music("lofi_playlist.mp3")
 
-            # Mute / Unmute
             if self.btns['stop'].is_clicked(event):
                 if hasattr(self.sm, 'toggle_mute'):
                     self.sm.toggle_mute()
                 else:
-                    # Fallback jeśli nie ma metody toggle_mute
                     current = getattr(self.sm, 'is_muted', False)
                     self.sm.mute(not current)
 
@@ -119,7 +179,6 @@ class Menu:
             self.active_game.draw()
             return
 
-        # Pobieramy aktualne stany z Managera dla UI
         current_vol = getattr(self.sm, 'volume_music', 0.5)
         is_muted = getattr(self.sm, 'muted', False)
 
@@ -129,10 +188,12 @@ class Menu:
             screens.draw_exit(self.screen, self.bg_image, self.btns, self.font, self.font_small)
         elif self.state == "SETTINGS":
             screens.draw_settings(self.screen, self.bg_image, self.btns, self.font)
+        
+        elif self.state == "INSTRUCTIONS":
+            screens.draw_instructions(self.screen, self.bg_image, self.btns, self.font, self.font_smaller, self.instr_scroll)
+            
         elif self.state == "SETTINGS_MUSIC":
-            # Synchronizujemy wartość suwaka z aktualną głośnością
             self.vol_slider.value = current_vol
-            # Przekazujemy volume i mute z sound managera do rysowania
             screens.draw_settings_music(
                 self.screen, self.bg_image, self.btns, self.font, self.font_smaller, 
                 current_vol, self.vol_slider, is_muted
