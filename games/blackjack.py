@@ -676,6 +676,8 @@ class BlackjackGame:
 
         # ruch gracza dobiera (HIT) lub nie dobiera(STAY)
         elif self.state == "player_turn":
+            if self.wait_timer > 0:
+                return
             current_hand = self.player_hands[self.current_hand_index]
 
             # Jeśli gracz ma mniej niż 21, pokazujemy główne przyciski akcji
@@ -692,15 +694,29 @@ class BlackjackGame:
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_h:
-                    action = "hit"
+                    if current_hand.value < 21:
+                        action = "hit"
                 elif event.key == pygame.K_s:
                     action = "stand"
                 elif event.key == pygame.K_d:
-                    action = "double"
+                    if (
+                        len(current_hand.cards) == 2
+                        and self.chips >= current_hand.bet
+                        and current_hand.value < 21
+                    ):
+                        action = "double"
                 elif event.key == pygame.K_p:
-                    action = "split"
+                    if (
+                        len(current_hand.cards) == 2
+                        and values[current_hand.cards[0].rank]
+                        == values[current_hand.cards[1].rank]
+                        and self.chips >= self.current_bet
+                        and len(self.player_hands) < 2
+                    ):
+                        action = "split"
                 elif event.key == pygame.K_u:
-                    action = "surrender"
+                    if len(self.player_hands) == 1 and len(current_hand.cards) == 2:
+                        action = "surrender"
 
             # sprawdzamy klikniecia myszka
             if self.btn_hit.is_clicked(event):
