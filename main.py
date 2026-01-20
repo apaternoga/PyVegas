@@ -6,11 +6,11 @@ import ctypes  # Potrzebne do naprawy ikonki na pasku zadań
 #importy z innych plikow
 from core.settings import *
 from core.sound_manager import SoundManager
-from Menu import Menu
+from core.menu import Menu
 from games.blackjack import BlackjackGame, Card, Button, Deck, Hand
 from games.crash import CrashGame
-from ui_elements import Manager
-from intro import IntroSequence
+from core.ui_elements import Manager
+from core.intro import IntroSequence
 from core.wallet import Wallet
 
 def main():
@@ -40,7 +40,7 @@ def main():
     # --- TYTUŁ I IKONKA ---
     pygame.display.set_caption("PyVegas")
     
-    icon_path = os.path.join("assets", "pyvegas.png")
+    icon_path = os.path.join("assets", "images", "pyvegas.png")
     if os.path.exists(icon_path):
         icon = pygame.image.load(icon_path)
     

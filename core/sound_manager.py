@@ -5,7 +5,9 @@ class SoundManager:
     def __init__(self):
         self.sounds = {}
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-        self.base_path = os.path.join(base_dir, "assets", "sounds")
+        self.sfx_path = os.path.join(base_dir, "assets", "sfx")
+        self.music_path = os.path.join(base_dir, "assets", "music")
+        self.crash_path = os.path.join(base_dir, "assets", "crash")
 
         self.volume = 0.5           # Domyślna głośność efektów (0.0 do 1.0)
         self.volume_music = 0.1     # Domyślna głośność muzyki (0.0 do 1.0)
@@ -20,7 +22,7 @@ class SoundManager:
         }
         loaded = 0
         for name, filename in common_sounds.items():
-            if self.load_sound(name, filename):
+            if self.load_sound(name, filename, self.sfx_path):
                 loaded += 1
         print(f"Loaded {loaded}/{len(common_sounds)} common sounds")
         return loaded
@@ -42,7 +44,7 @@ class SoundManager:
         }
         loaded = 0
         for name, filename in blackjack_sounds.items():
-            if self.load_sound(name, filename):
+            if self.load_sound(name, filename, self.sfx_path):
                 loaded += 1
         print(f"Loaded {loaded}/{len(blackjack_sounds)} blackjack sounds")
         return loaded
@@ -56,7 +58,7 @@ class SoundManager:
         }
         loaded = 0
         for name, filename in crash_sounds.items():
-            if self.load_sound(name, filename):
+            if self.load_sound(name, filename, self.crash_path):
                 loaded += 1
         print(f"Loaded {loaded}/{len(crash_sounds)} crash sounds")
         return loaded
@@ -72,12 +74,14 @@ class SoundManager:
             print(f"Warning: pygame.mixer not available: {e}")
             return False
 
-    def load_sound(self, name, filename): #zaladuj dzwiek
+    def load_sound(self, name, filename, base_path=None): #zaladuj dzwiek
         if not self._ensure_mixer():
             print(f"Nie można załadować dźwięku '{filename}': mixer niedostępny.")
             return False
 
-        path = os.path.join(self.base_path, filename)
+        if base_path is None:
+            base_path = self.sfx_path
+        path = os.path.join(base_path, filename)
         if not os.path.exists(path):
             print(f"Brak pliku dźwięku: {path}")
             return False
@@ -112,9 +116,11 @@ class SoundManager:
             print(f"Cannot play music '{name}': mixer not initialized.")
             return False
 
-        path = os.path.join(self.base_path, name)
+        path = os.path.join(self.music_path, name)
         if not os.path.exists(path):
-            print(f"Plik muzyki '{name}' nie istnieje w {self.base_path}.")
+            path = os.path.join(self.crash_path, name)
+        if not os.path.exists(path):
+            print(f"Plik muzyki '{name}' nie istnieje w {self.music_path} ani {self.crash_path}.")
             return False
         try:
             pygame.mixer.music.load(path)

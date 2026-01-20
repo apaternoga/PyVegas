@@ -2,7 +2,7 @@
 
 <div align="center">
 
-<img src="assets/pyvegas.png" alt="PyVegas Banner" width="700" />
+<img src="assets/images/pyvegas.png" alt="PyVegas Banner" width="700" />
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python&logoColor=white)
 ![Pygame](https://img.shields.io/badge/Pygame-CE-yellow?style=for-the-badge&logo=python&logoColor=white)
@@ -95,9 +95,15 @@ To run the project on your machine, follow these steps in your terminal:
 The project maintains a clean file structure by separating logic from assets:
 
 * `main.py` – Application entry point (engine initialization, main loop).
-* `core/` – System core (menu, settings, sound manager, input handling).
+* `core/` – System core (menu, settings, sound manager, input handling, UI helpers).
 * `games/` – Logic for specific games (Blackjack, Crash).
-* `assets/` – Multimedia resources (sounds, graphics, fonts).
+* `assets/` – Multimedia resources:
+  * `images/` – UI graphics and logos.
+  * `fonts/` – Typeface files.
+  * `music/` – Background music.
+  * `sfx/` – Shared sound effects.
+  * `crash/` – Crash-specific audio.
+* `data/` – Runtime data (wallet save).
 * `requirements.txt` – List of required Python libraries.
 * `CREDITS.txt` – Detailed information about asset sources.
 
