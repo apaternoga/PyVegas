@@ -8,6 +8,7 @@ from Menu import Menu
 from games.blackjack import BlackjackGame, Card, Button, Deck, Hand
 from games.crash import CrashGame
 from ui_elements import Manager
+from intro import IntroSequence
 
 def main():
     #inicjalizacja modulow pygame
@@ -30,10 +31,13 @@ def main():
     #odpowiada za FPS
     clock=pygame.time.Clock()
 
-    #tu bedzie intro
+    #tu jest intro
+    intro = IntroSequence(screen)
+    intro.run()
+
     menu = Menu(screen, sm)
     game= None
-
+    
     app_state ="MENU"
 
     running =True

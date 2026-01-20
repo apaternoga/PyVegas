@@ -152,10 +152,3 @@ class IntroSequence:
             pygame.display.flip()
             self.clock.tick(60)
 
-if __name__ == "__main__":
-    pygame.init()
-    test_screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("PyVegas Intro")
-    intro = IntroSequence(test_screen)
-    intro.run()
-    pygame.quit()
