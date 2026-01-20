@@ -9,6 +9,7 @@ from games.blackjack import BlackjackGame, Card, Button, Deck, Hand
 from games.crash import CrashGame
 from ui_elements import Manager
 from intro import IntroSequence
+from core.wallet import Wallet
 
 def main():
     #inicjalizacja modulow pygame
@@ -19,7 +20,6 @@ def main():
     sm = SoundManager()
     sm.load_common_sounds()
     sm.load_blackjack_sounds() #przeniesc potem
-
     Manager.sm = sm
 
     #tworzenie 'screen', czyli glownego okna gry o rozmiarach podanych w settings.py
@@ -35,7 +35,7 @@ def main():
     intro = IntroSequence(screen)
     intro.run()
 
-    menu = Menu(screen, sm)
+    menu = Menu(screen, sm, wallet=Wallet(STARTING_MONEY))
     game= None
     
     app_state ="MENU"
@@ -53,15 +53,16 @@ def main():
             if action == "EXIT_APP":
                 running = False
             elif action == "BLACKJACK":
-                game = BlackjackGame(screen, sm)
+                game = BlackjackGame(screen, sm, wallet=menu.wallet)
                 app_state = "GAME"
             elif action == "CRASH":
-                game = CrashGame(screen)
+                game = CrashGame(screen, wallet=menu.wallet)
                 app_state = "GAME"
 
         elif app_state == "GAME":
             if game:
                 game.update()
+                menu.wallet.save()
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT: running = False
                     if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:

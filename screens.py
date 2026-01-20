@@ -3,7 +3,7 @@ import pygame
 from constants import WHITE, BLACK, GRAY, WIDTH, HEIGHT
 
 # --- GŁÓWNE MENU ---
-def draw_menu(screen, bg_image, btns, font, logo=None, logo_scale=1.0):
+def draw_menu(screen, bg_image, btns, font, logo=None, logo_scale=1.0, wallet_balance=0, pyzeton_img=None, pyzeton_rect=None):
     if bg_image: screen.blit(bg_image, (0, 0))
     else: screen.fill(WHITE)
 
@@ -24,6 +24,17 @@ def draw_menu(screen, bg_image, btns, font, logo=None, logo_scale=1.0):
     btns['start'].draw(screen, font)
     btns['exit'].draw(screen, font)
     btns['settings'].draw(screen, font)
+
+    # rysuj PyZeton
+    if pyzeton_img and pyzeton_rect:
+        screen.blit(pyzeton_img, pyzeton_rect)
+        mouse_pos = pygame.mouse.get_pos()
+        center = pyzeton_rect.center
+        radius = min(pyzeton_rect.width, pyzeton_rect.height) / 2
+        if (mouse_pos[0] - center[0]) ** 2 + (mouse_pos[1] - center[1]) ** 2 <= radius ** 2:
+            font_small = pygame.font.Font(os.path.join("assets", "LuckiestGuy-Regular.ttf"), 20)
+            text = font_small.render("click to reset chips", True, GRAY)
+            screen.blit(text, text.get_rect(center=(center[0], center[1]+95)))
 
 # --- USTAWIENIA ---
 def draw_settings(screen, bg_image, btns, font, font_large):
@@ -264,7 +275,7 @@ def draw_fullscreen(screen, btns, font_smaller, is_fullscreen):
     btns['no'].draw(screen, font_smaller)
 
 # --- MINIGIERKI ---
-def draw_game_placeholder(screen, bg_image, btns, font, logo, logo_scale=1.0):
+def draw_game_placeholder(screen, bg_image, btns, font, logo, logo_scale=1.0, wallet_balance=0):
     if bg_image: screen.blit(bg_image, (0, 0))
     else: screen.fill((20, 20, 20))
     if logo:
@@ -284,6 +295,9 @@ def draw_game_placeholder(screen, bg_image, btns, font, logo, logo_scale=1.0):
         title = font.render("MINIGIERKI", True, WHITE)
         screen.blit(title, title.get_rect(center=(1280 // 2, 80)))
     
+    text_balance = font.render(f"${wallet_balance:.2f}", True, WHITE)
+    screen.blit(text_balance, text_balance.get_rect(topleft=(50, 50)))
+
     btns['bj'].draw(screen, font)
     btns['cr'].draw(screen, font)
     btns['back'].draw(screen, font)

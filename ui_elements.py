@@ -11,7 +11,7 @@ class Manager:
 
     # Mój przycisk główny do ustawień (Patryk)
 class Button:
-    def __init__(self, x, y, width, height, text):
+    def __init__(self, x, y, width, height, text, circular=False):
         self.text = text
         # Automatyczne centrowanie w poziomie jeśli x == -1
         if x == -1:
@@ -20,10 +20,19 @@ class Button:
         self.text = text
         self.color = GRAY
         self.is_hovered = False
+        self.circular = circular
+
+    def is_point_inside(self, point):
+        if self.circular:
+            center = self.rect.center
+            radius = min(self.rect.width, self.rect.height) / 2
+            return (point[0] - center[0]) ** 2 + (point[1] - center[1]) ** 2 <= radius ** 2
+        else:
+            return self.rect.collidepoint(point)
 
     def draw(self, surface, font):
         mouse_pos = pygame.mouse.get_pos()
-        if self.rect.collidepoint(mouse_pos):
+        if self.is_point_inside(mouse_pos):
             current_color = DARK_GRAY
             if not self.is_hovered:
                 if Manager.sm: Manager.sm.play_sound('hover')

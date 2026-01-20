@@ -6,7 +6,7 @@ from ui_elements import Button, Button2, BlackjackIcon, CrashIcon, Slider
 import screens
 
 class Menu:
-    def __init__(self, screen, sound_manager):
+    def __init__(self, screen, sound_manager, wallet):
         self.screen = screen
         self.width = screen.get_width()
         self.height = screen.get_height()
@@ -15,6 +15,9 @@ class Menu:
         self.sm = sound_manager
         if not pygame.mixer.music.get_busy():
             self.sm.play_music("jazz_playlist.mp3")
+
+        # --- PORTFEL ---
+        self.wallet = wallet
 
         self.state = "MENU"
         self.active_game = None
@@ -41,6 +44,13 @@ class Menu:
         except:
             self.logo = None
         self.logo_scale=1.0
+
+        self.pyzeton_img = None
+        try:
+            self.pyzeton_img = pygame.image.load(os.path.join("assets", "PyZeton.png")).convert_alpha()
+            self.pyzeton_img = pygame.transform.smoothscale(self.pyzeton_img, (150, 150))
+            self.pyzeton_rect = self.pyzeton_img.get_rect(center=(145, 600))
+        except: pass
 
         self.font = pygame.font.Font(os.path.join("assets", "LuckiestGuy-Regular.ttf"), 55)
         self.font_small = pygame.font.Font(os.path.join("assets", "LuckiestGuy-Regular.ttf"), 50)
@@ -93,6 +103,15 @@ class Menu:
             if self.btns['start'].is_clicked(event): self.state = "GRY"
             if self.btns['settings'].is_clicked(event): self.state = "SETTINGS"
             if self.btns['exit'].is_clicked(event): self.state = "EXIT"
+
+            # sprawdź PyZeton
+            if self.pyzeton_img and event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                center = self.pyzeton_rect.center
+                radius = min(self.pyzeton_rect.width, self.pyzeton_rect.height) / 2
+                if (event.pos[0] - center[0]) ** 2 + (event.pos[1] - center[1]) ** 2 <= radius ** 2:
+                    self.wallet.balance = self.wallet.start_money
+                    self.wallet.save()
+                    if self.sm: self.sm.play_sound('click')
         
         elif self.state == "EXIT":
             if self.btns['yes'].is_clicked(event): return "EXIT_APP" 
@@ -246,7 +265,7 @@ class Menu:
         is_muted = getattr(self.sm, 'muted', False)
 
         if self.state == "MENU":
-            screens.draw_menu(self.screen, self.bg_image, self.btns, self.font, self.logo, self.logo_scale)
+            screens.draw_menu(self.screen, self.bg_image, self.btns, self.font, self.logo, self.logo_scale, self.wallet.balance, self.pyzeton_img, self.pyzeton_rect)
         elif self.state == "EXIT":
             screens.draw_exit(self.screen, self.bg_image, self.btns, self.font, self.font_small)
         elif self.state == "SETTINGS":
@@ -265,4 +284,4 @@ class Menu:
                 current_vol, self.vol_slider, is_muted
             )
         elif self.state == "GRY":
-            screens.draw_game_placeholder(self.screen, self.bg_image, self.btns, self.font, self.logo, self.logo_scale)
+            screens.draw_game_placeholder(self.screen, self.bg_image, self.btns, self.font, self.logo, self.logo_scale, self.wallet.balance)

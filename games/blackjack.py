@@ -390,11 +390,12 @@ class Hand:
 
 
 class BlackjackGame:
-    def __init__(self, screen, sound_manager):
+    def __init__(self, screen, sound_manager, wallet):
         self.screen = (
             screen  # referencja do glownego okna gry, tym sie zajmujemy juz w mainie
         )
         self.sm = sound_manager
+        self.wallet = wallet
         self.font = pygame.font.SysFont("Arial", 30, bold=True)
         self.small_font = pygame.font.SysFont("Arial", 20)
         self.label_font = pygame.font.SysFont("Arial", 22, bold=True)
@@ -416,7 +417,6 @@ class BlackjackGame:
         self.text_anim_progress = 0.0
 
         self.message = "Please place your bet (↑ / ↓), then press DEAL."
-        self.chips = STARTING_MONEY
         self.current_bet = 10
         self.insurance_bet = 0
         self.wait_timer = 0
@@ -585,7 +585,7 @@ class BlackjackGame:
         self.player_hands[0].bet = self.current_bet
 
         # POPRAWKA: Odejmujemy pieniądze na starcie
-        self.chips -= self.current_bet
+        self.wallet.balance -= self.current_bet
 
         self.deck = Deck(num_decks=6)
         self.deck.shuffle()
@@ -617,8 +617,8 @@ class BlackjackGame:
         insurance_cost = self.current_bet // 2
 
         if take_insurance:
-            if self.chips >= insurance_cost:
-                self.chips -= insurance_cost
+            if self.wallet.balance >= insurance_cost:
+                self.wallet.balance -= insurance_cost
                 self.insurance_bet = insurance_cost
                 self.message = "Insurance taken."
             else:
@@ -633,7 +633,7 @@ class BlackjackGame:
             # KRUPIER MA BLACKJACKA
             if take_insurance:
                 payout = self.insurance_bet * 3
-                self.chips += payout
+                self.wallet.balance += payout
                 self.message = "Insurance Pays! Dealer has Blackjack."
             else:
                 self.message = "Dealer has Blackjack."
@@ -657,20 +657,20 @@ class BlackjackGame:
         if self.state == "betting":
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    if self.chips >= self.current_bet:
+                    if self.wallet.balance >= self.current_bet:
                         self.start_round()
                     else:
                         self.message = "Insufficient funds."
                 elif event.key == pygame.K_UP:
-                    if self.chips >= self.current_bet + 10:
+                    if self.wallet.balance >= self.current_bet + 10:
                         self.current_bet += 10
                 elif event.key == pygame.K_DOWN:
-                    if self.chips > 10:
+                    if self.wallet.balance > 10:
                         self.current_bet -= 10
 
             # obsluga myszki dla przycisku rozdaj
             if self.btn_deal.is_clicked(event):
-                if self.chips >= self.current_bet:
+                if self.wallet.balance >= self.current_bet:
                     self.start_round()
                 else:
                     self.message = "Insufficient funds."
@@ -694,7 +694,7 @@ class BlackjackGame:
                 self.btn_stand.draw(self.screen)
 
                 # DOUBLE tylko na starcie (2 karty) i przy < 21 pkt
-                if len(current_hand.cards) == 2 and self.chips >= current_hand.bet:
+                if len(current_hand.cards) == 2 and self.wallet.balance >= current_hand.bet:
                     self.btn_double.draw(self.screen)
 
             # zmienna pomocnicza zeby nie pisac kodu dwa razy dla klawiatury i myszki
@@ -709,7 +709,7 @@ class BlackjackGame:
                 elif event.key == pygame.K_d:
                     if (
                         len(current_hand.cards) == 2
-                        and self.chips >= current_hand.bet
+                        and self.wallet.balance >= current_hand.bet
                         and current_hand.value < 21
                     ):
                         action = "double"
@@ -718,7 +718,7 @@ class BlackjackGame:
                         len(current_hand.cards) == 2
                         and values[current_hand.cards[0].rank]
                         == values[current_hand.cards[1].rank]
-                        and self.chips >= self.current_bet
+                        and self.wallet.balance >= self.current_bet
                         and len(self.player_hands) < 2
                     ):
                         action = "split"
@@ -732,14 +732,14 @@ class BlackjackGame:
             elif self.btn_stand.is_clicked(event):
                 action = "stand"
             elif self.btn_double.is_clicked(event):
-                if self.chips >= current_hand.bet and len(current_hand.cards) == 2:
+                if self.wallet.balance >= current_hand.bet and len(current_hand.cards) == 2:
                     action = "double"
             elif self.btn_split.is_clicked(event):
                 if (
                     len(current_hand.cards) == 2
                     and values[current_hand.cards[0].rank]
                     == values[current_hand.cards[1].rank]
-                    and self.chips >= self.current_bet
+                    and self.wallet.balance >= self.current_bet
                     and len(self.player_hands) < 2
                 ):
                     action = "split"
@@ -766,11 +766,11 @@ class BlackjackGame:
             elif action == "double":
                 # podwajamy tylko dla aktualnej reki
                 if (
-                    self.chips >= current_hand.bet
+                    self.wallet.balance >= current_hand.bet
                     and len(current_hand.cards) == 2
                     and current_hand.value < 21
                 ):
-                    self.chips -= current_hand.bet  # Pobieramy stawkę
+                    self.wallet.balance -= current_hand.bet  # Pobieramy stawkę
                     current_hand.bet *= 2  # Podwajamy stawkę ręki
 
                     # w prawdziwej grze kazda reka po splicie ma wlasny zaklad
@@ -789,7 +789,7 @@ class BlackjackGame:
 
             elif action == "surrender":
                 refund = current_hand.bet // 2
-                self.chips += refund
+                self.wallet.balance += refund
                 self.message = f"Surrendered. Refund: {refund}."
                 self.state = "game_over"
 
@@ -803,7 +803,7 @@ class BlackjackGame:
     def perform_split(self):
         # Pobieramy aktualna reke
         current_hand = self.player_hands[self.current_hand_index]
-        self.chips -= self.current_bet
+        self.wallet.balance -= self.current_bet
 
         # Zabieramy jedna karte z obecnej reki, by stworzyc nowa
         card_to_move = current_hand.cards.pop()
@@ -876,24 +876,24 @@ class BlackjackGame:
             elif player_is_bj:
                 if dealer_is_bj:
                     # Remis przy blackjackach
-                    self.chips += hand.bet
+                    self.wallet.balance += hand.bet
                     current_part += "Push."
                 else:
                     # Wygrana Blackjack (3:2)
                     win_amount = hand.bet + int(hand.bet * 1.5)
-                    self.chips += win_amount
+                    self.wallet.balance += win_amount
                     current_part += "Blackjack!"
                     self.sm.play_sound("win")
 
             elif self.dealer_hand.value > 21:
                 # Dealer fura (wygrana)
-                self.chips += hand.bet * 2
+                self.wallet.balance += hand.bet * 2
                 current_part += "Win!"
                 self.sm.play_sound("win")
 
             elif hand.value > self.dealer_hand.value:
                 # Wygrana punktowa
-                self.chips += hand.bet * 2
+                self.wallet.balance += hand.bet * 2
                 current_part += "Win!"
                 self.sm.play_sound("win")
 
@@ -904,7 +904,7 @@ class BlackjackGame:
 
             else:
                 # Remis
-                self.chips += hand.bet
+                self.wallet.balance += hand.bet
                 current_part += "Push."
 
             # Dodajemy gotowy tekst ręki do listy
@@ -917,8 +917,8 @@ class BlackjackGame:
     def reset_game(self):
         self.state = "betting"
         self.message = "Please place your bet (↑ / ↓), then press DEAL."
-        if self.chips < 10:
-            self.chips = STARTING_MONEY
+        if self.wallet.balance < 10:
+            self.wallet.balance = STARTING_MONEY
             self.message = "Bankroll reset."
 
     def draw_insurance_popup(self):
@@ -986,7 +986,7 @@ class BlackjackGame:
         # ZMIANA POZYCJI NAPISOW
 
         # 1. Wyswietlanie Zetonow
-        chips_text = self.font.render(f"Chips: {self.chips}", True, GOLD)
+        chips_text = self.font.render(f"Chips: {self.wallet.balance}", True, GOLD)
         chips_rect = chips_text.get_rect(midleft=(20, panel_y + (panel_height // 2)))
         self.screen.blit(chips_text, chips_rect)
 
@@ -1130,7 +1130,7 @@ class BlackjackGame:
                 self.btn_stand.draw(self.screen)
 
                 # DOUBLE tylko na starcie i przy < 21
-                if len(current_hand.cards) == 2 and self.chips >= current_hand.bet:
+                if len(current_hand.cards) == 2 and self.wallet.balance >= current_hand.bet:
                     self.btn_double.draw(self.screen)
 
                 # SPLIT
@@ -1138,7 +1138,7 @@ class BlackjackGame:
                     len(current_hand.cards) == 2
                     and values[current_hand.cards[0].rank]
                     == values[current_hand.cards[1].rank]
-                    and self.chips >= self.current_bet
+                    and self.wallet.balance >= self.current_bet
                     and len(self.player_hands) < 2
                 ):
                     self.btn_split.draw(self.screen)
@@ -1150,7 +1150,7 @@ class BlackjackGame:
             # Rysujemy DOUBLE tylko jeśli ma 2 karty i mniej niż 21 punktów
             if (
                 len(current_hand.cards) == 2
-                and self.chips >= current_hand.bet
+                and self.wallet.balance >= current_hand.bet
                 and current_hand.value < 21
             ):
                 self.btn_double.draw(self.screen)
@@ -1159,7 +1159,7 @@ class BlackjackGame:
                 len(current_hand.cards) == 2
                 and values[current_hand.cards[0].rank]
                 == values[current_hand.cards[1].rank]
-                and self.chips >= self.current_bet
+                and self.wallet.balance >= self.current_bet
                 and len(self.player_hands) < 2
             ):
                 self.btn_split.draw(self.screen)
