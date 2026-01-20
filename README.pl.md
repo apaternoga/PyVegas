@@ -1,7 +1,7 @@
 [![EN](https://img.shields.io/badge/Lang-EN-blue.svg)](README.md)
 <div align="center">
 
-<img src="assets/pyvegas.png" alt="PyVegas Banner" width="700" />
+<img src="assets/images/pyvegas.png" alt="PyVegas Banner" width="700" />
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python&logoColor=white)
 ![Pygame](https://img.shields.io/badge/Pygame-CE-yellow?style=for-the-badge&logo=python&logoColor=white)
@@ -91,9 +91,15 @@ Aby uruchomić projekt na swoim komputerze, wykonaj poniższe kroki w terminalu:
 Projekt zachowuje czystą strukturę plików, oddzielając logikę od zasobów:
 
 * `main.py` – Punkt startowy aplikacji (inicjalizacja silnika, pętla główna).
-* `core/` – Rdzeń systemu (menu, settings, sound manager, obsługa wejścia).
+* `core/` – Rdzeń systemu (menu, settings, sound manager, obsługa wejścia, UI helpers).
 * `games/` – Logika poszczególnych gier (Blackjack, Crash).
-* `assets/` – Zasoby multimedialne (dźwięki, grafiki, czcionki).
+* `assets/` – Zasoby multimedialne:
+  * `images/` – Grafiki i logotypy UI.
+  * `fonts/` – Pliki czcionek.
+  * `music/` – Muzyka w tle.
+  * `sfx/` – Wspólne efekty dźwiękowe.
+  * `crash/` – Dźwięki specyficzne dla Crasha.
+* `data/` – Dane zapisu (portfel).
 * `requirements.txt` – Lista wymaganych bibliotek Python.
 * `CREDITS.txt` – Szczegółowe informacje o źródłach assetów.
 

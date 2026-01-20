@@ -3,7 +3,8 @@ import os
 class Wallet:
     def __init__(self, starting_money=1000):
         self.start_money = starting_money
-        self.file_name = "wallet.txt"
+        base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        self.file_name = os.path.join(base_dir, "data", "wallet.txt")
         self.balance = self.load()
 
     def load(self): 

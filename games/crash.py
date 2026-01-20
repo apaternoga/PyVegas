@@ -30,10 +30,6 @@ class CrashGame:
         if not pygame.mixer.get_init():
             pygame.mixer.init()
 
-        # Paths (games/crash.py -> assets/sounds/)
-        base_dir = os.path.dirname(__file__)
-        sounds_dir = os.path.abspath(os.path.join(base_dir, "..", "assets", "sounds"))
-
         # Fonts
         self.font_main = pygame.font.SysFont("Arial Rounded MT Bold", 120, bold=True)
         self.font_ui = pygame.font.SysFont("Verdana", 24)
