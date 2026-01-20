@@ -76,8 +76,8 @@ Aby uruchomić projekt na swoim komputerze, wykonaj poniższe kroki w terminalu:
 
 1. **Sklonuj repozytorium:**
    ```bash
-   git clone [https://github.com/apaternoga/pygames.git](https://github.com/apaternoga/pygames.git)
-   cd pygames
+   git clone [https://github.com/apaternoga/PyVegas.git](https://github.com/apaternoga/PyVegas.git)
+   cd PyVegas
 2. **Zainstaluj zależności:**
    Projekt wymaga biblioteki `pygame`. Aby ją zainstalować, wpisz w terminalu:
    ```bash

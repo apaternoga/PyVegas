@@ -74,8 +74,8 @@ To run the project on your machine, follow these steps in your terminal:
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/apaternoga/pygames.git](https://github.com/apaternoga/pygames.git)
-    cd pygames
+    git clone [https://github.com/apaternoga/PyVegas.git](https://github.com/apaternoga/PyVegas.git)
+    cd PyVegas
     ```
 
 2.  **Install dependencies:**
