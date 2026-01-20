@@ -104,7 +104,7 @@ The project maintains a clean file structure by separating logic from assets:
 ## 👥 Authors
 
 * **Adrian Paternoga** - **Team Leader**, Blackjack Logic, Animation & Rendering, Project Managment
-* **Adam Zalewski** - Crash Feature Delivery, Project Coordination, Main Branch Merges, Blackjack Tester
+* **Adam Zalewski** - Crash Logic, Animations & UI, Project Coordination, Blackjack Tester
 * **Filip Liskowski** - README, Blackjack Tester
 * **Miłosz Kiedrzyński** - 
 * **Patryk Iżbicki** - 

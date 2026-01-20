@@ -101,7 +101,7 @@ Projekt zachowuje czystą strukturę plików, oddzielając logikę od zasobów:
 ## 👥 Autorzy
 
 * **Adrian Paternoga** - **lider zespołu**, logika, animacje i GUI Blackjacka, zarządzanie całością projektu.
-* **Adam Zalewski** - 
+* **Adam Zalewski** - Logika, animacje i GUI Crasha, koordynacja projektu, tester Blackjacka
 * **Filip Liskowski** - README, Blackjack tester
 * **Miłosz Kiedrzyński** - 
 * **Patryk Iżbicki** - 
@@ -112,7 +112,7 @@ Projekt zachowuje czystą strukturę plików, oddzielając logikę od zasobów:
 ### Licencja
 Projekt udostępniany jest na licencji **MIT**.
 
-Copyright © 2025 **Adrian Paternoga**.
+Copyright © 2025 **Adrian Paternoga**, **Adam Zalewski**.
 
 Oprogramowanie jest dostarczane w stanie „takim, jakie jest”, bez udzielania jakichkolwiek gwarancji. Masz prawo do swobodnego używania, modyfikacji, łączenia, publikowania i dystrybucji kodu, pod warunkiem dołączenia powyższej noty o prawach autorskich. Szczegóły znajdują się w pliku `LICENSE`.
 
