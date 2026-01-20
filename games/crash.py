@@ -1,4 +1,5 @@
 import os
+import pygame.gfxdraw
 import pygame
 import random
 
@@ -421,7 +422,14 @@ class CrashGame:
             kx = self.rect_toggle_auto.right - knob_radius - 6
         else:
             kx = self.rect_toggle_auto.x + knob_radius + 6
-        pygame.draw.circle(self.screen, COLORS["text_white"], (kx, self.rect_toggle_auto.centery), knob_radius)
+        cx, cy = kx, self.rect_toggle_auto.centery
+        scale = 5
+        size = knob_radius * 2 * scale
+        knob = pygame.Surface((size, size), pygame.SRCALPHA)
+        pygame.gfxdraw.filled_circle(knob, size // 2, size // 2, knob_radius * scale, COLORS["text_white"])
+        pygame.gfxdraw.aacircle(knob, size // 2, size // 2, knob_radius * scale, COLORS["text_white"])
+        knob = pygame.transform.smoothscale(knob, (knob_radius * 2, knob_radius * 2))
+        self.screen.blit(knob, (cx - knob_radius, cy - knob_radius))
 
         # Action Button
         b_col = COLORS["accent_green"]
