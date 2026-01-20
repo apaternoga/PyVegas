@@ -1,3 +1,4 @@
+import math
 import os
 import pygame.gfxdraw
 import pygame
@@ -86,8 +87,8 @@ class CrashGame:
         center_x = self.W // 2
         self.rect_graph = pygame.Rect(50, 50, self.W - 100, self.H - 300)
         
-        panel_y = self.H - 200
-        self.rect_panel_bg = pygame.Rect(0, panel_y, self.W, 200)
+        self.panel_y = self.H - 200
+        self.rect_panel_bg = pygame.Rect(0, self.panel_y, self.W, 200)
         
         margin = 40
         input_w = 240
@@ -97,7 +98,7 @@ class CrashGame:
         bet_x = margin
         auto_x = self.W - margin - input_w - gap - btn_w
 
-        base_center_y = panel_y + 105
+        base_center_y = self.panel_y + 105
 
         self.rect_input_bet = pygame.Rect(bet_x, base_center_y - 36, input_w, 72)
         self.rect_btn_double = pygame.Rect(self.rect_input_bet.right + gap, self.rect_input_bet.y, btn_w, 32)
@@ -164,6 +165,9 @@ class CrashGame:
             return str(int(value))
         return f"{value:.2f}".rstrip("0").rstrip(".")
 
+    def _display_balance(self):
+        return math.floor(self.balance * 100) / 100
+
     def _apply_bet_multiplier(self, factor):
         if self.state == "RUNNING":
             return
@@ -171,8 +175,9 @@ class CrashGame:
         if amount <= 0:
             amount = 1.0
         amount *= factor
-        if self.balance > 0:
-            amount = min(amount, self.balance)
+        max_bet = self._display_balance()
+        if max_bet > 0:
+            amount = min(amount, max_bet)
         self.bet_input_text = self._format_amount(amount)
         self.active_input = "BET"
 
@@ -183,10 +188,18 @@ class CrashGame:
         try:
             bet = float(self.bet_input_text)
         except:
-            bet = 0
+            bet = 0.0
             
-        if bet <= 0: return self.show_error("Invalid Bet")
-        if bet > self.balance: return self.show_error("No Funds")
+        max_bet = self._display_balance()
+        if max_bet <= 0:
+            self.current_bet = 0
+            return self.show_error("No Funds")
+        if bet <= 0:
+            self.current_bet = 0
+            return self.show_error("Invalid Bet")
+        if bet > max_bet:
+            self.current_bet = 0
+            return self.show_error("No Funds")
         
         if self.auto_cashout_on:
             try:
@@ -343,7 +356,7 @@ class CrashGame:
 
         # Balance
         lbl = self.font_ui.render("BALANCE", True, COLORS["text_gray"])
-        val = self.font_mono.render(f"${self.balance:.2f}", True, COLORS["text_white"])
+        val = self.font_mono.render(f"${self._display_balance():.2f}", True, COLORS["text_white"])
         self.screen.blit(lbl, (20, 20))
         self.screen.blit(val, (20, 50))
         if self.last_delta != 0:
@@ -473,9 +486,9 @@ class CrashGame:
         
         # Errors
         if self.error_msg:
-             et = self.font_ui.render(f"⚠ {self.error_msg}", True, COLORS["accent_red"])
-             er = et.get_rect(center=(self.W // 2, panel_y - 30))
-             self.screen.blit(et, er)
+            et = self.font_ui.render(f"⚠ {self.error_msg}", True, COLORS["accent_red"])
+            er = et.get_rect(center=(self.W // 2, self.panel_y - 30))
+            self.screen.blit(et, er)
 
     def draw(self):
         self.draw_gradient_bg()
