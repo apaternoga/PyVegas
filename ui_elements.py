@@ -110,6 +110,8 @@ class BlackjackIcon:
     def __init__(self):
         self.card1 = Card("Spades", "Ace")
         self.card2 = Card("Hearts", "Jack")
+        # te wartosci sa nadpisywane w draw
+        self.x, self.y = 0, 0
         
     def draw(self, surface, center_x, center_y, offset, is_hovered):
         if is_hovered: scale =75+offset//10
@@ -119,8 +121,17 @@ class BlackjackIcon:
         
         # Centrowanie kart
         # Karta 1 w lewo, Karta 2 w prawo
-        self.card1.draw(surface, center_x - (w / 2) - offset, draw_y, hidden=False, sc=scale)
-        self.card2.draw(surface, center_x - (w / 2) + offset, draw_y, hidden=False, sc=scale)
+        
+        # Ustawiamy pozycje recznie aby pominac animacje
+        target_x1 = center_x - (w / 2) - offset
+        self.card1.x = target_x1
+        self.card1.y = draw_y
+        self.card1.draw(surface, target_x1, draw_y, hidden=False, sc=scale)
+        
+        target_x2 = center_x - (w / 2) + offset
+        self.card2.x = target_x2
+        self.card2.y = draw_y
+        self.card2.draw(surface, target_x2, draw_y, hidden=False, sc=scale)
 
 #tym razem nowa klasa bo crash zbyt skomplikowany na animacje w Button2
 class CrashIcon:
