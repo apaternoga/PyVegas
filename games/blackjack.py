@@ -482,14 +482,15 @@ class BlackjackGame:
         )
 
         # Przycisk EXIT w prawym górnym rogu
+        # ZMIANA: Kolor tła na WHITE, tekst na BLACK
         self.btn_exit = Button(
             "EXIT",
             SCREEN_WIDTH - 120,
             20,
             100,
             40,
-            color=(DARK_PANEL),
-            text_color=WHITE,
+            color=WHITE,
+            text_color=BLACK,
             sm=self.sm,
         )
 
@@ -1193,6 +1194,10 @@ class BlackjackGame:
 
             if len(self.player_hands) == 1 and len(current_hand.cards) == 2:
                 self.btn_surrender.draw(self.screen)
+            
+            # Zapewnienie, że EXIT wciąż jest rysowany w turze gracza, jeśli chcesz, żeby był widoczny
+            self.btn_exit.draw(self.screen)
+
         elif self.state == "game_over":
             self.btn_deal.draw(self.screen)
             self.btn_exit.draw(self.screen)
