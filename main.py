@@ -69,21 +69,21 @@ def main():
                 menu.wallet.save()
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT: running = False
+                    
+                    # Poprawiona obsługa ESC - sprawdzamy czy gra pozwala na wyjście
                     if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                        app_state = "MENU"
-                        if game_curr=='CRASH': sm.play_music()
-                        game = None # Usuwamy grę z pamięci
+                        if hasattr(game, 'can_exit') and game.can_exit():
+                            app_state = "MENU"
+                            if game_curr=='CRASH': sm.play_music()
+                            game = None # Usuwamy grę z pamięci
                     
                     if game: game.handle_input(event)
-                if game_curr == "BLACKJACK":
-                    if game and game.exit_requested:
-                        app_state = "MENU"
-                        game = None
-                elif game_curr == "CRASH":
-                    if game and game.exit_requested:
-                        app_state = "MENU"
-                        game = None
-                        sm.play_music()
+
+                # Sprawdzanie czy gra sama poprosiła o wyjście (np. przez przycisk EXIT na ekranie)
+                if game and game.exit_requested:
+                    app_state = "MENU"
+                    if game_curr == "CRASH": sm.play_music()
+                    game = None
                 
                 if game: game.draw()
 

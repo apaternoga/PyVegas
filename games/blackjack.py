@@ -375,7 +375,7 @@ class Hand:
             self.value -= 10
             self.aces -= 1
 
-    # iterujac po decku, rysujemy obok siebie karty w przesunieciu o 10 pixeli od poprzedniej karty, (bo karta ma 100)
+    # iterujac po decku, rysujemy obok siebie karty v przesunieciu o 10 pixeli od poprzedniej karty, (bo karta ma 100)
     # ZMIANA: Przekazujemy cel (target), a nie sztywna pozycje. Karta sie zanimuje.
     def draw(self, screen, start_x, start_y, hide_first=False):
         for i, card in enumerate(self.cards):
@@ -591,6 +591,9 @@ class BlackjackGame:
                 else:
                     # Krupier skończył, sprawdzamy wyniki
                     self.finish_round()
+                    
+    def can_exit(self):
+        return self.state == "betting" or self.state == "game_over"
 
     def start_round(self):
         self.player_hands = [Hand()]
@@ -667,9 +670,12 @@ class BlackjackGame:
 
     # funkcja odpowiadajaca za wcisniecia klawiszy ORAZ myszki
     def handle_input(self, event):
-        # Sprawdzenie przycisku EXIT między partiami
-        if self.state in ["betting", "game_over"] and self.btn_exit.is_clicked(event):
-            self.exit_requested = True
+        # Sprawdzenie przycisku EXIT oraz klawisza ESC (tylko gdy można wyjść)
+        if self.can_exit():
+            if self.btn_exit.is_clicked(event):
+                self.exit_requested = True
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                self.exit_requested = True
 
         # system obstawiania
         if self.state == "betting":

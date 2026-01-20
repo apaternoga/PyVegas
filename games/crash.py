@@ -91,6 +91,10 @@ class CrashGame:
             "toggle": False,
             "action": False,
         }
+        
+    def can_exit(self):
+        # POPRAWKA: Można wyjść tylko gdy portfel nie jest zaangażowany w trwający lot
+        return self.state == "BETTING" or self.state == "SUCCESS" or self.state == "CRASHED"
 
     def draw_rounded_rect(self, surface, color, rect, radius=10):
         pygame.draw.rect(surface, color, rect, border_radius=radius)
@@ -117,12 +121,6 @@ class CrashGame:
             pygame.draw.line(self.screen, (20, 30, 50), (0, y), (self.W, y))
 
     def _generate_crash_point(self):
-        # ============================================================================
-        # This function is derived from the Bustabit v1-webserver source code.
-        # Original Copyright (c) 2014 Bustabit
-        # Licensed under the GNU Affero General Public License v3.0 (AGPL-3.0)
-        # Source: https://github.com/bustabit/v1-webserver
-        # ============================================================================
         # Bustabit algorithm
         r = random.random()
         house_edge = 0.01
@@ -271,10 +269,15 @@ class CrashGame:
                     if self.state == "RUNNING": self.cash_out()
                     else: self.start_round()
 
-                if self.state != "RUNNING" and self.rect_btn_exit.collidepoint(event.pos):
+                # Poprawione sprawdzanie przycisku EXIT
+                if self.can_exit() and self.rect_btn_exit.collidepoint(event.pos):
                     self.exit_requested = True
 
         if event.type == pygame.KEYDOWN:
+            # ESCAPE Support
+            if event.key == pygame.K_ESCAPE and self.can_exit():
+                self.exit_requested = True
+                
             if event.key == pygame.K_SPACE:
                 if self.state == "RUNNING": self.cash_out()
                 else: self.start_round()
@@ -471,7 +474,7 @@ class CrashGame:
             self.screen.blit(et, er)
 
         # Exit Button 
-        if self.state != "RUNNING":
+        if self.can_exit():
             hover_exit = self.rect_btn_exit.collidepoint(mouse_pos)
             exit_col = COLORS["accent_red"] if hover_exit else COLORS["bg_panel"]
             self.draw_rounded_rect(self.screen, exit_col, self.rect_btn_exit, 8)
@@ -485,30 +488,3 @@ class CrashGame:
         self.draw_gradient_bg()
         self.draw_graph()
         self.draw_ui()
-
-
-# Setup
-def run_game():
-    pygame.init()
-    screen = pygame.display.set_mode((1280, 720))
-    pygame.display.set_caption("CRASH GAME")
-    
-    game = CrashGame(screen)
-    clock = pygame.time.Clock()
-    running = True
-
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT: running = False
-            game.handle_input(event)
-
-        game.update()
-        game.draw()
-        
-        pygame.display.flip()
-        clock.tick(60)
-
-    pygame.quit()
-
-if __name__ == "__main__":
-    run_game()
