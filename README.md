@@ -114,7 +114,7 @@ The project maintains a clean file structure by separating logic from assets:
 * **Filip Liskowski** - README, Blackjack Tester
 * **Miłosz Kiedrzyński** - Implementation of global systems (Wallet, Sound Manager), card rendering logic, and an interactive menu with animations and asset management 
 * **Patryk Iżbicki** - 
-* **Borys Kaczka** - 
+* **Borys Kaczka** - Crash logic, animations, UI, graph
 
 ## 📚 Credits & License
 
