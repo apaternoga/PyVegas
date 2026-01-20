@@ -2,7 +2,7 @@
 
 <div align="center">
 
-<img src="assets/pyvegas.png" alt="PyVegas Banner" width="700" />
+<img src="assets/pyvegas.png" alt="PyVegas Banner" width="400" />
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python&logoColor=white)
 ![Pygame](https://img.shields.io/badge/Pygame-CE-yellow?style=for-the-badge&logo=python&logoColor=white)
