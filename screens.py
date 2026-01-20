@@ -36,7 +36,7 @@ def draw_settings(screen, bg_image, btns, font, font_large):
     screen.blit(title_surf, title_surf.get_rect(center=(1280 // 2, 100)))
     
     btns['instr'].draw(screen, font)
-    btns['lic'].draw(screen, font)
+    btns['credits'].draw(screen, font)
     btns['music_m'].draw(screen, font)
     btns['back'].draw(screen, font)
 
@@ -117,6 +117,88 @@ def draw_instructions(screen, bg_image, btns, font, font_smaller, scroll_y):
              thumb_y = viewport_rect.bottom - thumb_height
         
         # Kolor suwaka
+        pygame.draw.rect(screen, (200, 200, 200), (scrollbar_x, thumb_y, 8, thumb_height), border_radius=4)
+
+    # 5. PRZYCISK POWROTU
+    if 'back_instr' in btns:
+        btns['back_instr'].draw(screen, font)
+    else:
+        btns['back'].draw(screen, font)
+
+# --- EKRAN CREDITS (SCROLLOWANY) ---
+def draw_credits(screen, bg_image, btns, font, font_smaller, scroll_y):
+    # 1. TŁO I NAGŁÓWEK
+    if bg_image:
+        screen.blit(bg_image, (0, 0))
+        overlay = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 210))
+        screen.blit(overlay, (0, 0))
+    else:
+        screen.fill((30, 30, 35))
+
+    title = font.render("CREDITS", True, WHITE)
+    screen.blit(title, title.get_rect(center=(WIDTH // 2, 60)))
+
+    # 2. TREŚĆ (Bez nazwisk autorów)
+    full_text = [
+        "HEADER:CRASH GAME MATH",
+        "Algorithm: Inverse Probability Distribution.",
+        "Based on: Bustabit Open Source code.",
+        "", 
+        "HEADER:AUDIO RESOURCES",
+        "Background Music: Public Domain (CC0).",
+        "Crash Riser: Generated via Suno AI.",
+        "SFX: Kenney Assets & Pixabay.",
+        "UI Sounds: Freesound (CC0 license).",
+        "",
+        "HEADER:GRAPHICS & TOOLS",
+        "Menu Background: Pexels.com.",
+        "Logos: Generated via Gemini AI.",
+        "Code Assistant: LLM (Gemini/ChatGPT)."
+    ]
+
+    # 3. OBSZAR WIDZENIA (VIEWPORT)
+    viewport_rect = pygame.Rect(100, 100, WIDTH - 200, HEIGHT - 220)
+    screen.set_clip(viewport_rect)
+
+    start_y = viewport_rect.y + 35 - scroll_y 
+    gap = 45 
+
+    for i, line in enumerate(full_text):
+        if line.startswith("HEADER:"):
+            clean_line = line.replace("HEADER:", "")
+            # Inny kolor dla nagłówków (np. złoty/zółty)
+            txt_surf = font_smaller.render(clean_line, True, (255, 200, 50))
+        else:
+            # Biały/szary dla zwykłego tekstu
+            txt_surf = font_smaller.render(line, True, (230, 230, 230))
+        
+        rect = txt_surf.get_rect(center=(WIDTH // 2, start_y + i * gap))
+        screen.blit(txt_surf, rect)
+
+    screen.set_clip(None)
+
+    # 4. PASEK PRZEWIJANIA
+    scrollbar_x = viewport_rect.right + 10
+    scrollbar_h = viewport_rect.height
+    
+    # Długość scrolla - ZMNIEJSZONA DO 180
+    max_scroll = 180 
+    
+    # Tło paska
+    pygame.draw.rect(screen, (60, 60, 60), (scrollbar_x, viewport_rect.y, 8, scrollbar_h), border_radius=4)
+    
+    if max_scroll > 0:
+        thumb_height = 60
+        # Zabezpieczenie przed dzieleniem przez zero
+        progress = scroll_y / max_scroll if max_scroll > 0 else 0
+        if progress > 1: progress = 1
+        
+        thumb_y = viewport_rect.y + progress * (scrollbar_h - thumb_height)
+        
+        if thumb_y > viewport_rect.bottom - thumb_height:
+             thumb_y = viewport_rect.bottom - thumb_height
+        
         pygame.draw.rect(screen, (200, 200, 200), (scrollbar_x, thumb_y, 8, thumb_height), border_radius=4)
 
     # 5. PRZYCISK POWROTU

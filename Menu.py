@@ -21,6 +21,7 @@ class Menu:
         
         # --- ZMIENNE SCROLLOWANIA ---
         self.instr_scroll = 0      # Pozycja tekstu
+        self.credits_scroll = 0    # Pozycja tekstu credits
         self.is_dragging = False   # Czy trzymamy suwak myszką?
         
         # Suwak inicjujemy głośnością pobraną z Sound Managera
@@ -53,7 +54,7 @@ class Menu:
             'exit':     Button(1080, 630, 160, 65, "EXIT"),
 
             'instr':    Button(-1, 200, 400, 80, "INSTRUCTIONS"),
-            'lic':      Button(-1, 300, 400, 80, "LICENSES"),
+            'credits':  Button(-1, 300, 400, 80, "CREDITS"),
             'music_m':  Button(-1, 400, 400, 80, "MUSIC"),
             'back':     Button(-1, 580, 300, 60, "BACK"), 
             
@@ -111,6 +112,11 @@ class Menu:
                 self.instr_scroll = 0 
                 self.is_dragging = False
 
+            if self.btns['credits'].is_clicked(event):
+                self.state = "CREDITS"
+                self.credits_scroll = 0
+                self.is_dragging = False
+
             if self.btns['back'].is_clicked(event): self.state = "MENU"
 
         # --- INSTRUKCJE (LOGIKA MYSZKI) ---
@@ -164,6 +170,52 @@ class Menu:
             if self.instr_scroll < 0: self.instr_scroll = 0
             if self.instr_scroll > max_scroll: self.instr_scroll = max_scroll
 
+        # --- CREDITS (LOGIKA MYSZKI - Kopia logiki Instructions) ---
+        elif self.state == "CREDITS":
+            if self.btns['back_instr'].is_clicked(event):
+                self.state = "SETTINGS"
+            
+            # Parametry paska (MUSZĄ BYĆ IDENTYCZNE JAK W screens.py -> draw_credits)
+            viewport_y = 100            
+            viewport_h = HEIGHT - 220   
+            
+            scrollbar_x = (WIDTH - 200) + 100 + 10 
+            thumb_height = 60
+            # ZMNIEJSZONA WARTOŚĆ SCROLLA
+            max_scroll = 180
+
+            # 1. Scroll Wheel
+            if event.type == pygame.MOUSEWHEEL:
+                self.credits_scroll -= event.y * 20 
+
+            # 2. Kliknięcie (złapanie suwaka)
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    progress = self.credits_scroll / max_scroll if max_scroll > 0 else 0
+                    thumb_y = viewport_y + progress * (viewport_h - thumb_height)
+                    
+                    thumb_rect = pygame.Rect(scrollbar_x - 5, thumb_y, 25, thumb_height) 
+                    
+                    if thumb_rect.collidepoint(event.pos):
+                        self.is_dragging = True
+
+            # 3. Puszczenie myszki
+            elif event.type == pygame.MOUSEBUTTONUP:
+                self.is_dragging = False
+
+            # 4. Ruch myszką
+            elif event.type == pygame.MOUSEMOTION:
+                if self.is_dragging:
+                    rel_y = event.rel[1]
+                    track_len = viewport_h - thumb_height
+                    if track_len > 0:
+                        scroll_change = (rel_y / track_len) * max_scroll
+                        self.credits_scroll += scroll_change
+
+            # Zabezpieczenia zakresu
+            if self.credits_scroll < 0: self.credits_scroll = 0
+            if self.credits_scroll > max_scroll: self.credits_scroll = max_scroll
+
         elif self.state == "SETTINGS_MUSIC":
             if self.btns['back'].is_clicked(event): self.state = "SETTINGS"
             
@@ -202,6 +254,9 @@ class Menu:
         
         elif self.state == "INSTRUCTIONS":
             screens.draw_instructions(self.screen, self.bg_image, self.btns, self.font, self.font_smaller, self.instr_scroll)
+
+        elif self.state == "CREDITS":
+            screens.draw_credits(self.screen, self.bg_image, self.btns, self.font, self.font_smaller, self.credits_scroll)
             
         elif self.state == "SETTINGS_MUSIC":
             self.vol_slider.value = current_vol
