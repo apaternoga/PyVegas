@@ -1,3 +1,4 @@
+import math
 import os, pygame, sys
 from games import blackjack
 from constants import *
@@ -29,23 +30,31 @@ class Menu:
         # --- GRAFIKA ---
         try:
             self.bg_image = pygame.image.load(os.path.join("assets", "tlo_menu.jpg")).convert()
-            self.bg_image = pygame.transform.scale(self.bg_image, (self.width, self.height))
+            self.bg_image = pygame.transform.smoothscale(self.bg_image, (self.width, self.height))
         except:
             self.bg_image = None
-            
+
+        try:
+            self.logo = pygame.image.load(os.path.join("assets", "PyVegas_napis.png")).convert_alpha()
+            self.logo = pygame.transform.smoothscale(self.logo, (self.logo.get_width() //2, self.logo.get_height() //2))
+        except:
+            self.logo = None
+        self.logo_scale=1.0
+
         self.font = pygame.font.Font(os.path.join("assets", "LuckiestGuy-Regular.ttf"), 55)
         self.font_small = pygame.font.Font(os.path.join("assets", "LuckiestGuy-Regular.ttf"), 50)
         self.font_smaller = pygame.font.Font(os.path.join("assets", "LuckiestGuy-Regular.ttf"), 45)
+        self.font_large = pygame.font.Font(os.path.join("assets", "LuckiestGuy-Regular.ttf"), 85) 
 
         # --- PRZYCISKI ---
         self.btns = {
             'start':    Button(-1, 320, 380, 90, "START"),
             'settings': Button(-1, 430, 380, 90, "SETTINGS"),
-            'exit':     Button(1080, 650, 160, 65, "EXIT"),
+            'exit':     Button(1080, 630, 160, 65, "EXIT"),
 
-            'instr':    Button(-1, 200, 400, 55, "INSTRUCTIONS"),
-            'lic':      Button(-1, 300, 400, 55, "LICENSES"),
-            'music_m':  Button(-1, 400, 400, 55, "MUSIC"),
+            'instr':    Button(-1, 200, 400, 80, "INSTRUCTIONS"),
+            'lic':      Button(-1, 300, 400, 80, "LICENSES"),
+            'music_m':  Button(-1, 400, 400, 80, "MUSIC"),
             'back':     Button(-1, 580, 300, 60, "BACK"), 
             
             'back_instr': Button(-1, 620, 300, 60, "BACK"),
@@ -57,9 +66,8 @@ class Menu:
             't2':       Button(650, 230, 300, 55, "LOFI CHILL"),
             'stop':     Button(-1, 450, 400, 50, "SOUND ON / OFF"),
 
-            'bj':       Button2(310, 250, 200, 200, "Blackjack", icon_renderer=BlackjackIcon()),
-            'g2':       Button2(540, 250, 200, 200, "Gra 2"),
-            'g3':       Button2(770, 250, 200, 200, "Gra 3")
+            'bj':       Button2(300, 270, 300, 200, "Blackjack", icon_renderer=BlackjackIcon()),
+            'cr':       Button2(700, 270, 300, 200, "Crash"),
         }
 
     def update(self):
@@ -80,6 +88,7 @@ class Menu:
 
         # --- MENU ---
         if self.state == "MENU":
+            self.logo_scale = 1.0 + 0.1 * math.sin(pygame.time.get_ticks() * 0.0035)
             if self.btns['start'].is_clicked(event): self.state = "GRY"
             if self.btns['settings'].is_clicked(event): self.state = "SETTINGS"
             if self.btns['exit'].is_clicked(event): self.state = "EXIT"
@@ -89,6 +98,7 @@ class Menu:
             if self.btns['no'].is_clicked(event): self.state = "MENU"
 
         elif self.state == "GRY":
+            self.logo_scale = 1.0 + 0.1 * math.sin(pygame.time.get_ticks() * 0.0035)
             if self.btns['bj'].is_clicked(event): return "BLACKJACK"
             if self.btns['back'].is_clicked(event): self.state = "MENU"
 
@@ -183,11 +193,11 @@ class Menu:
         is_muted = getattr(self.sm, 'muted', False)
 
         if self.state == "MENU":
-            screens.draw_menu(self.screen, self.bg_image, self.btns, self.font)
+            screens.draw_menu(self.screen, self.bg_image, self.btns, self.font, self.logo, self.logo_scale)
         elif self.state == "EXIT":
             screens.draw_exit(self.screen, self.bg_image, self.btns, self.font, self.font_small)
         elif self.state == "SETTINGS":
-            screens.draw_settings(self.screen, self.bg_image, self.btns, self.font)
+            screens.draw_settings(self.screen, self.bg_image, self.btns, self.font, self.font_large)
         
         elif self.state == "INSTRUCTIONS":
             screens.draw_instructions(self.screen, self.bg_image, self.btns, self.font, self.font_smaller, self.instr_scroll)
@@ -199,4 +209,4 @@ class Menu:
                 current_vol, self.vol_slider, is_muted
             )
         elif self.state == "GRY":
-            screens.draw_game_placeholder(self.screen, self.bg_image, self.btns, self.font)
+            screens.draw_game_placeholder(self.screen, self.bg_image, self.btns, self.font, self.logo, self.logo_scale)

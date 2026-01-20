@@ -2,22 +2,37 @@ import pygame
 from constants import WHITE, BLACK, GRAY, WIDTH, HEIGHT
 
 # --- GŁÓWNE MENU ---
-def draw_menu(screen, bg_image, btns, font):
+def draw_menu(screen, bg_image, btns, font, logo=None, logo_scale=1.0):
     if bg_image: screen.blit(bg_image, (0, 0))
     else: screen.fill(WHITE)
+
+    if logo:
+        target_w = round(logo.get_width() * logo_scale)
+        if target_w % 2 != 0: target_w += 1
+        aspect_ratio = logo.get_height() / logo.get_width()
+        target_h = round(target_w * aspect_ratio)
+        if target_h % 2 != 0: target_h += 1
+
+        # skalowanie -smoothscale
+        scaled_logo = pygame.transform.smoothscale(logo, (target_w, target_h))
+        
+        # centrowanie
+        logo_rect = scaled_logo.get_rect(center=(1280 // 2, 140))
+        screen.blit(scaled_logo, logo_rect)
+    
     btns['start'].draw(screen, font)
     btns['exit'].draw(screen, font)
     btns['settings'].draw(screen, font)
 
 # --- USTAWIENIA ---
-def draw_settings(screen, bg_image, btns, font):
+def draw_settings(screen, bg_image, btns, font, font_large):
     if bg_image: 
         screen.blit(bg_image, (0, 0))
     else: 
         screen.fill(GRAY)
-        
-    title_surf = font.render("SETTINGS", True, WHITE)
-    screen.blit(title_surf, title_surf.get_rect(center=(1280 // 2, 80)))
+
+    title_surf = font_large.render("SETTINGS", True, WHITE)
+    screen.blit(title_surf, title_surf.get_rect(center=(1280 // 2, 100)))
     
     btns['instr'].draw(screen, font)
     btns['lic'].draw(screen, font)
@@ -166,16 +181,28 @@ def draw_fullscreen(screen, btns, font_smaller, is_fullscreen):
     btns['no'].draw(screen, font_smaller)
 
 # --- MINIGIERKI ---
-def draw_game_placeholder(screen, bg_image, btns, font):
+def draw_game_placeholder(screen, bg_image, btns, font, logo, logo_scale=1.0):
     if bg_image: screen.blit(bg_image, (0, 0))
     else: screen.fill((20, 20, 20))
-    
-    title = font.render("MINIGIERKI", True, WHITE)
-    screen.blit(title, title.get_rect(center=(1280 // 2, 80)))
+    if logo:
+        target_w = round(logo.get_width() * logo_scale)
+        if target_w % 2 != 0: target_w += 1
+        aspect_ratio = logo.get_height() / logo.get_width()
+        target_h = round(target_w * aspect_ratio)
+        if target_h % 2 != 0: target_h += 1
+
+        # skalowanie -smoothscale
+        scaled_logo = pygame.transform.smoothscale(logo, (target_w, target_h))
+        
+        # centrowanie
+        logo_rect = scaled_logo.get_rect(center=(1280 // 2, 140))
+        screen.blit(scaled_logo, logo_rect)
+    else:
+        title = font.render("MINIGIERKI", True, WHITE)
+        screen.blit(title, title.get_rect(center=(1280 // 2, 80)))
     
     btns['bj'].draw(screen, font)
-    btns['g2'].draw(screen, font)
-    btns['g3'].draw(screen, font)
+    btns['cr'].draw(screen, font)
     btns['back'].draw(screen, font)
 
 # --- IKONA GŁOŚNIKA ---

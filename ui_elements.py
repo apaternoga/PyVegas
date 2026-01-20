@@ -1,6 +1,7 @@
 import pygame
 import os
 from constants import WHITE, BLACK, GRAY, DARK_GRAY, WIDTH
+from core.settings import TABLE_COLOR
 from games.blackjack import Card
 
 
@@ -58,7 +59,7 @@ class Button2:
         self.icon_renderer = icon_renderer 
         self.anim_offset = 0 
         self.max_offset = 50 
-        self.base_color = (52, 152, 219)
+        self.base_color = TABLE_COLOR                  #(52, 152, 219)
         self.hover_color = (41, 128, 185)
         self.text_color = (255, 255, 255)
         self.is_hovered = False 
@@ -68,6 +69,8 @@ class Button2:
         if self.original_rect.collidepoint(mouse_pos):
             current_color = self.hover_color
             self.rect = self.original_rect.inflate(20, 20)
+            current_color = tuple(max(0, c - 30) for c in current_color)  # Zciemniaj kolor o 30
+            inner_border_color = (0, 0, 0)
             if self.anim_offset < self.max_offset: self.anim_offset += 4
             if not self.is_hovered:
                 if Manager.sm: Manager.sm.play_sound('hover')
@@ -77,8 +80,13 @@ class Button2:
             current_color = self.base_color
             self.rect = self.original_rect.copy()
             self.is_hovered = False
+            inner_border_color = (30, 30, 30)
             
         pygame.draw.rect(surface, current_color, self.rect, border_radius=15)
+
+        inner_rect = self.rect.inflate(-10, -10) 
+        pygame.draw.rect(surface, inner_border_color, inner_rect, 2, border_radius=10)
+
         pygame.draw.rect(surface, (255, 255, 255), self.rect, 3, border_radius=15)
         
         # Rysowanie ikony dokładnie na środku przycisku
@@ -87,7 +95,7 @@ class Button2:
             
         # Centrowanie tekstu w dolnej części przycisku
         text_surf = font.render(self.text, True, self.text_color)
-        text_rect = text_surf.get_rect(midbottom=(self.rect.centerx, self.rect.bottom - 30))
+        text_rect = text_surf.get_rect(midbottom=(self.rect.centerx, self.rect.bottom - 10))
         surface.blit(text_surf, text_rect)
 
     def is_clicked(self, event):
