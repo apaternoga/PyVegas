@@ -9,7 +9,6 @@ WHITE = (255, 255, 255)
 GRAY_FRAME = (180, 180, 180) 
 DARK_GRAY = (40, 40, 40)
 CYAN = (0, 245, 255)
-AUTO_SKIP_TIME = 10000 # 10 sekund w milisekundach
 
 class IntroSequence:
     def __init__(self, screen):
@@ -24,9 +23,20 @@ class IntroSequence:
         # Dźwięk syczenia
         self.hiss_sound = self.load_sound("hiss.mp3")
         
-        # Przycisk SKIP 
-        self.skip_btn_rect = pygame.Rect(WIDTH - 200, HEIGHT - 100, 160, 60)
-        
+        # Zmienne do efektu fade
+        self.fade_alpha = 255 
+        self.fade_state = "FADE_IN" 
+        self.fade_speed = 15 
+        self.fade_surface = pygame.Surface((WIDTH, HEIGHT))
+        self.fade_surface.fill(BLACK)
+
+        # Czas trwania slajdów (w ms)
+        self.durations = {
+            1: 4000, 
+            2: 7000, 
+            3: 3000  
+        }
+
         # Czcionki
         try:
             path = os.path.join("assets", "LuckiestGuy-Regular.ttf")
@@ -53,43 +63,24 @@ class IntroSequence:
             return pygame.mixer.Sound(path)
         except: return None
 
-    def handle_advance(self):
-        # Jeśli przechodzimy z 2 na 3 slajd, graj syczenie
-        if self.stage == 2 and self.hiss_sound:
-            self.hiss_sound.play()
-            
-        self.stage += 1
-        self.timer_start = pygame.time.get_ticks() # Reset timera dla nowego slajdu
-        
-        if self.stage > 3:
-            return "FINISHED"
-        return None
-
     def run(self):
         running = True
-        while running:
-            current_time = pygame.time.get_ticks()
+        self.timer_start = pygame.time.get_ticks()
 
+        while running:
             # --- 1. OBSŁUGA ZDARZEŃ ---
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: return "QUIT"
                 
+                # OBSŁUGA SPACJI (SKIP)
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
-                        res = self.handle_advance()
-                        if res: return res
+                        # Jeśli nie jesteśmy już w trakcie wygaszania,
+                        # wymuś wygaszanie, aby przejść do następnego slajdu
+                        if self.fade_state != "FADE_OUT":
+                            self.fade_state = "FADE_OUT"
                 
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    if self.skip_btn_rect.collidepoint(event.pos):
-                        res = self.handle_advance()
-                        if res: return res
-
-            # --- 2. AUTOMATYCZNY SKIP PO 10 SEKUNDACH ---
-            if current_time - self.timer_start > AUTO_SKIP_TIME:
-                res = self.handle_advance()
-                if res: return res
-
-            # --- 3. RYSOWANIE ---
+            # --- 2. RYSOWANIE TREŚCI ---
             self.screen.fill(BLACK)
 
             if self.stage == 1:
@@ -142,13 +133,37 @@ class IntroSequence:
                 txt = self.font_final.render("GOOD LUCK!", True, WHITE)
                 self.screen.blit(txt, txt.get_rect(center=(WIDTH // 2, 600)))
 
-            # Przycisk SKIP/START
-            pygame.draw.rect(self.screen, DARK_GRAY, self.skip_btn_rect, border_radius=8)
-            pygame.draw.rect(self.screen, GRAY_FRAME, self.skip_btn_rect, 3, border_radius=8)
-            btn_label = "SKIP" if self.stage < 3 else "START"
-            label_surf = self.font_main.render(btn_label, True, WHITE)
-            self.screen.blit(label_surf, label_surf.get_rect(center=self.skip_btn_rect.center))
+            # --- 3. OBSŁUGA FADE ---
+            if self.fade_state == "FADE_IN":
+                self.fade_alpha -= self.fade_speed
+                if self.fade_alpha <= 0:
+                    self.fade_alpha = 0
+                    self.fade_state = "DISPLAY"
+                    self.timer_start = pygame.time.get_ticks()
+
+            elif self.fade_state == "DISPLAY":
+                duration = self.durations.get(self.stage, 3000)
+                if pygame.time.get_ticks() - self.timer_start > duration:
+                    self.fade_state = "FADE_OUT"
+
+            elif self.fade_state == "FADE_OUT":
+                self.fade_alpha += self.fade_speed
+                if self.fade_alpha >= 255:
+                    self.fade_alpha = 255
+                    self.stage += 1
+                    
+                    if self.stage > 3:
+                        return "FINISHED"
+                    
+                    # Jeśli przechodzimy z 2 na 3 slajd, graj syczenie
+                    if self.stage == 3 and self.hiss_sound:
+                        self.hiss_sound.play()
+                        
+                    self.fade_state = "FADE_IN"
+
+            # Rysowanie czarnej nakładki z odpowiednim alpha
+            self.fade_surface.set_alpha(self.fade_alpha)
+            self.screen.blit(self.fade_surface, (0, 0))
 
             pygame.display.flip()
             self.clock.tick(60)
-
