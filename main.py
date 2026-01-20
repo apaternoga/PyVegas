@@ -54,9 +54,11 @@ def main():
                 running = False
             elif action == "BLACKJACK":
                 game = BlackjackGame(screen, sm, wallet=menu.wallet)
+                game_curr='BLACKJACK' 
                 app_state = "GAME"
             elif action == "CRASH":
-                game = CrashGame(screen, wallet=menu.wallet)
+                game = CrashGame(screen)
+                game_curr='CRASH' 
                 app_state = "GAME"
 
         elif app_state == "GAME":
@@ -70,6 +72,10 @@ def main():
                         game = None # Usuwamy grę z pamięci
                     
                     if game: game.handle_input(event)
+                if game_curr == "BLACKJACK":
+                    if game and game.exit_requested:
+                        app_state = "MENU"
+                        game = None
                 
                 if game: game.draw()
 

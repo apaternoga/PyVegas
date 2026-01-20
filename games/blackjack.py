@@ -421,6 +421,8 @@ class BlackjackGame:
         self.insurance_bet = 0
         self.wait_timer = 0
 
+        self.exit_requested = False
+
         # LOGIKA PRZYCISKÓW
         btn_y = SCREEN_HEIGHT - 75
 
@@ -476,6 +478,18 @@ class BlackjackGame:
             50,
             color=WHITE,
             text_color=BLACK,
+            sm=self.sm,
+        )
+
+        # Przycisk EXIT w prawym górnym rogu
+        self.btn_exit = Button(
+            "EXIT",
+            SCREEN_WIDTH - 120,
+            20,
+            100,
+            40,
+            color=(150, 50, 50),
+            text_color=WHITE,
             sm=self.sm,
         )
 
@@ -653,6 +667,10 @@ class BlackjackGame:
 
     # funkcja odpowiadajaca za wcisniecia klawiszy ORAZ myszki
     def handle_input(self, event):
+        # Sprawdzenie przycisku EXIT między partiami
+        if self.state in ["betting", "game_over"] and self.btn_exit.is_clicked(event):
+            self.exit_requested = True
+
         # system obstawiania
         if self.state == "betting":
             if event.type == pygame.KEYDOWN:
@@ -1121,6 +1139,7 @@ class BlackjackGame:
         # Rysowanie przyciskow
         if self.state == "betting":
             self.btn_deal.draw(self.screen)
+            self.btn_exit.draw(self.screen)
         elif self.state == "player_turn":
             current_hand = self.player_hands[self.current_hand_index]
 
@@ -1168,6 +1187,7 @@ class BlackjackGame:
                 self.btn_surrender.draw(self.screen)
         elif self.state == "game_over":
             self.btn_deal.draw(self.screen)
+            self.btn_exit.draw(self.screen)
 
         if self.state == "insurance":
             self.draw_insurance_popup()
