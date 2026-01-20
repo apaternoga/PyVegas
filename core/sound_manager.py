@@ -15,7 +15,7 @@ class SoundManager:
     
     def load_common_sounds(self): #dzwieki uzywane czesto
         common_sounds = {
-            "click": "click.wav",
+            "click": "select_001.ogg",
             "hover": "hover.wav"
         }
         loaded = 0
