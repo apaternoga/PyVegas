@@ -11,17 +11,18 @@ DARK_GRAY = (40, 40, 40)
 CYAN = (0, 245, 255)
 
 class IntroSequence:
-    def __init__(self, screen):
+    def __init__(self, screen, sm=None):
         self.screen = screen
         self.clock = pygame.time.Clock()
         self.stage = 1 
         self.timer_start = pygame.time.get_ticks()
+
+        #Dźwięk syczenia
+        self.sm = sm
+        sm.load_sound('hiss', 'hiss.mp3')
         
         # Logo 
         self.logo = self.load_and_scale_logo(width=700) 
-        
-        # Dźwięk syczenia
-        self.hiss_sound = self.load_sound("hiss.mp3")
         
         # Zmienne do efektu fade
         self.fade_alpha = 255 
@@ -156,8 +157,8 @@ class IntroSequence:
                         return "FINISHED"
                     
                     # Jeśli przechodzimy z 2 na 3 slajd, graj syczenie
-                    if self.stage == 3 and self.hiss_sound:
-                        self.hiss_sound.play()
+                    if self.stage == 3:
+                        self.sm.play_sound('hiss')
                         
                     self.fade_state = "FADE_IN"
 

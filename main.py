@@ -32,7 +32,7 @@ def main():
     clock=pygame.time.Clock()
 
     #tu jest intro
-    intro = IntroSequence(screen)
+    intro = IntroSequence(screen, sm)
     intro.run()
 
     menu = Menu(screen, sm, wallet=Wallet(STARTING_MONEY))
