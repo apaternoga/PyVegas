@@ -520,6 +520,22 @@ class BlackjackGame:
             sm=self.sm,
         )  # Czerwony
 
+        # NOWE PRZYCISKI DO ZMIANY BETU (w miejscu starej strzałki tekstowej)
+        panel_y = SCREEN_HEIGHT - 100
+        center_y = panel_y + 50
+        
+        # ZMIANA: Przyciski po LEWEJ stronie napisu Bet
+        # Napis Bet będzie mniej więcej przy SCREEN_WIDTH - 20
+        # Przyciski ustawiamy w pionie jeden pod drugim
+        
+        btn_x = SCREEN_WIDTH - 160 # Pozycja przycisków
+        
+        # Przycisk UP 
+        self.btn_bet_up = Button(" ▲", btn_x, center_y - 32, 30, 30, color=WHITE, text_color=BLACK, sm=self.sm)
+        # Przycisk DOWN 
+        self.btn_bet_down = Button(" ▼", btn_x, center_y + 2, 30, 30, color=WHITE, text_color=BLACK, sm=self.sm)
+
+
     # NOWA FUNKCJA: obsluguje logike oparta na czasie (zamiast time.wait)
     def update(self):
         current_time = pygame.time.get_ticks()
@@ -673,13 +689,24 @@ class BlackjackGame:
     def handle_input(self, event):
         # Sprawdzenie przycisku EXIT oraz klawisza ESC (tylko gdy można wyjść)
         if self.can_exit():
-            if self.btn_exit.is_clicked(event):
+            # ZMIANA: Przycisk Exit działa tylko w fazie betting, ESC działa w betting i game_over
+            if self.state == "betting" and self.btn_exit.is_clicked(event):
                 self.exit_requested = True
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 self.exit_requested = True
 
         # system obstawiania
         if self.state == "betting":
+            # Obsługa przycisków zmiany zakładu
+            if self.btn_bet_up.is_clicked(event):
+                 if self.wallet.balance >= self.current_bet + 10:
+                        self.current_bet += 10
+                        self.sm.play_sound("chip_stack")
+            if self.btn_bet_down.is_clicked(event):
+                 if self.current_bet > 10:
+                        self.current_bet -= 10
+                        self.sm.play_sound("chip_stack")
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     if self.wallet.balance >= self.current_bet:
@@ -1019,9 +1046,9 @@ class BlackjackGame:
 
         # 2. Wyswietlanie Stawki
         bet_info = f"Bet: {self.current_bet}"
-        if self.state == "betting":
-            bet_info += " ↕"
-
+        
+        # ZMIANA: Przesuwamy tekst w lewo, aby zrobic miejsce na przyciski
+        # Napis Bet jest po prawej stronie (ale robimy miejsce na przyciski z jego lewej strony)
         bet_text = self.font.render(bet_info, True, GOLD)
         bet_rect = bet_text.get_rect(
             midright=(SCREEN_WIDTH - 20, panel_y + (panel_height // 2))
@@ -1148,7 +1175,12 @@ class BlackjackGame:
         # Rysowanie przyciskow
         if self.state == "betting":
             self.btn_deal.draw(self.screen)
+            # Rysowanie nowych przyciskow zakladu
+            self.btn_bet_up.draw(self.screen)
+            self.btn_bet_down.draw(self.screen)
+            # Przycisk exit tylko w betting
             self.btn_exit.draw(self.screen)
+
         elif self.state == "player_turn":
             current_hand = self.player_hands[self.current_hand_index]
 
@@ -1194,13 +1226,10 @@ class BlackjackGame:
 
             if len(self.player_hands) == 1 and len(current_hand.cards) == 2:
                 self.btn_surrender.draw(self.screen)
-            
-            # Zapewnienie, że EXIT wciąż jest rysowany w turze gracza, jeśli chcesz, żeby był widoczny
-            self.btn_exit.draw(self.screen)
 
         elif self.state == "game_over":
             self.btn_deal.draw(self.screen)
-            self.btn_exit.draw(self.screen)
+            # Tu usunelismy przycisk EXIT, zgodnie z zyczeniem
 
         if self.state == "insurance":
             self.draw_insurance_popup()
