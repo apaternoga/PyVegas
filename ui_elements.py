@@ -112,8 +112,8 @@ class BlackjackIcon:
         self.card2 = Card("Hearts", "Jack")
         
     def draw(self, surface, center_x, center_y, offset, is_hovered):
-        if is_hovered: scale =75 
-        else: scale = 70
+        if is_hovered: scale =75+offset//10
+        else: scale = 70+offset//10
         h, w = 150*scale//100, 100*scale//100
         draw_y = center_y - (h / 2) -35
         
