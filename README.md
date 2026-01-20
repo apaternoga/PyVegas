@@ -6,7 +6,7 @@
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python&logoColor=white)
 ![Pygame](https://img.shields.io/badge/Pygame-CE-yellow?style=for-the-badge&logo=python&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+![License](https://img.shields.io/badge/License-AGPL--3.0-blue?style=for-the-badge)
 </div>
 
 ## 📋 Table of Contents
@@ -113,7 +113,7 @@ The project maintains a clean file structure by separating logic from assets:
 ## 📚 Credits & License
 
 ### License
-This project is available under the **MIT License**.
+This project is available under the **AGPL-3.0** license.
 
 Copyright © 2025 **Adrian Paternoga**, **Adam Zalewski**.
 
@@ -123,7 +123,8 @@ The software is provided "as is", without warranty of any kind. You are free to 
 
 **1. Crash Game:**
 * **Algorithm:** The `_generate_crash_point` function is implemented based on the open-source code of **Bustabit** (Inverse Probability Distribution).
-* [Bustabit Repository Link](https://github.com/bustabit/v1-webserver)
+    * **License:** Bustabit v1-webserver is licensed under **AGPL-3.0**.
+    * [Bustabit Repository Link](https://github.com/bustabit/v1-webserver)
 
 **2. Audio:**
 * **Background Music:** Tracks released under **Public Domain (CC0)** license – no attribution required.

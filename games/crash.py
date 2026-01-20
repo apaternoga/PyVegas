@@ -141,6 +141,12 @@ class CrashGame:
             pygame.draw.line(self.screen, (20, 30, 50), (0, y), (self.W, y))
 
     def _generate_crash_point(self):
+        # ============================================================================
+        # This function is derived from the Bustabit v1-webserver source code.
+        # Original Copyright (c) 2014 Bustabit
+        # Licensed under the GNU Affero General Public License v3.0 (AGPL-3.0)
+        # Source: https://github.com/bustabit/v1-webserver
+        # ============================================================================
         # Bustabit algorithm
         r = random.random()
         house_edge = 0.01
