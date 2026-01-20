@@ -40,7 +40,7 @@ class Button:
         # Centrowanie tekstu wewnątrz przycisku
         text_surf = font.render(self.text, True, BLACK)
         text_x = self.rect.centerx
-        text_y = self.rect.centery + 5
+        text_y = self.rect.centery +7
         text_rect = text_surf.get_rect(center=(text_x, text_y))
         surface.blit(text_surf, text_rect)
 
