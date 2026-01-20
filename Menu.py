@@ -2,7 +2,7 @@ import math
 import os, pygame, sys
 from games import blackjack
 from constants import *
-from ui_elements import Button, Button2, BlackjackIcon, Slider 
+from ui_elements import Button, Button2, BlackjackIcon, CrashIcon, Slider 
 import screens
 
 class Menu:
@@ -67,7 +67,7 @@ class Menu:
             'stop':     Button(-1, 450, 400, 50, "SOUND ON / OFF"),
 
             'bj':       Button2(300, 270, 300, 200, "Blackjack", icon_renderer=BlackjackIcon()),
-            'cr':       Button2(700, 270, 300, 200, "Crash"),
+            'cr':       Button2(700, 270, 300, 200, "Crash", icon_renderer=CrashIcon()),
         }
 
     def update(self):
@@ -100,6 +100,7 @@ class Menu:
         elif self.state == "GRY":
             self.logo_scale = 1.0 + 0.1 * math.sin(pygame.time.get_ticks() * 0.0035)
             if self.btns['bj'].is_clicked(event): return "BLACKJACK"
+            if self.btns['cr'].is_clicked(event): return "CRASH"
             if self.btns['back'].is_clicked(event): self.state = "MENU"
 
         elif self.state == "SETTINGS":
