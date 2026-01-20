@@ -2,21 +2,26 @@ import pygame
 import sys
 import os
 
+#importy z innych plikow
 from core.settings import *
-#importuje wszystkie wartosci z settings.py
-from games.blackjack import BlackjackGame
-#importuje Blajacka
 from core.sound_manager import SoundManager
-#importuje SoundManagera
+from Menu import Menu
+from games.blackjack import BlackjackGame, Card, Button, Deck, Hand
+from games.crash import CrashGame
+from ui_elements import Manager
+from intro import IntroSequence
+from core.wallet import Wallet
+
 def main():
     #inicjalizacja modulow pygame
     pygame.init()
+
+    #inicjalizacja miksera dzwiekow
     pygame.mixer.init()
     sm = SoundManager()
-    sm.load_common_sounds() 
-    sm.load_blackjack_sounds()
-    sm.play_music()
-    sm.volume_music = 0.05
+    sm.load_common_sounds()
+    sm.load_blackjack_sounds() #przeniesc potem
+    Manager.sm = sm
 
     #tworzenie 'screen', czyli glownego okna gry o rozmiarach podanych w settings.py
     screen=pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
@@ -27,28 +32,55 @@ def main():
     #odpowiada za FPS
     clock=pygame.time.Clock()
 
-    game= BlackjackGame(screen, sm)
+    #tu jest intro
+    intro = IntroSequence(screen, sm)
+    intro.run()
+
+    menu = Menu(screen, sm, wallet=Wallet(STARTING_MONEY))
+    game= None
+    
+    app_state ="MENU"
 
     running =True
 
-    #GLOWNA PETLA GRY
+    #GLOWNA PETLA
     #wykonuje sie ona kilkadziesiat razy na sekunde
     while running:
         
-        #pygame.event.get() pobiera liste wszystkiego co gracz zrobil
-        for event in pygame.event.get():
-            
-            #sprawdzenie czy gracz kliknal X w oknie aplikacji
-            if event.type == pygame.QUIT:
-                running= False
+        if app_state == "MENU":
+            action = menu.update() 
+            menu.draw()
 
-            #przekazujemy kazde zdarzenie (wcisniecie klawisza) do logiki naszej gry
-            game.handle_input(event)
+            if action == "EXIT_APP":
+                running = False
+            elif action == "BLACKJACK":
+                game = BlackjackGame(screen, sm, wallet=menu.wallet)
+                game_curr='BLACKJACK' 
+                app_state = "GAME"
+            elif action == "CRASH":
+                game = CrashGame(screen)
+                game_curr='CRASH' 
+                app_state = "GAME"
 
-        game.update()
+        elif app_state == "GAME":
+            if game:
+                game.update()
+                menu.wallet.save()
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT: running = False
+                    if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                        app_state = "MENU"
+                        game = None # Usuwamy grę z pamięci
+                    
+                    if game: game.handle_input(event)
+                if game_curr == "BLACKJACK":
+                    if game and game.exit_requested:
+                        app_state = "MENU"
+                        game = None
+                
+                if game: game.draw()
+
         #rysujemy cala gre na ekranie
-        game.draw()
-
         #dzieki temu uzytkownik widzi plynna animacje, w pelni narysowane obrazy, a nie proces ich powstawania
         pygame.display.flip()
         
