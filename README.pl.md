@@ -120,7 +120,7 @@ Oprogramowanie jest dostarczane w stanie „takim, jakie jest”, bez udzielania
 
 **1. Gra Crash:**
 * **Algorytm:** Funkcja `_generate_crash_point` zaimplementowana na podstawie otwartego kodu źródłowego **Bustabit** (Inverse Probability Distribution).
-    * [Link do repozytorium Bustabit](https://github.com/bustabit/bustabit-web-server)
+* [Link do repozytorium Bustabit](https://github.com/bustabit/v1-webserver)
 
 **2. Oprawa Audio:**
 * **Muzyka w tle (Menu/Rozgrywka):** Utwory na licencji **Public Domain (CC0)** – brak wymogu atrybucji autora.

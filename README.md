@@ -123,7 +123,7 @@ The software is provided "as is", without warranty of any kind. You are free to 
 
 **1. Crash Game:**
 * **Algorithm:** The `_generate_crash_point` function is implemented based on the open-source code of **Bustabit** (Inverse Probability Distribution).
-    * [Bustabit Repository Link](https://github.com/bustabit/bustabit-web-server)
+* [Bustabit Repository Link](https://github.com/bustabit/v1-webserver)
 
 **2. Audio:**
 * **Background Music:** Tracks released under **Public Domain (CC0)** license – no attribution required.
