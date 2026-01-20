@@ -87,16 +87,6 @@ class Menu:
         if event.type == pygame.QUIT:
             return "EXIT_APP"
 
-        # --- GRA ---
-        if self.state == "GRA" and self.active_game:
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                self.state = "GRY"
-                self.active_game = None
-                self.sm.play_music("jazz_playlist.mp3")
-            else:
-                self.active_game.handle_input(event)
-            return True
-
         # --- MENU ---
         if self.state == "MENU":
             self.logo_scale = 1.0 + 0.1 * math.sin(pygame.time.get_ticks() * 0.0035)

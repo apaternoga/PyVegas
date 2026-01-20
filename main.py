@@ -20,7 +20,8 @@ def main():
     pygame.mixer.init()
     sm = SoundManager()
     sm.load_common_sounds()
-    sm.load_blackjack_sounds() #przeniesc potem
+    sm.load_blackjack_sounds()
+    sm.load_crash_sounds()
     Manager.sm = sm
 
     #tworzenie 'screen', czyli glownego okna gry o rozmiarach podanych w settings.py
@@ -58,7 +59,7 @@ def main():
                 game_curr='BLACKJACK' 
                 app_state = "GAME"
             elif action == "CRASH":
-                game = CrashGame(screen)
+                game = CrashGame(screen, sm, wallet=menu.wallet)
                 game_curr='CRASH' 
                 app_state = "GAME"
 
@@ -70,6 +71,7 @@ def main():
                     if event.type == pygame.QUIT: running = False
                     if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                         app_state = "MENU"
+                        if game_curr=='CRASH': sm.play_music()
                         game = None # Usuwamy grę z pamięci
                     
                     if game: game.handle_input(event)
@@ -77,6 +79,11 @@ def main():
                     if game and game.exit_requested:
                         app_state = "MENU"
                         game = None
+                elif game_curr == "CRASH":
+                    if game and game.exit_requested:
+                        app_state = "MENU"
+                        game = None
+                        sm.play_music()
                 
                 if game: game.draw()
 

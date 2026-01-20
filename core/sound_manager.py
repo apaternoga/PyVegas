@@ -11,6 +11,7 @@ class SoundManager:
         self.volume_music = 0.1     # Domyślna głośność muzyki (0.0 do 1.0)
         self.muted = False          # Czy muzyka jest wyciszona (mute dla muzyki)
         self.previous_volume_music = self.volume_music
+        self.last_music_played = "jazz_playlist.mp3"
     
     def load_common_sounds(self): #dzwieki uzywane czesto
         common_sounds = {
@@ -30,17 +31,34 @@ class SoundManager:
             "card_place2": "card_place2.ogg",
             "card_place3": "card_place3.ogg",
             "card_place4": "card_place4.ogg",
+            "deal1": "deal1.ogg",
+            "deal2": "deal2.ogg",
+            "deal3": "deal3.ogg",
+            "deal4": "deal4.ogg",
 
-            "chips_stack": "chips_stack.ogg",
-            "split": "split.ogg",
-
+            "chip_stack": "chips_stack.ogg",
             "win": "chip_drop.wav",
+            "lose": "chip_drop.wav"
         }
         loaded = 0
         for name, filename in blackjack_sounds.items():
             if self.load_sound(name, filename):
                 loaded += 1
         print(f"Loaded {loaded}/{len(blackjack_sounds)} blackjack sounds")
+        return loaded
+    
+    def load_crash_sounds(self): #dzwieki do crasha
+        crash_sounds = {
+            "cashout": "cashout.mp3",
+            "crash_cr": "crash_climb_riser.mp3",
+            "crash_explosion": "crash_explosion.mp3",
+            "crash_loop_ticking": "crash_loop_ticking.mp3"
+        }
+        loaded = 0
+        for name, filename in crash_sounds.items():
+            if self.load_sound(name, filename):
+                loaded += 1
+        print(f"Loaded {loaded}/{len(crash_sounds)} crash sounds")
         return loaded
     
     def _ensure_mixer(self):
@@ -86,7 +104,10 @@ class SoundManager:
         else:
             print(f"Dźwięk {name} nie został załadowany.")
 
-    def play_music(self, name="jazz_playlist.mp3"): #odtworz muzyke
+    def play_music(self, name=None): #odtworz muzyke
+        if name is None:
+            name = self.last_music_played
+
         if not self._ensure_mixer():
             print(f"Cannot play music '{name}': mixer not initialized.")
             return False
@@ -98,6 +119,8 @@ class SoundManager:
         try:
             pygame.mixer.music.load(path)
             pygame.mixer.music.set_volume(0.0 if self.muted else self.volume_music)
+            if name != "crash_climb_riser.mp3":
+                self.last_music_played = name
             pygame.mixer.music.play(-1)  # Odtwarzaj w pętli
             return True
         except Exception as e:

@@ -23,7 +23,8 @@ class Wallet:
             return self.start_money
 
     def save(self):
-        """Zapisuje aktualny stan konta do pliku."""
+        """Zapisuje aktualny stan konta do pliku i zaokragla do 2 miejsc po przecinku."""
+        self.balance = round(self.balance, 2)
         try:
             with open(self.file_name, "w") as f:
                 f.write(str(self.balance))

@@ -19,44 +19,20 @@ COLORS = {
 }
 
 class CrashGame:
-    def __init__(self, screen):
+    def __init__(self, screen, sm, wallet):
         self.screen = screen
         self.W, self.H = screen.get_size()
+        self.sm = sm
+        self.wallet = wallet
+        self.exit_requested = False
         
         # Audio setup
         if not pygame.mixer.get_init():
             pygame.mixer.init()
 
-        # Paths (games/crash.py -> assets/crash/)
+        # Paths (games/crash.py -> assets/sounds/)
         base_dir = os.path.dirname(__file__)
-        asset_dir = os.path.abspath(os.path.join(base_dir, "..", "assets", "crash"))
         sounds_dir = os.path.abspath(os.path.join(base_dir, "..", "assets", "sounds"))
-
-        self.music_file = os.path.join(asset_dir, "crash_climb_riser.mp3")
-        path_crash = os.path.join(asset_dir, "crash_explosion.mp3")
-        path_cashout = os.path.join(asset_dir, "cashout.mp3")
-        path_select = os.path.join(sounds_dir, "select_001.ogg")
-        path_hover = os.path.join(sounds_dir, "hover.wav")
-
-        # Load sounds
-        try:
-            pygame.mixer.music.load(self.music_file)
-        except:
-            self.music_file = None
-
-        self.sfx_crash = None
-        try: self.sfx_crash = pygame.mixer.Sound(path_crash)
-        except: pass
-
-        self.sfx_cashout = None
-        try: self.sfx_cashout = pygame.mixer.Sound(path_cashout)
-        except: pass
-        self.sfx_select = None
-        try: self.sfx_select = pygame.mixer.Sound(path_select)
-        except: pass
-        self.sfx_hover = None
-        try: self.sfx_hover = pygame.mixer.Sound(path_hover)
-        except: pass
 
         # Fonts
         self.font_main = pygame.font.SysFont("Arial Rounded MT Bold", 120, bold=True)
@@ -64,7 +40,6 @@ class CrashGame:
         self.font_mono = pygame.font.SysFont("Consolas", 28, bold=True)
 
         # Variables
-        self.balance = 1000.00
         self.current_bet = 0
         self.game_history = [] 
         
@@ -106,6 +81,7 @@ class CrashGame:
         self.rect_input_auto = pygame.Rect(auto_x, base_center_y - 36, input_w, 72)
         self.rect_toggle_auto = pygame.Rect(self.rect_input_auto.right + gap, base_center_y - 30, btn_w, 60)
         self.rect_btn_action = pygame.Rect(center_x - 150, base_center_y - 40, 300, 80)
+        self.rect_btn_exit = pygame.Rect(self.W - 120, 20, 100, 40)
 
         self.error_msg = ""
         self.error_timer = 0
@@ -128,8 +104,8 @@ class CrashGame:
 
     def _handle_hover(self, key, hovered):
         if hovered and not self.hover_states.get(key, False):
-            if self.sfx_hover:
-                self.sfx_hover.play()
+            if self.sm:
+                self.sm.play_sound("hover")
         self.hover_states[key] = hovered
 
     def draw_gradient_bg(self):
@@ -172,7 +148,7 @@ class CrashGame:
         return f"{value:.2f}".rstrip("0").rstrip(".")
 
     def _display_balance(self):
-        return math.floor(self.balance * 100) / 100
+        return math.floor(self.wallet.balance * 100) / 100
 
     def _apply_bet_multiplier(self, factor):
         if self.state == "RUNNING":
@@ -214,7 +190,7 @@ class CrashGame:
                 return self.show_error("Bad Input")
 
         # Start logic
-        self.balance -= bet
+        self.wallet.balance -= bet
         self.current_bet = bet
         self.target_crash = self._generate_crash_point()
         
@@ -225,21 +201,16 @@ class CrashGame:
         self.last_delta = 0.0
         
         # Audio
-        if self.music_file:
-            try:
-                pygame.mixer.music.rewind()
-                pygame.mixer.music.play(-1)
-            except:
-                pass
+        self.sm.play_music("crash_climb_riser.mp3")
 
     def cash_out(self):
         if self.state == "RUNNING":
-            if self.sfx_cashout: self.sfx_cashout.play()
+            self.sm.play_sound("cashout")
             
             self.state = "SUCCESS"
             self.cashout_point = self.current_multiplier
             win = self.current_bet * self.cashout_point
-            self.balance += win
+            self.wallet.balance += win
             self.last_delta = win
             self.game_history.append((self.cashout_point, True))
             if len(self.game_history) > 12: self.game_history.pop(0)
@@ -272,7 +243,7 @@ class CrashGame:
                 self.current_multiplier = self.target_crash
                 self.state = "CRASHED"
                 
-                if self.sfx_crash: self.sfx_crash.play()
+                self.sm.play_sound("crash_explosion")
                 self.last_delta = -self.current_bet
                 
                 self.game_history.append((self.target_crash, False))
@@ -287,18 +258,21 @@ class CrashGame:
 
                 if self.rect_btn_half.collidepoint(event.pos):
                     self._apply_bet_multiplier(0.5)
-                    if self.sfx_select: self.sfx_select.play()
+                    if self.sm: self.sm.play_sound("click")
                 if self.rect_btn_double.collidepoint(event.pos):
                     self._apply_bet_multiplier(2.0)
-                    if self.sfx_select: self.sfx_select.play()
-                
+                    if self.sm: self.sm.play_sound("click")
+
                 if self.rect_toggle_auto.collidepoint(event.pos):
                     self.auto_cashout_on = not self.auto_cashout_on
-                    if self.sfx_select: self.sfx_select.play()
+                    if self.sm: self.sm.play_sound("click")
                 
                 if self.rect_btn_action.collidepoint(event.pos):
                     if self.state == "RUNNING": self.cash_out()
                     else: self.start_round()
+
+                if self.state != "RUNNING" and self.rect_btn_exit.collidepoint(event.pos):
+                    self.exit_requested = True
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
@@ -495,6 +469,17 @@ class CrashGame:
             et = self.font_ui.render(f"⚠ {self.error_msg}", True, COLORS["accent_red"])
             er = et.get_rect(center=(self.W // 2, self.panel_y - 30))
             self.screen.blit(et, er)
+
+        # Exit Button 
+        if self.state != "RUNNING":
+            hover_exit = self.rect_btn_exit.collidepoint(mouse_pos)
+            exit_col = COLORS["accent_red"] if hover_exit else COLORS["bg_panel"]
+            self.draw_rounded_rect(self.screen, exit_col, self.rect_btn_exit, 8)
+            if hover_exit:
+                self.draw_inner_glow(self.rect_btn_exit, COLORS["accent_red"], alpha=70, radius=8)
+            t_exit = self.font_ui.render("EXIT", True, COLORS["text_white"])
+            tr_exit = t_exit.get_rect(center=self.rect_btn_exit.center)
+            self.screen.blit(t_exit, tr_exit)
 
     def draw(self):
         self.draw_gradient_bg()

@@ -488,7 +488,7 @@ class BlackjackGame:
             20,
             100,
             40,
-            color=(150, 50, 50),
+            color=(DARK_PANEL),
             text_color=WHITE,
             sm=self.sm,
         )
@@ -682,9 +682,11 @@ class BlackjackGame:
                 elif event.key == pygame.K_UP:
                     if self.wallet.balance >= self.current_bet + 10:
                         self.current_bet += 10
+                        self.sm.play_sound("chip_stack")
                 elif event.key == pygame.K_DOWN:
-                    if self.wallet.balance > 10:
+                    if self.current_bet > 10:
                         self.current_bet -= 10
+                        self.sm.play_sound("chip_stack")
 
             # obsluga myszki dla przycisku rozdaj
             if self.btn_deal.is_clicked(event):
