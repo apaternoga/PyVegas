@@ -1,6 +1,7 @@
 import pygame
 import sys
 import os
+import ctypes  # Potrzebne do naprawy ikonki na pasku zadań
 
 #importy z innych plikow
 from core.settings import *
@@ -13,6 +14,15 @@ from intro import IntroSequence
 from core.wallet import Wallet
 
 def main():
+    # --- NAPRAWA IKONKI NA PASKU ZADAŃ (WINDOWS) ---
+    # Ta sekcja informuje Windows, że to jest oddzielna aplikacja, a nie skrypt Pythona.
+    # Dzięki temu ikonka na pasku zadań nie będzie domyślnym logo Pythona.
+    try:
+        myappid = 'mycompany.pyvegas.casino.1.0' # Dowolny unikalny ciąg znaków
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+    except:
+        pass 
+
     #inicjalizacja modulow pygame
     pygame.init()
 
@@ -24,11 +34,17 @@ def main():
     sm.load_crash_sounds()
     Manager.sm = sm
 
-    #tworzenie 'screen', czyli glownego okna gry o rozmiarach podanych w settings.py
+    #tworzenie 'screen', czyli glownego okna gry
     screen=pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
     
-    #ta linijka odpowiada za tytul u gory
-    pygame.display.set_caption(CAPTION)
+    # --- TYTUŁ I IKONKA ---
+    pygame.display.set_caption("PyVegas")
+    
+    icon_path = os.path.join("assets", "pyvegas.png")
+    if os.path.exists(icon_path):
+        icon = pygame.image.load(icon_path)
+    
+        pygame.display.set_icon(icon)
     
     #odpowiada za FPS
     clock=pygame.time.Clock()
@@ -38,14 +54,13 @@ def main():
     intro.run()
 
     menu = Menu(screen, sm, wallet=Wallet(STARTING_MONEY))
-    game= None
+    game = None
     
     app_state ="MENU"
 
-    running =True
+    running = True
 
     #GLOWNA PETLA
-    #wykonuje sie ona kilkadziesiat razy na sekunde
     while running:
         
         if app_state == "MENU":
@@ -56,11 +71,11 @@ def main():
                 running = False
             elif action == "BLACKJACK":
                 game = BlackjackGame(screen, sm, wallet=menu.wallet)
-                game_curr='BLACKJACK' 
+                game_curr = 'BLACKJACK' 
                 app_state = "GAME"
             elif action == "CRASH":
                 game = CrashGame(screen, sm, wallet=menu.wallet)
-                game_curr='CRASH' 
+                game_curr = 'CRASH' 
                 app_state = "GAME"
 
         elif app_state == "GAME":
@@ -70,16 +85,16 @@ def main():
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT: running = False
                     
-                    # Poprawiona obsługa ESC - sprawdzamy czy gra pozwala na wyjście
+                    # Obsługa ESC - sprawdzamy czy gra pozwala na wyjście
                     if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                         if hasattr(game, 'can_exit') and game.can_exit():
                             app_state = "MENU"
-                            if game_curr=='CRASH': sm.play_music()
-                            game = None # Usuwamy grę z pamięci
+                            if game_curr == 'CRASH': sm.play_music()
+                            game = None
                     
                     if game: game.handle_input(event)
 
-                # Sprawdzanie czy gra sama poprosiła o wyjście (np. przez przycisk EXIT na ekranie)
+                # Sprawdzanie czy gra sama poprosiła o wyjście
                 if game and game.exit_requested:
                     app_state = "MENU"
                     if game_curr == "CRASH": sm.play_music()
@@ -87,16 +102,11 @@ def main():
                 
                 if game: game.draw()
 
-        #rysujemy cala gre na ekranie
-        #dzieki temu uzytkownik widzi plynna animacje, w pelni narysowane obrazy, a nie proces ich powstawania
         pygame.display.flip()
-        
         clock.tick(FPS)
     
-    #sprzatanie po zamknieciu petli
     pygame.quit()
     sys.exit()
 
-#uruchom gre wtedy i tylko wtedy jesli ten plik zostal uruchomiony bezposrednio przez czlowieka
 if __name__=="__main__":
     main()
