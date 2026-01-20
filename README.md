@@ -28,6 +28,16 @@ The project is designed with a **modular** architecture: each game has its own l
 Currently, the collection includes:
 - **Blackjack** - a classic card game played against the dealer.
 - **Crash** - a chance game based on increasing multipliers and the decision to cash out at the right moment.
+## 🖥️ Main Menu
+
+The central hub of the application (`core/`) that unites all mini-games into a single ecosystem.
+
+**Key Features:**
+* **Seamless Navigation:** An optimized state management system allows for instant transitions between Blackjack, Crash, and the menu without restarting the application.
+* **Interactive Buttons:** The user interface responds dynamically to player actions – buttons feature hover states (highlighting) and click animations.
+* **Sound Manager:** A global audio module initialized at startup. It handles background music mixing, sound effects (SFX) playback, and centralized volume management.
+* **Settings & Guide:** A dedicated settings panel where players can adjust game parameters and access the **built-in manual** (game rules and controls) without exiting the application.
+
 ## 🎮 Game Modules
 
 ### ♠️ Blackjack

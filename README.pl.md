@@ -31,6 +31,16 @@ Aktualnie w zestawie znajdują się m.in.:
 - **Blackjack** - klasyczna gra karciana przeciwko krupierowi,
 - **Crash** - gra losowa oparta o rosnący mnożniki i decyzję o wypłacie w odpowiednim momencie..
 
+## 🖥️ Menu Główne
+
+Centralny hub aplikacji (`core/`), który spaja wszystkie mini-gry w jeden ekosystem.
+
+**Główne funkcjonalności:**
+* **Płynna nawigacja:** Zoptymalizowany system zarządzania stanem gry pozwala na błyskawiczne przełączanie się między Blackjackiem, Crashem a menu bez konieczności restartowania aplikacji.
+* **Interaktywne przyciski:** Interfejs użytkownika reaguje dynamicznie na akcje gracza – przyciski posiadają stany "hover" (podświetlenie po najechaniu) oraz animacje kliknięcia.
+* **Sound Manager:** Globalny moduł audio inicjowany przy starcie. Odpowiada za miksowanie muzyki w tle, odtwarzanie efektów dźwiękowych (SFX) oraz centralne zarządzanie głośnością.
+* **Ustawienia i Instrukcja:** Dedykowany panel ustawień, w którym gracz może nie tylko dostosować parametry gry, ale również zapoznać się z **wbudowaną instrukcją** (zasady gier i sterowanie) bez wychodzenia z aplikacji.
+
 ## 🎮 Moduły Gier
 
 ### ♠️ Blackjack
