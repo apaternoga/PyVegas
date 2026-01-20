@@ -111,7 +111,7 @@ Projekt zachowuje czystą strukturę plików, oddzielając logikę od zasobów:
 * **Filip Liskowski** - README, Blackjack tester
 * **Miłosz Kiedrzyński** - Implementacja globalnych systemów (Wallet, Sound Manager), logiki wyglądu kart oraz interaktywnego menu z animacjami i obsługą assetów
 * **Patryk Iżbicki** - 
-* **Borys Kaczka** - 
+* **Borys Kaczka** - Logika, animacje, GUI i wykres Crasha
 
 ## 📚 Źródła i Licencja
 
