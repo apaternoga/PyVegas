@@ -116,15 +116,23 @@ Copyright © 2025 **Adrian Paternoga**.
 
 Oprogramowanie jest dostarczane w stanie „takim, jakie jest”, bez udzielania jakichkolwiek gwarancji. Masz prawo do swobodnego używania, modyfikacji, łączenia, publikowania i dystrybucji kodu, pod warunkiem dołączenia powyższej noty o prawach autorskich. Szczegóły znajdują się w pliku `LICENSE`.
 
-### Wykorzystane zasoby (Credits)
+### Wykorzystane zasoby i Narzędzia (Credits)
 
 **1. Gra Crash:**
 * **Algorytm:** Funkcja `_generate_crash_point` zaimplementowana na podstawie otwartego kodu źródłowego **Bustabit** (Inverse Probability Distribution).
     * [Link do repozytorium Bustabit](https://github.com/bustabit/bustabit-web-server)
 
 **2. Oprawa Audio:**
-* **Muzyka:** Utwór *"Crash Climb Riser"* wygenerowany przy użyciu narzędzia **Suno AI** (Data generacji: 19.01.2026).
-    * [Suno AI](https://suno.com/)
-* **Efekty dźwiękowe:** Pobrane z bibliotek **Kenney** oraz **Pixabay**.
-    * [Kenney Assets](https://kenney.nl/assets)
-    * [Pixabay Sound Effects](https://pixabay.com/sound-effects/)
+* **Muzyka w tle (Menu/Rozgrywka):** Utwory na licencji **Public Domain (CC0)** – brak wymogu atrybucji autora.
+* **Muzyka (Crash Riser):** Utwór *"Crash Climb Riser"* wygenerowany przy użyciu narzędzia **Suno AI**.
+* **Efekty dźwiękowe (SFX):** Biblioteki **Kenney** oraz **Pixabay**.
+* **Dźwięki interfejsu (UI):** Dźwięki kliknięcia i najechania pobrane z serwisu **Freesound** (licencja CC0).
+
+**3. Grafika:**
+* **Tło Menu:** Pobrane z serwisu **Pexels.com**.
+* **Logotypy:** Wygenerowane przy pomocy modelu **Gemini** (Google).
+
+**4. Wykorzystanie Sztucznej Inteligencji (AI Disclosure):**
+W projekcie wykorzystano narzędzia AI w charakterze asystenta deweloperskiego:
+* **Kod:** Modele LLM (Gemini/ChatGPT) były wykorzystywane do refaktoryzacji kodu, optymalizacji algorytmów oraz generowania dokumentacji.
+* **Assets:** Część zasobów wizualnych i dźwiękowych została wygenerowana przy użyciu generatywnej sztucznej inteligencji (Suno AI, Gemini).

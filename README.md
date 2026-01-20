@@ -119,15 +119,23 @@ Copyright © 2025 **Adrian Paternoga**.
 
 The software is provided "as is", without warranty of any kind. You are free to use, modify, merge, publish, and distribute the code, provided the above copyright notice is included. See the `LICENSE` file for details.
 
-### Asset Credits
+### Resources & Tools
 
 **1. Crash Game:**
 * **Algorithm:** The `_generate_crash_point` function is implemented based on the open-source code of **Bustabit** (Inverse Probability Distribution).
     * [Bustabit Repository Link](https://github.com/bustabit/bustabit-web-server)
 
 **2. Audio:**
-* **Music:** Track *"Crash Climb Riser"* generated using **Suno AI** (Generated: 2026-01-19).
-    * [Suno AI](https://suno.com/)
-* **Sound Effects:** Sourced from **Kenney** and **Pixabay** libraries.
-    * [Kenney Assets](https://kenney.nl/assets)
-    * [Pixabay Sound Effects](https://pixabay.com/sound-effects/)
+* **Background Music:** Tracks released under **Public Domain (CC0)** license – no attribution required.
+* **Music (Crash Riser):** Track *"Crash Climb Riser"* generated using **Suno AI**.
+* **Sound Effects (SFX):** Sourced from **Kenney** and **Pixabay** libraries.
+* **UI Sounds:** Hover and click sounds sourced from **Freesound** (CC0 license).
+
+**3. Graphics:**
+* **Menu Background:** Sourced from **Pexels.com**.
+* **Logos:** Generated using the **Gemini** model (Google).
+
+**4. AI Usage Disclosure:**
+Artificial Intelligence tools were used as a development assistant in this project:
+* **Code:** LLM models (Gemini/ChatGPT) were used for code refactoring, algorithm optimization, and documentation generation.
+* **Assets:** Selected visual and audio resources were created using generative AI tools (Suno AI, Gemini).
