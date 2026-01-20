@@ -1,5 +1,6 @@
 import pygame
 import os
+import random
 from constants import WHITE, BLACK, GRAY, DARK_GRAY, WIDTH
 from core.settings import TABLE_COLOR
 from games.blackjack import Card
@@ -39,7 +40,7 @@ class Button:
         # Centrowanie tekstu wewnątrz przycisku
         text_surf = font.render(self.text, True, BLACK)
         text_x = self.rect.centerx
-        text_y = self.rect.centery + 5
+        text_y = self.rect.centery +7
         text_rect = text_surf.get_rect(center=(text_x, text_y))
         surface.blit(text_surf, text_rect)
 
@@ -111,8 +112,8 @@ class BlackjackIcon:
         self.card2 = Card("Hearts", "Jack")
         
     def draw(self, surface, center_x, center_y, offset, is_hovered):
-        if is_hovered: scale =75 
-        else: scale = 70
+        if is_hovered: scale =75+offset//10
+        else: scale = 70+offset//10
         h, w = 150*scale//100, 100*scale//100
         draw_y = center_y - (h / 2) -35
         
@@ -120,6 +121,70 @@ class BlackjackIcon:
         # Karta 1 w lewo, Karta 2 w prawo
         self.card1.draw(surface, center_x - (w / 2) - offset, draw_y, hidden=False, sc=scale)
         self.card2.draw(surface, center_x - (w / 2) + offset, draw_y, hidden=False, sc=scale)
+
+#tym razem nowa klasa bo crash zbyt skomplikowany na animacje w Button2
+class CrashIcon:
+    def __init__(self):
+        self.val = 1.00
+        self.state = "IDLE"  # IDLE, RISING, CRASHED, WAIT_FOR_RESET
+        self.crash_point = 2.00
+        try:
+            path = os.path.join("assets", "LuckiestGuy-Regular.ttf")
+            self.font = pygame.font.Font(path, 160)
+        except:
+            self.font = pygame.font.SysFont("Arial", 160, bold=True)
+
+    def draw(self, surface, center_x, center_y, offset, is_hovered):
+        center_y -= 20
+        # LOGIKA
+        if is_hovered:
+            if self.state == "IDLE" or self.state == "WAIT_FOR_RESET":
+                # Reset i start
+                self.state = "RISING"
+                self.val = 1.00
+                self.crash_point = random.uniform(1.2, 5.0) # Losowy punkt wybuchu
+            
+            elif self.state == "RISING":
+                self.val += 0.04  # Prędkość wzrostu
+                if self.val >= self.crash_point:
+                    self.val = self.crash_point
+                    self.state = "CRASHED"
+        else:
+            if self.state == "RISING":
+                self.state = "CRASHED"
+            
+            elif self.state == "CRASHED":
+                self.state = "WAIT_FOR_RESET"
+
+        # RYSOWANIE
+        if self.state == "CRASHED" or self.state == "WAIT_FOR_RESET":
+            color = (230, 50, 50) # Czerwony
+            shadow_color = (139, 0, 0)
+        else:
+            color = (50, 230, 50) # Zielony
+            shadow_color = (0, 100, 0)
+            
+        text_str = f"{self.val:.2f}x"
+        text_surf = self.font.render(text_str, True, color)
+        text_surf_shadow = self.font.render(text_str, True, shadow_color)
+
+        scale = (60 + (offset * 0.5)) / 150.0
+        new_w = int(text_surf.get_width() * scale)
+        new_h = int(text_surf.get_height() * scale)
+        if new_w %2==1: new_w+=1
+        if new_h %2==1: new_h+=1
+        text_surf_shadow =pygame.transform.smoothscale(text_surf_shadow, (new_w, new_h))
+        text_surf = pygame.transform.smoothscale(text_surf, (new_w, new_h))
+
+        base_center = (center_x, center_y)
+        depth_offset = 5 * scale
+        shadow_center = (base_center[0] + depth_offset, base_center[1] + depth_offset)
+        rect_shadow = text_surf_shadow.get_rect(center=shadow_center)
+        surface.blit(text_surf_shadow, rect_shadow)
+
+        
+        rect_main = text_surf.get_rect(center=base_center)
+        surface.blit(text_surf, rect_main)
 
 class Slider:
     def __init__(self, x, y, width, initial_val):

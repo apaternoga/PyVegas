@@ -6,6 +6,7 @@ from core.settings import *
 from core.sound_manager import SoundManager
 from Menu import Menu
 from games.blackjack import BlackjackGame, Card, Button, Deck, Hand
+from games.crash import CrashGame
 from ui_elements import Manager
 
 def main():
@@ -49,6 +50,9 @@ def main():
                 running = False
             elif action == "BLACKJACK":
                 game = BlackjackGame(screen, sm)
+                app_state = "GAME"
+            elif action == "CRASH":
+                game = CrashGame(screen)
                 app_state = "GAME"
 
         elif app_state == "GAME":

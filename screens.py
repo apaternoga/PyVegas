@@ -1,3 +1,4 @@
+import os
 import pygame
 from constants import WHITE, BLACK, GRAY, WIDTH, HEIGHT
 
@@ -162,7 +163,7 @@ def draw_exit(screen, bg_image, btns, font, font_small):
     pygame.draw.rect(screen, (0, 0, 0), (rect_x, rect_y, rect_w, rect_h), 5, border_radius=25) 
     
     text_surf = font_small.render("ARE YOU SURE YOU WANT TO EXIT?", True, (0, 0, 0))
-    text_rect = text_surf.get_rect(center=(1280 // 2, rect_y + 80))
+    text_rect = text_surf.get_rect(center=(1280 // 2, rect_y + 90))
     screen.blit(text_surf, text_rect)
     
     btns['yes'].draw(screen, font)
@@ -207,15 +208,35 @@ def draw_game_placeholder(screen, bg_image, btns, font, logo, logo_scale=1.0):
 
 # --- IKONA GŁOŚNIKA ---
 def draw_speaker_icon(screen, x, y, muted):
-    pygame.draw.rect(screen, WHITE, (x, y + 5, 10, 10))
-    pygame.draw.polygon(screen, WHITE, [
-        (x + 10, y + 5), (x + 25, y - 5), 
-        (x + 25, y + 25), (x + 10, y + 15)
-    ])
-    
-    if muted:
-        pygame.draw.line(screen, (255, 50, 50), (x - 5, y - 5), (x + 30, y + 25), 4)
-        pygame.draw.line(screen, (255, 50, 50), (x + 30, y - 5), (x - 5, y + 25), 4)
+    try:
+        icon_muted = pygame.image.load(os.path.join("assets", "muted.png")).convert_alpha()
+        icon_muted = pygame.transform.smoothscale(icon_muted, (58, 58))
+    except:
+        icon_muted = None
+        print("Brak ikony wyciszenia w assets/muted.png")
+
+    try:
+        icon = pygame.image.load(os.path.join("assets", "notmuted.png")).convert_alpha()
+        icon = pygame.transform.smoothscale(icon, (60, 60))
+    except:
+        icon = None
+        print("Brak ikony braku wyciszenia w assets/notmuted.png")
+    if not icon_muted or not icon:
+        pygame.draw.rect(screen, WHITE, (x, y + 5, 10, 10))
+        pygame.draw.polygon(screen, WHITE, [
+            (x + 10, y + 5), (x + 25, y - 5), 
+            (x + 25, y + 25), (x + 10, y + 15)
+        ])
+        
+        if muted:
+            pygame.draw.line(screen, (255, 50, 50), (x - 5, y - 5), (x + 30, y + 25), 4)
+            pygame.draw.line(screen, (255, 50, 50), (x + 30, y - 5), (x - 5, y + 25), 4)
+        else:
+            pygame.draw.arc(screen, WHITE, (x + 15, y - 5, 20, 30), -1.5, 1.5, 3)
+            pygame.draw.arc(screen, WHITE, (x + 22, y - 10, 25, 40), -1.5, 1.5, 2)
+
     else:
-        pygame.draw.arc(screen, WHITE, (x + 15, y - 5, 20, 30), -1.5, 1.5, 3)
-        pygame.draw.arc(screen, WHITE, (x + 22, y - 10, 25, 40), -1.5, 1.5, 2)
+        if muted:
+            screen.blit(icon_muted, (x, y-18))
+        else:
+            screen.blit(icon, (x, y-20))
