@@ -104,7 +104,7 @@ The project maintains a clean file structure by separating logic from assets:
 ## 👥 Authors
 
 * **Adrian Paternoga** - **Team Leader**, Blackjack Logic, Animation & Rendering, Project Managment
-* **Adam Zalewski** - 
+* **Adam Zalewski** - Crash Feature Delivery, Project Coordination, Main Branch Merges, Blackjack Tester
 * **Filip Liskowski** - README, Blackjack Tester
 * **Miłosz Kiedrzyński** - 
 * **Patryk Iżbicki** - 
@@ -115,7 +115,7 @@ The project maintains a clean file structure by separating logic from assets:
 ### License
 This project is available under the **MIT License**.
 
-Copyright © 2025 **Adrian Paternoga**.
+Copyright © 2025 **Adrian Paternoga**, **Adam Zalewski**.
 
 The software is provided "as is", without warranty of any kind. You are free to use, modify, merge, publish, and distribute the code, provided the above copyright notice is included. See the `LICENSE` file for details.
 
