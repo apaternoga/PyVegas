@@ -1,0 +1,120 @@
+[![EN](https://img.shields.io/badge/Lang-EN-blue.svg)](README.md)
+<div align="center">
+
+<img src="assets/pyvegas.png" alt="PyVegas Banner" width="700" />
+
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python&logoColor=white)
+![Pygame](https://img.shields.io/badge/Pygame-CE-yellow?style=for-the-badge&logo=python&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+
+
+
+</div>
+
+## 📋 Spis treści
+- [Wprowadzenie](#-wprowadzenie)
+- [Moduły Gier](#-moduły-gier)
+  - [Blackjack](#-blackjack)
+  - [Crash](#-crash)
+- [Instrukcja uruchomienia](#-instrukcja-uruchomienia)
+- [Struktura projektu](#-struktura-projektu)
+- [Autorzy](#-autorzy)
+- [Źródła i Licencja](#-źródła-i-licencja)
+
+## 💡 Wprowadzenie
+
+**PyVegas** to projekt powstały w ramach studiów informatycznych realizowany w Pythonie, którego celem jest stworzenie jednej, prostej aplikacji zbierającej kilka mini-gier w jednym miejscu. Program udostępnia wspólne **menu główne**, z którego można uruchomić wybraną grę, śledzić przebieg rozgrywki i w każdej chwili wrócić do wyboru kolejnej pozycji.
+
+Projekt został zaprojektowany w sposób **modułowy**: każda gra posiada własną logikę w katalogu `games/`, natomiast elementy współdzielone (np. nawigacja, obsługa wejścia, wspólne komponenty) są wydzielone do `core/`. Dodatkowo repozytorium zawiera katalog `assets/` przeznaczony na zasoby wykorzystywane w grach (np. grafiki, dźwięki, czcionki). Taka struktura ułatwia rozwój projektu oraz dodawanie kolejnych gier bez przebudowy całej aplikacji.
+
+Aktualnie w zestawie znajdują się m.in.:
+- **Blackjack** - klasyczna gra karciana przeciwko krupierowi,
+- **Crash** - gra losowa oparta o rosnący mnożniki i decyzję o wypłacie w odpowiednim momencie..
+
+## 🎮 Moduły Gier
+
+### ♠️ Blackjack
+
+Zaawansowana symulacja Blackjacka kładąca nacisk na płynność rozgrywki, proceduralne animacje i **korzystne dla gracza zasady kasynowe**.
+
+***Główne funkcjonalności:**
+* **Wielokrotne talie:** Gra symuluje „but” (shoe) składający się z **6 talii**, tasowany automatycznie przy zużyciu 75% kart.
+* **Logika Krupiera (Soft 17):** Zaimplementowano zasadę, w której krupier dobiera karty przy miękkim 17.
+* **Pełen wachlarz akcji:** Hit, Stand, Double Down, Split oraz Surrender.
+* **Zaawansowany rendering:** Karty nie są statycznymi obrazkami – są **rysowane kodem** w czasie rzeczywistym (kształty, symbole, cienie), co pozwala na idealne skalowanie.
+* **Animacje:** Płynna interpolacja ruchu kart przy rozdawaniu.
+**Unikalne zasady (House Rules):**
+* ✅ **Brak ograniczeń po Splicie Asów:** Możliwość dobierania kart po rozdzieleniu asów.
+* ✅ **Blackjack po Splicie (3:2):** 21 punktów z dwóch kart po rozdzieleniu jest traktowane jako Blackjack.
+* ✅ **Brak "Dealer Peek":** Krupier sprawdza Blackjacka tylko przy odsłoniętym Asie.
+
+### 🚀 Crash
+
+Dynamiczna gra typu "Crypto/Stock", testująca chciwość i refleks gracza. Inspirowana mechaniką *Bustabit*.
+
+**Główne funkcjonalności:**
+* **Bustabit-like Algorithm:** Punkt "wybuchu" (crash point) generowany jest na podstawie sprawdzonego algorytmu opartego na *Inverse Probability Distribution*.
+* **Auto Cashout:** System pozwalający na ustawienie automatycznej wypłaty przy określonym mnożniku.
+* **System Mnożnika:** Wykładniczy wzrost wartości wykresu (`growth_speed`) symulujący giełdową "pompę".
+* **Wizualizacja:** Wykres rysowany dynamicznie za pomocą wielokątów z gradientowym wypełnieniem.
+* **Historia:** Pasek ostatnich wyników (History Pills) pozwalający śledzić trendy.
+* **Audio Feedback:** Dźwięk typu "riser", którego napięcie rośnie wraz z mnożnikiem.
+
+## ⚙️ Instrukcja uruchomienia
+
+Aby uruchomić projekt na swoim komputerze, wykonaj poniższe kroki w terminalu:
+
+1. **Sklonuj repozytorium:**
+   ```bash
+   git clone [https://github.com/apaternoga/pygames.git](https://github.com/apaternoga/pygames.git)
+   cd pygames
+2. **Zainstaluj zależności:**
+   Projekt wymaga biblioteki `pygame`. Aby ją zainstalować, wpisz w terminalu:
+   ```bash
+   pip install -r requirements.txt
+3. **Uruchom grę:**
+   Aby włączyć menu główne i rozpocząć grę, wpisz:
+   ```bash
+   python main.py
+## 📂 Struktura projektu
+
+Projekt zachowuje czystą strukturę plików, oddzielając logikę od zasobów:
+
+* `main.py` – Punkt startowy aplikacji (inicjalizacja silnika, pętla główna).
+* `core/` – Rdzeń systemu (menu, settings, sound manager, obsługa wejścia).
+* `games/` – Logika poszczególnych gier (Blackjack, Crash).
+* `assets/` – Zasoby multimedialne (dźwięki, grafiki, czcionki).
+* `requirements.txt` – Lista wymaganych bibliotek Python.
+* `CREDITS.txt` – Szczegółowe informacje o źródłach assetów.
+
+
+## 👥 Autorzy
+
+* **Adrian Paternoga** - **lider zespołu**, logika, animacje i GUI Blackjacka, zarządzanie całością projektu.
+* **Adam Zalewski** - 
+* **Filip Liskowski** - README, Blackjack tester
+* **Miłosz Kiedrzyński** - 
+* **Patryk Iżbicki** - 
+* **Borys Kaczka** - 
+
+## 📚 Źródła i Licencja
+
+### Licencja
+Projekt udostępniany jest na licencji **MIT**.
+
+Copyright © 2025 **Adrian Paternoga**.
+
+Oprogramowanie jest dostarczane w stanie „takim, jakie jest”, bez udzielania jakichkolwiek gwarancji. Masz prawo do swobodnego używania, modyfikacji, łączenia, publikowania i dystrybucji kodu, pod warunkiem dołączenia powyższej noty o prawach autorskich. Szczegóły znajdują się w pliku `LICENSE`.
+
+### Wykorzystane zasoby (Credits)
+
+**1. Gra Crash:**
+* **Algorytm:** Funkcja `_generate_crash_point` zaimplementowana na podstawie otwartego kodu źródłowego **Bustabit** (Inverse Probability Distribution).
+    * [Link do repozytorium Bustabit](https://github.com/bustabit/bustabit-web-server)
+
+**2. Oprawa Audio:**
+* **Muzyka:** Utwór *"Crash Climb Riser"* wygenerowany przy użyciu narzędzia **Suno AI** (Data generacji: 19.01.2026).
+    * [Suno AI](https://suno.com/)
+* **Efekty dźwiękowe:** Pobrane z bibliotek **Kenney** oraz **Pixabay**.
+    * [Kenney Assets](https://kenney.nl/assets)
+    * [Pixabay Sound Effects](https://pixabay.com/sound-effects/)
