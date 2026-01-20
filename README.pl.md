@@ -1,7 +1,7 @@
 [![EN](https://img.shields.io/badge/Lang-EN-blue.svg)](README.md)
 <div align="center">
 
-<img src="assets/pyvegas.png" alt="PyVegas Banner" width="400" />
+<img src="assets/pyvegas.png" alt="PyVegas Banner" width="700" />
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python&logoColor=white)
 ![Pygame](https://img.shields.io/badge/Pygame-CE-yellow?style=for-the-badge&logo=python&logoColor=white)
@@ -103,7 +103,7 @@ Projekt zachowuje czystą strukturę plików, oddzielając logikę od zasobów:
 * **Adrian Paternoga** - **lider zespołu**, logika, animacje i GUI Blackjacka, zarządzanie całością projektu.
 * **Adam Zalewski** - Logika, animacje i GUI Crasha, koordynacja projektu, tester Blackjacka
 * **Filip Liskowski** - README, Blackjack tester
-* **Miłosz Kiedrzyński** - 
+* **Miłosz Kiedrzyński** - Implementacja globalnych systemów (Wallet, Sound Manager), logiki wyglądu kart oraz interaktywnego menu z animacjami i obsługą assetów
 * **Patryk Iżbicki** - 
 * **Borys Kaczka** - 
 
