@@ -110,7 +110,7 @@ The project maintains a clean file structure by separating logic from assets:
 ## 👥 Authors
 
 * **Adrian Paternoga** - **Team Leader**, Blackjack Logic, Animation & Rendering, Project Managment
-* **Adam Zalewski** - Crash Logic, Animations & UI, Project Coordination, Blackjack Tester
+* **Adam Zalewski** - Crash Logic, Animations & UI, Project Coordination, Final Project Polish, Blackjack Tester
 * **Filip Liskowski** - README, Blackjack Tester
 * **Miłosz Kiedrzyński** - Implementation of global systems (Wallet, Sound Manager), card rendering logic, and an interactive menu with animations and asset management 
 * **Patryk Iżbicki** - 
@@ -121,7 +121,7 @@ The project maintains a clean file structure by separating logic from assets:
 ### License
 This project is available under the **AGPL-3.0** license.
 
-Copyright © 2025 **Adrian Paternoga**, **Adam Zalewski**.
+Copyright © 2025 **Adrian Paternoga**, **Adam Zalewski**, **Filip Liskowski**, **Miłosz Kiedrzyński**, **Patryk Iżbicki**, **Borys Kaczka**.
 
 The software is provided "as is", without warranty of any kind. You are free to use, modify, merge, publish, and distribute the code, provided the above copyright notice is included. See the `LICENSE` file for details.
 
