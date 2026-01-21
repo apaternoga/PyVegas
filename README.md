@@ -12,9 +12,9 @@
 ## 📋 Table of Contents
 - [Introduction](#-introduction)
 - [Game Modules](#-game-modules)
-  - [Blackjack](#-blackjack)
+  - [Blackjack](#️-blackjack)
   - [Crash](#-crash)
-- [Setup Instructions](#-setup-instructions)
+- [Setup Instructions](#️-setup-instructions)
 - [Project Structure](#-project-structure)
 - [Authors](#-authors)
 - [Credits & License](#-credits--license)

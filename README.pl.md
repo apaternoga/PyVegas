@@ -14,9 +14,9 @@
 ## 📋 Spis treści
 - [Wprowadzenie](#-wprowadzenie)
 - [Moduły Gier](#-moduły-gier)
-  - [Blackjack](#-blackjack)
+  - [Blackjack](#️-blackjack)
   - [Crash](#-crash)
-- [Instrukcja uruchomienia](#-instrukcja-uruchomienia)
+- [Instrukcja uruchomienia](#️-instrukcja-uruchomienia)
 - [Struktura projektu](#-struktura-projektu)
 - [Autorzy](#-autorzy)
 - [Źródła i Licencja](#-źródła-i-licencja)
