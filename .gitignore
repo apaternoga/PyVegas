@@ -21,3 +21,4 @@ Thumbs.db
 # Logi i bazy danych (tego nawet prawdobodnie nie trzeba ale na wrazie napisze)
 *.log 
 *.sqlite3
+data/wallet.txt

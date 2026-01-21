@@ -86,6 +86,11 @@ Aby uruchomić projekt na swoim komputerze, wykonaj poniższe kroki w terminalu:
    Aby włączyć menu główne i rozpocząć grę, wpisz:
    ```bash
    python main.py
+   ```
+   Aby pominąć intro i przejść od razu do menu:
+   ```bash
+   python main.py --skip
+   ```
 ## 📂 Struktura projektu
 
 Projekt zachowuje czystą strukturę plików, oddzielając logikę od zasobów:

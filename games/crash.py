@@ -25,6 +25,7 @@ class CrashGame:
         self.sm = sm
         self.wallet = wallet
         self.exit_requested = False
+        self.prev_music_volume = None
         
         # Audio setup
         if not pygame.mixer.get_init():
@@ -195,7 +196,11 @@ class CrashGame:
         self.last_delta = 0.0
         
         # Audio
-        self.sm.play_music("crash_climb_riser.mp3")
+        if self.sm:
+            if self.prev_music_volume is None:
+                self.prev_music_volume = self.sm.volume_music
+            self.sm.set_volume_music(1.0)
+            self.sm.play_music("crash_climb_riser.mp3")
 
     def cash_out(self):
         if self.state == "RUNNING":
@@ -216,6 +221,9 @@ class CrashGame:
         # Stop theme if ended
         if self.state != "RUNNING" and pygame.mixer.music.get_busy():
             pygame.mixer.music.stop()
+            if self.sm and self.prev_music_volume is not None:
+                self.sm.set_volume_music(self.prev_music_volume)
+                self.prev_music_volume = None
 
         if self.state == "RUNNING":
             self.growth_speed *= 1.005
