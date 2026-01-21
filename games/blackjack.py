@@ -263,7 +263,7 @@ class Card:
         else:
             # FIGURY (J, Q, K, A)
             if rank_short == "A":
-                font_ace = pygame.font.SysFont("Segoe UI Symbol", 80*sc//100)
+                font_ace = pygame.font.SysFont("DejaVu Sans", 80*sc//100)
                 pip_surf = font_ace.render(suit_icon, True, color)
                 pip_rect = pip_surf.get_rect(center=(x + w//2, y + h//2))
                 screen.blit(pip_surf, pip_rect)

@@ -70,30 +70,46 @@ A dynamic "Crypto/Stock" style game that tests greed and reflexes. Inspired by t
 
 ## ⚙️ Setup Instructions
 
-To run the project on your machine, follow these steps in your terminal:
+To avoid system conflicts (e.g., `externally-managed-environment` error on Linux) and ensure clean dependency management, we recommend using a virtual environment.
 
-1.  **Clone the repository:**
-    ```bash
-    git clone [https://github.com/apaternoga/PyVegas.git](https://github.com/apaternoga/PyVegas.git)
-    cd PyVegas
-    ```
+### 🐧 Linux / macOS
+Run the following commands in your terminal to clone, setup, and launch the game:
 
-2.  **Install dependencies:**
-    The project requires the `pygame` library. To install it, run:
-    ```bash
-    pip install -r requirements.txt
-    ```
+```bash
+git clone https://github.com/apaternoga/PyVegas.git
+cd PyVegas
+# 1. Install venv if missing (Ubuntu/Debian only)
+sudo apt install -y python3-venv
+# 2. Create and activate virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
+# 3. Install requirements and run
+pip install -r requirements.txt
+python main.py
+```
 
-3.  **Run the game:**
-    To launch the main menu and start playing, run:
-    ```bash
-    python main.py
-    ```
-    To skip the intro and go straight to the menu:
-    ```bash
-    python main.py --skip
-    ```
+### 🪟 Windows
+Run the following commands in PowerShell or Command Prompt:
 
+```powershell
+git clone https://github.com/apaternoga/PyVegas.git
+cd PyVegas
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+python main.py
+```
+
+> **Note:** To skip the intro animation, run `python main.py --skip`.
+
+## 🔧 Troubleshooting
+
+### 🔲 Missing Card Symbols (Linux)
+If you see empty squares `[]` instead of card suits (♠♥♦♣) in Blackjack, your system is missing the required fonts. Install them by running:
+
+```bash
+sudo apt install fonts-dejavu fonts-liberation
+```
 ## 📂 Project Structure
 
 The project maintains a clean file structure by separating logic from assets:

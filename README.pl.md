@@ -72,25 +72,47 @@ Dynamiczna gra typu "Crypto/Stock", testująca chciwość i refleks gracza. Insp
 
 ## ⚙️ Instrukcja uruchomienia
 
-Aby uruchomić projekt na swoim komputerze, wykonaj poniższe kroki w terminalu:
+Aby uniknąć błędów systemowych (np. `externally-managed-environment` na Linuxie) i zachować porządek w bibliotekach, zalecamy instalację w wirtualnym środowisku.
 
-1. **Sklonuj repozytorium:**
-   ```bash
-   git clone [https://github.com/apaternoga/PyVegas.git](https://github.com/apaternoga/PyVegas.git)
-   cd PyVegas
-2. **Zainstaluj zależności:**
-   Projekt wymaga biblioteki `pygame`. Aby ją zainstalować, wpisz w terminalu:
-   ```bash
-   pip install -r requirements.txt
-3. **Uruchom grę:**
-   Aby włączyć menu główne i rozpocząć grę, wpisz:
-   ```bash
-   python main.py
-   ```
-   Aby pominąć intro i przejść od razu do menu:
-   ```bash
-   python main.py --skip
-   ```
+### 🐧 Linux / macOS
+Wpisz poniższe komendy w terminalu, aby pobrać, skonfigurować i uruchomić grę:
+
+```bash
+git clone https://github.com/apaternoga/PyVegas.git
+cd PyVegas
+# 1. Zainstaluj moduł venv (tylko Ubuntu/Debian)
+sudo apt install -y python3-venv
+# 2. Utwórz i aktywuj środowisko wirtualne
+python3 -m venv .venv
+source .venv/bin/activate
+# 3. Zainstaluj biblioteki i uruchom grę
+pip install -r requirements.txt
+python main.py
+```
+
+### 🪟 Windows
+Wpisz poniższe komendy w PowerShell lub terminalu:
+
+```powershell
+git clone https://github.com/apaternoga/PyVegas.git
+cd PyVegas
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+python main.py
+```
+
+> **Wskazówka:** Aby pominąć intro przy starcie, wpisz `python main.py --skip`.
+
+## 🔧 Rozwiązywanie problemów (Troubleshooting)
+
+### 🔲 Brak symboli kart na Linuxie (kwadraty zamiast ♠♥♦♣)
+Jeśli w grze Blackjack zamiast symboli kolorów widzisz puste kwadraty `[]`, oznacza to, że Twój system nie posiada odpowiednich czcionek.
+
+**Rozwiązanie:** Zainstaluj pakiet uniwersalnych fontów w terminalu:
+```bash
+sudo apt install fonts-dejavu fonts-liberation
+```
 ## 📂 Struktura projektu
 
 Projekt zachowuje czystą strukturę plików, oddzielając logikę od zasobów:
