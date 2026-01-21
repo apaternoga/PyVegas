@@ -421,6 +421,10 @@ class BlackjackGame:
         self.current_bet = 10
         self.bet_input_text = str(self.current_bet)
         self.active_input = "BET"
+        self.hover_states = {
+            "bet_half": False,
+            "bet_double": False,
+        }
         self.insurance_bet = 0
         self.wait_timer = 0
 
@@ -560,6 +564,19 @@ class BlackjackGame:
         if base <= 0:
             base = self.current_bet if self.current_bet > 0 else 10
         self._set_bet(int(base * factor))
+
+    def _handle_hover(self, key, hovered):
+        if hovered and not self.hover_states.get(key, False):
+            if self.sm:
+                self.sm.play_sound("hover")
+        self.hover_states[key] = hovered
+
+    def _draw_inner_glow(self, rect, color, alpha=70, radius=8):
+        overlay = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 0))
+        glow_color = (color[0], color[1], color[2], alpha)
+        pygame.draw.rect(overlay, glow_color, overlay.get_rect(), border_radius=radius)
+        self.screen.blit(overlay, (rect.x, rect.y))
 
 
     # NOWA FUNKCJA: obsluguje logike oparta na czasie (zamiast time.wait)
@@ -1090,8 +1107,14 @@ class BlackjackGame:
         self.screen.blit(chips_text, chips_rect)
 
         # 2. Wyswietlanie Stawki (input + quick buttons)
+        mouse_pos = pygame.mouse.get_pos()
         bet_label = self.small_font.render("BET", True, GOLD)
         self.screen.blit(bet_label, bet_label.get_rect(center=(self.bet_input_rect.centerx, self.bet_input_rect.y - 12)))
+
+        hover_double = self.btn_bet_double_rect.collidepoint(mouse_pos)
+        hover_half = self.btn_bet_half_rect.collidepoint(mouse_pos)
+        self._handle_hover("bet_double", hover_double)
+        self._handle_hover("bet_half", hover_half)
 
         pygame.draw.rect(self.screen, WHITE, self.bet_input_rect, border_radius=8)
         pygame.draw.rect(self.screen, GOLD, self.bet_input_rect, 2, border_radius=8)
@@ -1102,6 +1125,10 @@ class BlackjackGame:
         pygame.draw.rect(self.screen, GOLD, self.btn_bet_double_rect, 2, border_radius=6)
         pygame.draw.rect(self.screen, WHITE, self.btn_bet_half_rect, border_radius=6)
         pygame.draw.rect(self.screen, GOLD, self.btn_bet_half_rect, 2, border_radius=6)
+        if hover_double:
+            self._draw_inner_glow(self.btn_bet_double_rect, GOLD, alpha=60, radius=6)
+        if hover_half:
+            self._draw_inner_glow(self.btn_bet_half_rect, GOLD, alpha=60, radius=6)
 
         t_double = self.small_font.render("2x", True, BLACK)
         t_half = self.small_font.render("0.5x", True, BLACK)
