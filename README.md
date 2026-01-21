@@ -89,6 +89,10 @@ To run the project on your machine, follow these steps in your terminal:
     ```bash
     python main.py
     ```
+    To skip the intro and go straight to the menu:
+    ```bash
+    python main.py --skip
+    ```
 
 ## 📂 Project Structure
 
