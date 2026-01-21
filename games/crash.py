@@ -195,7 +195,9 @@ class CrashGame:
         self.last_delta = 0.0
         
         # Audio
-        self.sm.play_music("crash_climb_riser.mp3")
+        if self.sm:
+            self.sm.set_volume_music(1.0)
+            self.sm.play_music("crash_climb_riser.mp3")
 
     def cash_out(self):
         if self.state == "RUNNING":
