@@ -71,7 +71,7 @@ def draw_instructions(screen, bg_image, btns, font, font_smaller, scroll_y):
         "HEADER:BLACKJACK",
         "Goal: Beat the dealer's score (max 21).",
         "Blackjack (Ace+10) pays 3:2.",
-        "Dealer stands on 17. No Dealer Peek.",
+        "Dealer hits Soft 17. No Dealer Peek.",
         "",
         "HEADER:ACTIONS & CONTROLS",
         "HIT (H): Take another card.",
@@ -79,7 +79,11 @@ def draw_instructions(screen, bg_image, btns, font, font_smaller, scroll_y):
         "DOUBLE (D): Double wager (1 card only).",
         "SPLIT (P): Split a pair into two hands.",
         "SURRENDER (U): Give up hand (get 50% back).",
-        "", 
+        "Bet: Click the BET box and type an amount.",
+        "Quick bet: 2x / 0.5x buttons.",
+        "Arrows adjust by 10.",
+        "DEAL button or SPACE starts the round.",
+        "",
         "HEADER:CRASH",
         "Multiplier starts at 1.00x and increases.",
         "Goal: Cash out before the crash occurs.",
@@ -87,8 +91,11 @@ def draw_instructions(screen, bg_image, btns, font, font_smaller, scroll_y):
         "Risk: Multiplier can crash at any time!",
         "",
         "HEADER:CRASH CONTROLS",
-        "SPACE: Place Bet / Cash Out.",
-        "ARROWS: Adjust bet amount (if available)."
+        "Click BET box to type your stake.",
+        "Use 2x / 0.5x buttons for quick changes.",
+        "Auto Cashout: type a multiplier",
+        "and toggle ON/OFF.",
+        "BET starts the round. CASH OUT during flight."
     ]
 
     # 3. OBSZAR WIDZENIA
@@ -114,7 +121,7 @@ def draw_instructions(screen, bg_image, btns, font, font_smaller, scroll_y):
     scrollbar_x = viewport_rect.right + 10
     scrollbar_h = viewport_rect.height
     
-    max_scroll = 480
+    max_scroll = 770
     
     # Tło paska
     pygame.draw.rect(screen, (60, 60, 60), (scrollbar_x, viewport_rect.y, 8, scrollbar_h), border_radius=4)
