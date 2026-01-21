@@ -91,7 +91,9 @@ def main():
                     if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                         if hasattr(game, 'can_exit') and game.can_exit():
                             app_state = "MENU"
-                            if game_curr == 'CRASH': sm.play_music()
+                            if game_curr == 'CRASH':
+                                sm.set_volume_music(sm.exit_volume_music)
+                                sm.play_music()
                             game = None
                     
                     if game: game.handle_input(event)
@@ -99,7 +101,9 @@ def main():
                 # Sprawdzanie czy gra sama poprosiła o wyjście
                 if game and game.exit_requested:
                     app_state = "MENU"
-                    if game_curr == "CRASH": sm.play_music()
+                    if game_curr == "CRASH": 
+                        sm.set_volume_music(sm.exit_volume_music)
+                        sm.play_music()
                     game = None
                 
                 if game: game.draw()
