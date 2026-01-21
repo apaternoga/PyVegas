@@ -103,7 +103,7 @@ class CrashGame:
         self.screen.blit(overlay, (rect.x, rect.y))
 
     def _handle_hover(self, key, hovered):
-        if hovered and not self.hover_states.get(key, False):
+        if hovered != self.hover_states.get(key, False):
             if self.sm:
                 self.sm.play_sound("hover")
         self.hover_states[key] = hovered
