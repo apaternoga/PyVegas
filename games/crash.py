@@ -198,7 +198,7 @@ class CrashGame:
         if self.sm:
             if (self.sm.volume_music == 0.0) or self.sm.muted:
                 self.exit_music_volume = 0.0
-            self.sm.set_volume_music(1.0, crash=True)
+            self.sm.set_volume_music(0.75, crash=True)
             self.sm.play_music("crash_climb_riser.mp3")
 
     def cash_out(self):
