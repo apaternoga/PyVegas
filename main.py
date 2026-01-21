@@ -14,6 +14,7 @@ from core.intro import IntroSequence
 from core.wallet import Wallet
 
 def main():
+    skip_intro = "--skip" in sys.argv or "--skip-intro" in sys.argv
     # --- NAPRAWA IKONKI NA PASKU ZADAŃ (WINDOWS) ---
     # Ta sekcja informuje Windows, że to jest oddzielna aplikacja, a nie skrypt Pythona.
     # Dzięki temu ikonka na pasku zadań nie będzie domyślnym logo Pythona.
@@ -50,8 +51,9 @@ def main():
     clock=pygame.time.Clock()
 
     #tu jest intro
-    intro = IntroSequence(screen, sm)
-    intro.run()
+    if not skip_intro:
+        intro = IntroSequence(screen, sm)
+        intro.run()
 
     menu = Menu(screen, sm, wallet=Wallet(STARTING_MONEY))
     game = None
