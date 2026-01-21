@@ -1182,10 +1182,19 @@ class BlackjackGame:
                     label_text = "Player"
 
                 value_text = str(current_hand_obj.value)
-                if current_hand_obj.aces > 0 and current_hand_obj.value <= 21:
-                    alt_value = current_hand_obj.value - 10
-                    if alt_value > 0:
-                        value_text = f"{alt_value}/{current_hand_obj.value}"
+                has_ace = any(card.rank == "Ace" for card in current_hand_obj.cards)
+                show_dual = (
+                    self.state == "player_turn"
+                    and i == self.current_hand_index
+                    and len(current_hand_obj.cards) == 2
+                )
+                if has_ace and show_dual:
+                    min_value = sum(values[c.rank] for c in current_hand_obj.cards if c.rank != "Ace") + sum(
+                        1 for c in current_hand_obj.cards if c.rank == "Ace"
+                    )
+                    soft_value = min_value + 10
+                    if soft_value <= 21:
+                        value_text = f"{min_value}/{soft_value}"
                 label_text += f": {value_text}"
 
                 # LOGIKA KOLORÓW DLA GRACZA

@@ -1,4 +1,4 @@
-import math
+﻿import math
 import os, pygame, sys
 from games import blackjack
 from core.settings import *
@@ -143,7 +143,7 @@ class Menu:
             scrollbar_x = (WIDTH - 200) + 100 + 10 # Pozycja X paska
             thumb_height = 60
             
-            max_scroll = 770
+            max_scroll = 480
 
             # 1. Obsługa kółka myszy (Scroll Wheel)
             if event.type == pygame.MOUSEWHEEL:
