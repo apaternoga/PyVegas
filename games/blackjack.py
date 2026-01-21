@@ -1255,6 +1255,7 @@ class BlackjackGame:
         # Rysowanie przyciskow
         # Rysowanie przyciskow
         if self.state == "betting":
+            self.btn_deal.text = "DEAL"
             self.btn_deal.draw(self.screen)
             
             # 1. Rysujemy same przyciski (tło + ramka)
@@ -1308,6 +1309,7 @@ class BlackjackGame:
                 self.btn_surrender.draw(self.screen)
 
         elif self.state == "game_over":
+            self.btn_deal.text = "NEXT ROUND"
             self.btn_deal.draw(self.screen)
             self.btn_exit.draw(self.screen)
 
