@@ -1191,6 +1191,22 @@ class BlackjackGame:
                 x_pos = start_x + (i * gap)
                 hand.draw(self.screen, x_pos, player_cards_y)
 
+            # Wskaznik aktywnej reki (po splicie) - strzalka w dol
+            if len(self.player_hands) > 1 and self.state == "player_turn":
+                start_x = 100
+                gap = 600
+                x_pos = start_x + (self.current_hand_index * gap)
+                arrow_x = x_pos + 50
+                arrow_y = player_cards_y - 45
+                arrow_w = 24
+                arrow_h = 16
+                points = [
+                    (arrow_x, arrow_y),
+                    (arrow_x - arrow_w // 2, arrow_y - arrow_h),
+                    (arrow_x + arrow_w // 2, arrow_y - arrow_h),
+                ]
+                pygame.draw.polygon(self.screen, GOLD, points)
+
             # RYSOWANIE NAPISÓW (z fadem, CIENIEM i KOLORAMI)
 
             # Definiujemy kolor dla "Bust"
@@ -1253,7 +1269,12 @@ class BlackjackGame:
                 else:
                     label_text = "Player"
 
-                label_text += f": {current_hand_obj.value}"
+                value_text = str(current_hand_obj.value)
+                if current_hand_obj.aces > 0 and current_hand_obj.value <= 21:
+                    alt_value = current_hand_obj.value - 10
+                    if alt_value > 0:
+                        value_text = f"{alt_value}/{current_hand_obj.value}"
+                label_text += f": {value_text}"
 
                 # LOGIKA KOLORÓW DLA GRACZA
                 current_text_color = WHITE

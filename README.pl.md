@@ -53,6 +53,7 @@ Zaawansowana symulacja Blackjacka kładąca nacisk na płynność rozgrywki, pro
 * **Pełen wachlarz akcji:** Hit, Stand, Double Down, Split oraz Surrender.
 * **Zaawansowany rendering:** Karty nie są statycznymi obrazkami – są **rysowane kodem** w czasie rzeczywistym (kształty, symbole, cienie), co pozwala na idealne skalowanie.
 * **Animacje:** Płynna interpolacja ruchu kart przy rozdawaniu.
+
 **Unikalne zasady (House Rules):**
 * ✅ **Brak ograniczeń po Splicie Asów:** Możliwość dobierania kart po rozdzieleniu asów.
 * ✅ **Blackjack po Splicie (3:2):** 21 punktów z dwóch kart po rozdzieleniu jest traktowane jako Blackjack.
@@ -138,7 +139,7 @@ Projekt zachowuje czystą strukturę plików, oddzielając logikę od zasobów:
 * **Filip Liskowski** - README, Blackjack tester.
 * **Miłosz Kiedrzyński** - Implementacja globalnych systemów (Wallet, Sound Manager), logiki wyglądu kart oraz interaktywnego menu z animacjami i obsługą assetów.
 * **Patryk Iżbicki** - Implementacja intro, współtworzenie menu, organizacja struktury UI (pliki screens i ui_elements), dodanie kluczowych assetow (w tym logo). 
-* **Borys Kaczka** - Logika, animacje, GUI i wykres Crasha
+* **Borys Kaczka** - Logika, animacje, GUI i wykres Crasha.
 
 ## 📚 Źródła i Licencja
 
