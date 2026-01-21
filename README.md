@@ -133,7 +133,7 @@ The project maintains a clean file structure by separating logic from assets:
 * **Adam Zalewski** - Crash Logic, Animations & UI, Project Coordination, Final Project Polish, Blackjack Tester
 * **Filip Liskowski** - README, Blackjack Tester
 * **Miłosz Kiedrzyński** - Implementation of global systems (Wallet, Sound Manager), card rendering logic, and an interactive menu with animations and asset management 
-* **Patryk Iżbicki** - 
+* **Patryk Iżbicki** - Intro implementation, menu co-development, UI structure organization (screens and ui_elements files), addition of key assets (including the logo).
 * **Borys Kaczka** - Crash logic, animations, UI, graph
 
 ## 📚 Credits & License

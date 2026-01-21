@@ -133,11 +133,11 @@ Projekt zachowuje czystą strukturę plików, oddzielając logikę od zasobów:
 
 ## 👥 Autorzy
 
-* **Adrian Paternoga** - **lider zespołu**, logika, animacje i GUI Blackjacka, zarządzanie całością projektu.
-* **Adam Zalewski** - Logika, animacje i GUI Crasha, koordynacja projektu, fianalne dopięcie projektu, tester Blackjacka
-* **Filip Liskowski** - README, Blackjack tester
-* **Miłosz Kiedrzyński** - Implementacja globalnych systemów (Wallet, Sound Manager), logiki wyglądu kart oraz interaktywnego menu z animacjami i obsługą assetów
-* **Patryk Iżbicki** - 
+* **Adrian Paternoga** - **Lider zespołu**, logika, animacje i GUI Blackjacka, zarządzanie całością projektu.
+* **Adam Zalewski** - Logika, animacje i GUI Crasha, koordynacja projektu, fianalne dopięcie projektu, tester Blackjacka.
+* **Filip Liskowski** - README, Blackjack tester.
+* **Miłosz Kiedrzyński** - Implementacja globalnych systemów (Wallet, Sound Manager), logiki wyglądu kart oraz interaktywnego menu z animacjami i obsługą assetów.
+* **Patryk Iżbicki** - Implementacja intro, współtworzenie menu, organizacja struktury UI (pliki screens i ui_elements), dodanie kluczowych assetow (w tym logo). 
 * **Borys Kaczka** - Logika, animacje, GUI i wykres Crasha
 
 ## 📚 Źródła i Licencja
