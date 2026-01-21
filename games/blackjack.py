@@ -141,9 +141,10 @@ class Card:
         size2 = 28 *sc//100
         size3 = 60 *sc//100
         
-        font_corner = pygame.font.SysFont("Arial", size1, bold=True)
-        font_pip = pygame.font.SysFont("Segoe UI Symbol", size2)  # Do małych symboli
-        font_face = pygame.font.SysFont("Times New Roman", size3)  # Do figur
+        # ZMIANA NA LINUXA: Używamy DejaVu Sans zamiast Arial/Segoe
+        font_corner = pygame.font.SysFont("DejaVu Sans", size1, bold=True)
+        font_pip = pygame.font.SysFont("DejaVu Sans", size2)  # Obsługuje symbole kart na Linuxie
+        font_face = pygame.font.SysFont("DejaVu Serif", size3)  # Odpowiednik Times New Roman
 
         # --- RYSOWANIE ROGÓW ---
 
