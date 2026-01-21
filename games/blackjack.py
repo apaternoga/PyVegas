@@ -419,12 +419,6 @@ class BlackjackGame:
 
         self.message = "Please place your bet (↑ / ↓), then press DEAL."
         self.current_bet = 10
-        self.bet_input_text = str(self.current_bet)
-        self.active_input = "BET"
-        self.hover_states = {
-            "bet_half": False,
-            "bet_double": False,
-        }
         self.insurance_bet = 0
         self.wait_timer = 0
 
@@ -527,27 +521,15 @@ class BlackjackGame:
             sm=self.sm,
         )  # Czerwony
 
-        # BET INPUT + QUICK BUTTONS (right side)
+        # PRZYCISKI STRZALEK DO ZMIANY STAWKI (jak w starej wersji)
         panel_y = SCREEN_HEIGHT - 100
-        input_w = 140
-        input_h = 44
-        btn_w = 60
-        btn_h = 20
-        gap = 8
-        right_margin = 20
+        center_y = panel_y + 50
+        btn_x = SCREEN_WIDTH - 160
 
-        bet_input_x = SCREEN_WIDTH - right_margin - (input_w + gap + btn_w)
-        bet_input_y = panel_y + 28
-
-        self.bet_input_rect = pygame.Rect(bet_input_x, bet_input_y, input_w, input_h)
-        self.btn_bet_double_rect = pygame.Rect(self.bet_input_rect.right + gap, bet_input_y, btn_w, btn_h)
-        self.btn_bet_half_rect = pygame.Rect(self.bet_input_rect.right + gap, bet_input_y + (input_h - btn_h), btn_w, btn_h)
-
-    def _parse_bet_text(self, text):
-        try:
-            return int(text)
-        except:
-            return 0
+        # Przycisk UP
+        self.btn_bet_up = Button(" ▲", btn_x, center_y - 32, 30, 30, color=WHITE, text_color=BLACK, sm=self.sm)
+        # Przycisk DOWN
+        self.btn_bet_down = Button(" ▼", btn_x, center_y + 2, 30, 30, color=WHITE, text_color=BLACK, sm=self.sm)
 
     def _set_bet(self, amount):
         min_bet = 10
@@ -557,26 +539,6 @@ class BlackjackGame:
         if max_bet >= min_bet:
             amount = min(amount, max_bet)
         self.current_bet = amount
-        self.bet_input_text = str(amount)
-
-    def _apply_bet_multiplier(self, factor):
-        base = self._parse_bet_text(self.bet_input_text)
-        if base <= 0:
-            base = self.current_bet if self.current_bet > 0 else 10
-        self._set_bet(int(base * factor))
-
-    def _handle_hover(self, key, hovered):
-        if hovered and not self.hover_states.get(key, False):
-            if self.sm:
-                self.sm.play_sound("hover")
-        self.hover_states[key] = hovered
-
-    def _draw_inner_glow(self, rect, color, alpha=70, radius=8):
-        overlay = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
-        overlay.fill((0, 0, 0, 0))
-        glow_color = (color[0], color[1], color[2], alpha)
-        pygame.draw.rect(overlay, glow_color, overlay.get_rect(), border_radius=radius)
-        self.screen.blit(overlay, (rect.x, rect.y))
 
 
     # NOWA FUNKCJA: obsluguje logike oparta na czasie (zamiast time.wait)
@@ -741,37 +703,26 @@ class BlackjackGame:
         # system obstawiania
         if self.state == "betting":
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                if self.bet_input_rect.collidepoint(event.pos):
-                    self.active_input = "BET"
-                else:
-                    self.active_input = None
-
-                if self.btn_bet_half_rect.collidepoint(event.pos):
-                    self._apply_bet_multiplier(0.5)
-                    self.sm.play_sound("chip_stack")
-                if self.btn_bet_double_rect.collidepoint(event.pos):
-                    self._apply_bet_multiplier(2.0)
-                    self.sm.play_sound("chip_stack")
+                if self.btn_bet_up.is_clicked(event):
+                    if self.wallet.balance >= self.current_bet + 10:
+                        self.current_bet += 10
+                        self.sm.play_sound("chip_stack")
+                if self.btn_bet_down.is_clicked(event):
+                    if self.current_bet > 10:
+                        self.current_bet -= 10
+                        self.sm.play_sound("chip_stack")
 
             if event.type == pygame.KEYDOWN:
-                if self.active_input == "BET":
-                    if event.key == pygame.K_BACKSPACE:
-                        self.bet_input_text = self.bet_input_text[:-1]
-                    elif event.unicode.isdigit():
-                        if len(self.bet_input_text) < 6:
-                            self.bet_input_text += event.unicode
-
                 if event.key == pygame.K_UP:
-                    self._set_bet(self.current_bet + 10)
-                    self.sm.play_sound("chip_stack")
+                    if self.wallet.balance >= self.current_bet + 10:
+                        self.current_bet += 10
+                        self.sm.play_sound("chip_stack")
                 elif event.key == pygame.K_DOWN:
-                    self._set_bet(self.current_bet - 10)
-                    self.sm.play_sound("chip_stack")
+                    if self.current_bet > 10:
+                        self.current_bet -= 10
+                        self.sm.play_sound("chip_stack")
 
                 if event.key == pygame.K_SPACE:
-                    bet_from_text = self._parse_bet_text(self.bet_input_text)
-                    if bet_from_text > 0:
-                        self.current_bet = bet_from_text
                     if self.current_bet < 10:
                         self.message = "Minimum bet is 10."
                     elif self.wallet.balance >= self.current_bet:
@@ -781,9 +732,6 @@ class BlackjackGame:
 
             # obsluga myszki dla przycisku rozdaj
             if self.btn_deal.is_clicked(event):
-                bet_from_text = self._parse_bet_text(self.bet_input_text)
-                if bet_from_text > 0:
-                    self.current_bet = bet_from_text
                 if self.current_bet < 10:
                     self.message = "Minimum bet is 10."
                 elif self.wallet.balance >= self.current_bet:
@@ -911,21 +859,6 @@ class BlackjackGame:
 
         # to odpowiada za "kliknij spacje zeby zaczac ponownie"
         elif self.state == "game_over":
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                if self.bet_input_rect.collidepoint(event.pos):
-                    self.reset_game()
-                    self.active_input = "BET"
-                    return
-                if self.btn_bet_double_rect.collidepoint(event.pos):
-                    self.reset_game()
-                    self._apply_bet_multiplier(2.0)
-                    self.sm.play_sound("chip_stack")
-                    return
-                if self.btn_bet_half_rect.collidepoint(event.pos):
-                    self.reset_game()
-                    self._apply_bet_multiplier(0.5)
-                    self.sm.play_sound("chip_stack")
-                    return
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 self.reset_game()
             if self.btn_deal.is_clicked(event):
@@ -1121,34 +1054,13 @@ class BlackjackGame:
         chips_rect = chips_text.get_rect(midleft=(20, panel_y + (panel_height // 2)))
         self.screen.blit(chips_text, chips_rect)
 
-        # 2. Wyswietlanie Stawki (input + quick buttons)
-        mouse_pos = pygame.mouse.get_pos()
-        bet_label = self.small_font.render("BET", True, GOLD)
-        self.screen.blit(bet_label, bet_label.get_rect(center=(self.bet_input_rect.centerx, self.bet_input_rect.y - 12)))
-
-        hover_double = self.btn_bet_double_rect.collidepoint(mouse_pos)
-        hover_half = self.btn_bet_half_rect.collidepoint(mouse_pos)
-        self._handle_hover("bet_double", hover_double)
-        self._handle_hover("bet_half", hover_half)
-
-        pygame.draw.rect(self.screen, WHITE, self.bet_input_rect, border_radius=8)
-        pygame.draw.rect(self.screen, GOLD, self.bet_input_rect, 2, border_radius=8)
-        bet_text = self.font.render(self.bet_input_text or "0", True, BLACK)
-        self.screen.blit(bet_text, bet_text.get_rect(center=self.bet_input_rect.center))
-
-        pygame.draw.rect(self.screen, WHITE, self.btn_bet_double_rect, border_radius=6)
-        pygame.draw.rect(self.screen, GOLD, self.btn_bet_double_rect, 2, border_radius=6)
-        pygame.draw.rect(self.screen, WHITE, self.btn_bet_half_rect, border_radius=6)
-        pygame.draw.rect(self.screen, GOLD, self.btn_bet_half_rect, 2, border_radius=6)
-        if hover_double:
-            self._draw_inner_glow(self.btn_bet_double_rect, GOLD, alpha=60, radius=6)
-        if hover_half:
-            self._draw_inner_glow(self.btn_bet_half_rect, GOLD, alpha=60, radius=6)
-
-        t_double = self.small_font.render("2x", True, BLACK)
-        t_half = self.small_font.render("0.5x", True, BLACK)
-        self.screen.blit(t_double, t_double.get_rect(center=self.btn_bet_double_rect.center))
-        self.screen.blit(t_half, t_half.get_rect(center=self.btn_bet_half_rect.center))
+        # 2. Wyswietlanie Stawki
+        bet_info = f"Bet: {self.current_bet}"
+        bet_text = self.font.render(bet_info, True, GOLD)
+        bet_rect = bet_text.get_rect(
+            midright=(SCREEN_WIDTH - 20, panel_y + (panel_height // 2))
+        )
+        self.screen.blit(bet_text, bet_rect)
 
         # 3. Wiadomosc glowna
 
@@ -1293,6 +1205,8 @@ class BlackjackGame:
         if self.state == "betting":
             self.btn_deal.text = "DEAL"
             self.btn_deal.draw(self.screen)
+            self.btn_bet_up.draw(self.screen)
+            self.btn_bet_down.draw(self.screen)
             
             # 1. Rysujemy same przyciski (tło + ramka)
             # Przycisk exit tylko w betting
