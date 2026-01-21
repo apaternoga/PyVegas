@@ -1,9 +1,9 @@
 import pygame
 import os
 import random
-from core.constants import WHITE, BLACK, GRAY, DARK_GRAY, WIDTH
-from core.settings import TABLE_COLOR
+from core.settings import WHITE, BLACK, GRAY, DARK_GRAY, SCREEN_WIDTH, TABLE_COLOR
 from games.blackjack import Card
+
 
 
 class Manager:
@@ -15,7 +15,7 @@ class Button:
         self.text = text
         # Automatyczne centrowanie w poziomie jeśli x == -1
         if x == -1:
-            x = (WIDTH - width) // 2
+            x = (SCREEN_WIDTH - width) // 2
         self.rect = pygame.Rect(x, y, width, height)
         self.text = text
         self.color = GRAY
@@ -210,7 +210,7 @@ class Slider:
     def __init__(self, x, y, width, initial_val):
         # Jeśli x == -1, suwak wyśrodkuje względem ekranu
         if x == -1:
-            x = (WIDTH - width) // 2
+            x = (SCREEN_WIDTH - width) // 2
         self.rect = pygame.Rect(x, y, width, 10)
         # Uchwyt centruje się na podstawie wartości początkowej
         self.handle_rect = pygame.Rect(x + (width * initial_val) - 10, y - 5, 20, 20)

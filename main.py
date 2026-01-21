@@ -40,12 +40,14 @@ def main():
     
     # --- TYTUŁ I IKONKA ---
     pygame.display.set_caption("PyVegas")
-    
-    icon_path = os.path.join("assets", "images", "pyvegas.png")
+
+    icon_path = os.path.join("assets", "images", "ikonka.png")
     if os.path.exists(icon_path):
-        icon = pygame.image.load(icon_path)
-    
+        icon = pygame.image.load(icon_path).convert_alpha()
+        icon = pygame.transform.smoothscale(icon, (64, 64))
         pygame.display.set_icon(icon)
+    else: 
+        print(f"Warning: Icon file not found at {icon_path}")
     
     #odpowiada za FPS
     clock=pygame.time.Clock()
@@ -91,7 +93,9 @@ def main():
                     if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                         if hasattr(game, 'can_exit') and game.can_exit():
                             app_state = "MENU"
-                            if game_curr == 'CRASH': sm.play_music()
+                            if game_curr == 'CRASH':
+                                sm.set_volume_music(sm.exit_volume_music)
+                                sm.play_music()
                             game = None
                     
                     if game: game.handle_input(event)
@@ -99,7 +103,9 @@ def main():
                 # Sprawdzanie czy gra sama poprosiła o wyjście
                 if game and game.exit_requested:
                     app_state = "MENU"
-                    if game_curr == "CRASH": sm.play_music()
+                    if game_curr == "CRASH": 
+                        sm.set_volume_music(sm.exit_volume_music)
+                        sm.play_music()
                     game = None
                 
                 if game: game.draw()

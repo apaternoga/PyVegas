@@ -1,9 +1,12 @@
 import math
 import os, pygame, sys
 from games import blackjack
-from core.constants import *
+from core.settings import *
 from core.ui_elements import Button, Button2, BlackjackIcon, CrashIcon, Slider 
 from core import screens
+
+WIDTH = SCREEN_WIDTH
+HEIGHT = SCREEN_HEIGHT
 
 class Menu:
     def __init__(self, screen, sound_manager, wallet):
@@ -250,9 +253,12 @@ class Menu:
         if self.state == "GRA" and self.active_game:
             self.active_game.draw()
             return
-
-        current_vol = getattr(self.sm, 'volume_music', 0.5)
-        is_muted = getattr(self.sm, 'muted', False)
+        if self.sm.muted:
+            current_vol = self.sm.previous_volume_music
+        else:
+            current_vol = self.sm.volume_music
+        is_muted = getattr(self.sm, 'muted', False) or (current_vol == 0.0)
+        
 
         if self.state == "MENU":
             screens.draw_menu(self.screen, self.bg_image, self.btns, self.font, self.logo, self.logo_scale, self.wallet.balance, self.pyzeton_img, self.pyzeton_rect)

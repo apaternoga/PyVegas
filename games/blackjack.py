@@ -141,9 +141,10 @@ class Card:
         size2 = 28 *sc//100
         size3 = 60 *sc//100
         
-        font_corner = pygame.font.SysFont("Arial", size1, bold=True)
-        font_pip = pygame.font.SysFont("Segoe UI Symbol", size2)  # Do małych symboli
-        font_face = pygame.font.SysFont("Times New Roman", size3)  # Do figur
+        # ZMIANA NA LINUXA: Używamy DejaVu Sans zamiast Arial/Segoe
+        font_corner = pygame.font.SysFont("DejaVu Sans", size1, bold=True)
+        font_pip = pygame.font.SysFont("DejaVu Sans", size2)  # Obsługuje symbole kart na Linuxie
+        font_face = pygame.font.SysFont("DejaVu Serif", size3)  # Odpowiednik Times New Roman
 
         # --- RYSOWANIE ROGÓW ---
 
@@ -167,9 +168,9 @@ class Card:
         # Pozycje
         if isinstance(rank_short, int):  # LICZBY 2-10
             # Pozycje X
-            col_L = 28
+            col_L = 31
             col_M = 50
-            col_R = 72
+            col_R = 69
 
             # Pozycje Y
             row_T = 35
@@ -238,15 +239,15 @@ class Card:
             elif rank_short == 10:
                 pips = [
                     (col_L, row_T),
-                    (col_L, row_MT + 3),
-                    (col_L, row_MB - 3),
+                    (col_L, row_MT + 6),
+                    (col_L, row_MB - 6),
                     (col_L, row_B),  # Lewa
                     (col_R, row_T),
-                    (col_R, row_MT + 3),
-                    (col_R, row_MB - 3),
+                    (col_R, row_MT + 6),
+                    (col_R, row_MB - 6),
                     (col_R, row_B),  # Prawa
-                    (col_M, 48),
-                    (col_M, 102),  # Dwa w środku
+                    (col_M, 50),
+                    (col_M, 100),  # Dwa w środku
                 ]
 
             # Rysowanie małych symboli
@@ -262,7 +263,7 @@ class Card:
         else:
             # FIGURY (J, Q, K, A)
             if rank_short == "A":
-                font_ace = pygame.font.SysFont("Segoe UI Symbol", 80*sc//100)
+                font_ace = pygame.font.SysFont("DejaVu Sans", 80*sc//100)
                 pip_surf = font_ace.render(suit_icon, True, color)
                 pip_rect = pip_surf.get_rect(center=(x + w//2, y + h//2))
                 screen.blit(pip_surf, pip_rect)
@@ -715,7 +716,7 @@ class BlackjackGame:
         # Sprawdzenie przycisku EXIT oraz klawisza ESC (tylko gdy można wyjść)
         if self.can_exit():
             # ZMIANA: Przycisk Exit działa tylko w fazie betting, ESC działa w betting i game_over
-            if self.state == "betting" and self.btn_exit.is_clicked(event):
+            if (self.state == "betting" or self.state == "game_over") and self.btn_exit.is_clicked(event):
                 self.exit_requested = True
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 self.exit_requested = True
@@ -1281,7 +1282,7 @@ class BlackjackGame:
 
         elif self.state == "game_over":
             self.btn_deal.draw(self.screen)
-            # Tu usunelismy przycisk EXIT, zgodnie z zyczeniem
+            self.btn_exit.draw(self.screen)
 
         if self.state == "insurance":
             self.draw_insurance_popup()

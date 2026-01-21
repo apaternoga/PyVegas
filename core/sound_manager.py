@@ -11,8 +11,9 @@ class SoundManager:
 
         self.volume = 0.5           # Domyślna głośność efektów (0.0 do 1.0)
         self.volume_music = 0.1     # Domyślna głośność muzyki (0.0 do 1.0)
+        self.exit_volume_music = 0.1  # Głośność muzyki przed wejściem do crasha
         self.muted = False          # Czy muzyka jest wyciszona (mute dla muzyki)
-        self.previous_volume_music = self.volume_music
+        self.previous_volume_music = 0.1
         self.last_music_played = "jazz_playlist.mp3"
     
     def load_common_sounds(self): #dzwieki uzywane czesto
@@ -64,14 +65,12 @@ class SoundManager:
         return loaded
     
     def _ensure_mixer(self):
-        """Ensure the pygame mixer is initialized. Returns True if mixer is ready."""
         if pygame.mixer.get_init():
             return True
         try:
             pygame.mixer.init()
             return True
         except Exception as e:
-            print(f"Warning: pygame.mixer not available: {e}")
             return False
 
     def load_sound(self, name, filename, base_path=None): #zaladuj dzwiek
@@ -96,7 +95,6 @@ class SoundManager:
 
     def play_sound(self, name): #odtworz dzwiek
         if not self._ensure_mixer():
-            # If mixer is not available, silently ignore to maintain UX
             print(f"Cannot play sound '{name}': mixer not initialized.")
             return
 
@@ -124,7 +122,7 @@ class SoundManager:
             return False
         try:
             pygame.mixer.music.load(path)
-            pygame.mixer.music.set_volume(0.0 if self.muted else self.volume_music)
+            pygame.mixer.music.set_volume(self.volume_music)
             if name != "crash_climb_riser.mp3":
                 self.last_music_played = name
             pygame.mixer.music.play(-1)  # Odtwarzaj w pętli
@@ -137,17 +135,21 @@ class SoundManager:
         self.volume = max(0.0, min(1.0, value))
         self._apply_sound_volume()
 
-    def set_volume_music(self, value): #ustaw glosnosc muzyki
+    def set_volume_music(self, value, crash=False): #ustaw glosnosc muzyki
         # Zabezpieczenie wartości między 0.0 a 1.0
         self.volume_music = max(0.0, min(1.0, value))
-        
+
+        if not crash:
+            self.exit_volume_music = self.volume_music
+        else:
+            if self.muted:
+                self.exit_volume_music = 0.0
         # Jeśli ruszasz suwakiem - zdjęcie wyciszenia 
-        if self.muted and self.volume_music > 0:
+        if self.muted and self.volume_music > 0 and not crash:
             self.muted = False
             
-        # Używamy volume_music (nie volume) do ustawienia głośności muzyki
         if self._ensure_mixer():
-            pygame.mixer.music.set_volume(0.0 if self.muted else self.volume_music)
+            pygame.mixer.music.set_volume(self.volume_music)
         else:
             print("Warning: mixer not initialized; cannot set music volume")
 
