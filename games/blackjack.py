@@ -1253,7 +1253,12 @@ class BlackjackGame:
                 else:
                     label_text = "Player"
 
-                label_text += f": {current_hand_obj.value}"
+                value_text = str(current_hand_obj.value)
+                if current_hand_obj.aces > 0 and current_hand_obj.value <= 21:
+                    alt_value = current_hand_obj.value - 10
+                    if alt_value > 0:
+                        value_text = f"{alt_value}/{current_hand_obj.value}"
+                label_text += f": {value_text}"
 
                 # LOGIKA KOLORÓW DLA GRACZA
                 current_text_color = WHITE
