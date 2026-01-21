@@ -1,7 +1,8 @@
 import os
 import pygame
-from core.constants import WHITE, BLACK, GRAY, WIDTH, HEIGHT
-
+from core.settings import WHITE, BLACK, GRAY, SCREEN_HEIGHT, SCREEN_WIDTH
+WIDTH = SCREEN_WIDTH
+HEIGHT = SCREEN_HEIGHT
 # --- GŁÓWNE MENU ---
 def draw_menu(screen, bg_image, btns, font, logo=None, logo_scale=1.0, wallet_balance=0, pyzeton_img=None, pyzeton_rect=None):
     if bg_image: screen.blit(bg_image, (0, 0))

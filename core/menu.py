@@ -1,9 +1,12 @@
 import math
 import os, pygame, sys
 from games import blackjack
-from core.constants import *
+from core.settings import *
 from core.ui_elements import Button, Button2, BlackjackIcon, CrashIcon, Slider 
 from core import screens
+
+WIDTH = SCREEN_WIDTH
+HEIGHT = SCREEN_HEIGHT
 
 class Menu:
     def __init__(self, screen, sound_manager, wallet):

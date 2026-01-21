@@ -95,7 +95,6 @@ class SoundManager:
 
     def play_sound(self, name): #odtworz dzwiek
         if not self._ensure_mixer():
-            # If mixer is not available, silently ignore to maintain UX
             print(f"Cannot play sound '{name}': mixer not initialized.")
             return
 
