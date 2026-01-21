@@ -40,12 +40,14 @@ def main():
     
     # --- TYTUŁ I IKONKA ---
     pygame.display.set_caption("PyVegas")
-    
-    icon_path = os.path.join("assets", "images", "pyvegas.png")
+
+    icon_path = os.path.join("assets", "images", "ikonka.png")
     if os.path.exists(icon_path):
-        icon = pygame.image.load(icon_path)
-    
+        icon = pygame.image.load(icon_path).convert_alpha()
+        icon = pygame.transform.smoothscale(icon, (64, 64))
         pygame.display.set_icon(icon)
+    else: 
+        print(f"Warning: Icon file not found at {icon_path}")
     
     #odpowiada za FPS
     clock=pygame.time.Clock()
