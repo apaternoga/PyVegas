@@ -911,6 +911,21 @@ class BlackjackGame:
 
         # to odpowiada za "kliknij spacje zeby zaczac ponownie"
         elif self.state == "game_over":
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if self.bet_input_rect.collidepoint(event.pos):
+                    self.reset_game()
+                    self.active_input = "BET"
+                    return
+                if self.btn_bet_double_rect.collidepoint(event.pos):
+                    self.reset_game()
+                    self._apply_bet_multiplier(2.0)
+                    self.sm.play_sound("chip_stack")
+                    return
+                if self.btn_bet_half_rect.collidepoint(event.pos):
+                    self.reset_game()
+                    self._apply_bet_multiplier(0.5)
+                    self.sm.play_sound("chip_stack")
+                    return
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 self.reset_game()
             if self.btn_deal.is_clicked(event):
