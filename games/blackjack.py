@@ -530,10 +530,11 @@ class BlackjackGame:
         
         btn_x = SCREEN_WIDTH - 160 # Pozycja przycisków
         
-        # Przycisk UP 
-        self.btn_bet_up = Button(" ▲", btn_x, center_y - 32, 30, 30, color=WHITE, text_color=BLACK, sm=self.sm)
-        # Przycisk DOWN 
-        self.btn_bet_down = Button(" ▼", btn_x, center_y + 2, 30, 30, color=WHITE, text_color=BLACK, sm=self.sm)
+# Przycisk UP - pusty tekst, my go dorysujemy
+        self.btn_bet_up = Button("", btn_x, center_y - 25, 24, 24, color=WHITE, text_color=BLACK, sm=self.sm)
+        
+        # Przycisk DOWN - pusty tekst
+        self.btn_bet_down = Button("", btn_x, center_y + 2, 24, 24, color=WHITE, text_color=BLACK, sm=self.sm)
 
 
     # NOWA FUNKCJA: obsluguje logike oparta na czasie (zamiast time.wait)
@@ -1173,11 +1174,25 @@ class BlackjackGame:
                 )
 
         # Rysowanie przyciskow
+        # Rysowanie przyciskow
         if self.state == "betting":
             self.btn_deal.draw(self.screen)
-            # Rysowanie nowych przyciskow zakladu
+            
+            # 1. Rysujemy same przyciski (tło + ramka)
             self.btn_bet_up.draw(self.screen)
             self.btn_bet_down.draw(self.screen)
+
+            # 2. Dorysowujemy "ręcznie" trójkąty na środku tych przycisków
+            # Trójkąt W GÓRĘ
+            cx, cy = self.btn_bet_up.rect.centerx, self.btn_bet_up.rect.centery
+            # Punkty: (Góra, Lewy-dół, Prawy-dół)
+            pygame.draw.polygon(self.screen, BLACK, [(cx, cy - 5), (cx - 5, cy + 3), (cx + 5, cy + 3)])
+
+            # Trójkąt W DÓŁ
+            cx, cy = self.btn_bet_down.rect.centerx, self.btn_bet_down.rect.centery
+            # Punkty: (Dół, Lewa-góra, Prawa-góra)
+            pygame.draw.polygon(self.screen, BLACK, [(cx, cy + 4), (cx - 5, cy - 4), (cx + 5, cy - 4)])
+
             # Przycisk exit tylko w betting
             self.btn_exit.draw(self.screen)
 
